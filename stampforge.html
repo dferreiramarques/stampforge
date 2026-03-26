@@ -1,0 +1,3902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StampForge — 3D Print Stamp Designer</title>
+<style>
+:root {
+  --bg:       #09090b;
+  --s1:       #111116;
+  --s2:       #18181f;
+  --s3:       #22222c;
+  --border:   #2c2c38;
+  --acc:      #f07020;
+  --acc2:     #ffaa44;
+  --acc-dim:  #7a3910;
+  --text:     #d0d0d8;
+  --dim:      #5a5a68;
+  --green:    #3ddc84;
+  --blue:     #4a9eff;
+  --canvas-bg:#f5f5f0;
+  --mono:     'JetBrains Mono', 'Cascadia Code', 'Fira Mono', 'Consolas', 'Liberation Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px}
+
+/* ─── HEADER ─────────────────────────────────────────────── */
+header{
+  height:56px;display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:var(--s1);border-bottom:1px solid var(--border);
+  position:relative;z-index:10;flex-shrink:0;
+}
+.logo{font-size:15px;font-weight:700;letter-spacing:2px;color:var(--text);white-space:nowrap}
+.logo em{color:var(--acc);font-style:normal}
+.sep{width:1px;height:26px;background:var(--border);flex-shrink:0}
+.hdr-right{display:flex;gap:8px;align-items:center}
+/* ── Vertical tool palette ── */
+#toolPalette{
+  position:absolute;left:8px;top:60px;
+  z-index:30;
+  background:var(--s2);border:1px solid var(--border);border-radius:6px;
+  padding:0 6px 6px;display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  user-select:none;
+}
+#palHandle{
+  grid-column:1/-1;display:flex;align-items:center;justify-content:center;
+  height:16px;cursor:grab;color:var(--border);font-size:10px;letter-spacing:3px;
+  margin:0 -6px;border-bottom:1px solid var(--border);margin-bottom:4px;
+  border-radius:6px 6px 0 0;
+  transition:color .15s, background .15s;
+}
+#palHandle:hover{color:var(--dim);background:rgba(255,255,255,.04)}
+#palHandle:active{cursor:grabbing}
+#toolPalette .pal-sep{
+  grid-column:1/-1;height:1px;background:var(--border);margin:2px 0;
+}
+.tool-btn{
+  width:42px;height:42px;border:1px solid var(--border);background:var(--s3);
+  color:var(--dim);border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:.15s;
+  font-size:18px;font-variant-emoji:text;
+  touch-action:manipulation;
+}
+.tool-btn:hover{border-color:var(--acc-dim);color:var(--acc);background:var(--s2)}
+.tool-btn.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.tool-btn.wide{grid-column:1/-1;width:100%}
+.hdr-right{display:flex;gap:8px;align-items:center;margin-left:auto}
+.color-pick-wrap{position:relative}
+.color-pick-wrap input[type=color]{
+  width:42px;height:42px;border:1px solid var(--border);border-radius:6px;
+  cursor:pointer;background:none;padding:2px;
+}
+.size-inp{
+  width:52px;height:42px;background:var(--s2);border:1px solid var(--border);
+  color:var(--text);border-radius:6px;text-align:center;padding:0 4px;font-family:var(--mono);font-size:14px;
+}
+label.tiny{color:var(--dim);font-size:11px;white-space:nowrap}
+
+
+/* Print quality selector */
+.quality-btns{display:flex;gap:4px;margin-bottom:6px}
+.quality-btn{
+  flex:1;height:38px;border:1px solid var(--border);background:var(--s3);
+  color:var(--dim);border-radius:6px;cursor:pointer;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;
+  transition:.15s;touch-action:manipulation;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+}
+.quality-btn:hover{border-color:var(--acc-dim);color:var(--acc)}
+.quality-btn.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.quality-btn span{font-size:8px;font-weight:400;opacity:.7}
+
+/* Brush preset buttons */
+.brush-preset{
+  width:42px;height:42px;border:1px solid var(--border);background:var(--s3);
+  color:var(--dim);border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;
+  transition:.15s;touch-action:manipulation;flex-direction:column;gap:1px;
+}
+.brush-preset:hover{border-color:var(--acc-dim);color:var(--acc);background:var(--s2)}
+.brush-preset.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.brush-dot{border-radius:50%;background:currentColor;flex-shrink:0;}
+
+.export-btn{
+  height:42px;padding:0 14px;background:var(--acc);color:#000;font-weight:700;
+  border:none;border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:12px;
+  letter-spacing:1px;transition:.15s;white-space:nowrap;
+  font-variant-emoji:text;touch-action:manipulation;
+}
+.export-btn:hover{background:var(--acc2)}
+.export-btn:disabled{background:var(--acc-dim);color:var(--dim);cursor:default}
+
+/* ─── MAIN LAYOUT ─────────────────────────────────────────── */
+main{display:flex;height:calc(100vh - 46px);overflow:hidden}
+
+/* ─── CANVAS AREA ─────────────────────────────────────────── */
+.canvas-wrap{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);position:relative;overflow:hidden;
+  padding-left:100px;
+}
+#projectTitle{
+  position:absolute;top:16px;left:88px;z-index:20;
+  font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:3px;
+  color:rgba(160,160,150,0.55);
+  background:none;border:none;outline:none;
+  cursor:text;padding:2px 4px;border-radius:3px;
+  transition:color .2s, background .2s;
+  min-width:60px;max-width:320px;
+  white-space:nowrap;overflow:hidden;
+}
+#projectTitle:hover{ color:rgba(200,200,190,0.75); }
+#projectTitle:focus{
+  color:var(--fg);background:rgba(255,255,255,0.06);
+  outline:1px solid var(--acc);
+}
+.canvas-frame{
+  position:relative;box-shadow:0 0 0 1px var(--border),0 4px 32px rgba(0,0,0,.6);
+}
+#drawCanvas{display:block;cursor:crosshair}
+#overlayCanvas{position:absolute;top:0;left:0;pointer-events:none;cursor:inherit}
+#svgBadge{position:absolute;top:8px;right:8px;background:rgba(255,140,0,.9);color:#000;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 7px;border-radius:3px;display:none;z-index:10;cursor:pointer;}#svgBadge.active{display:block}
+.canvas-label{
+  position:absolute;bottom:-22px;left:0;width:100%;text-align:center;
+  color:var(--dim);font-size:10px;letter-spacing:1px;
+}
+.zoom-info{
+  position:absolute;bottom:8px;left:8px;background:rgba(9,9,11,.7);
+  color:var(--dim);font-size:10px;padding:3px 7px;border-radius:3px;
+  pointer-events:none;
+}
+
+/* ─── RIGHT PANEL ─────────────────────────────────────────── */
+.panel{
+  width:240px;background:var(--s1);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.panel-section{border-bottom:1px solid var(--border);padding:12px}
+.section-title{
+  font-size:9px;font-weight:700;letter-spacing:2px;color:var(--dim);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.field{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.field label{color:var(--dim);font-size:11px}
+.field input[type=number],.field select{
+  width:72px;height:26px;background:var(--s3);border:1px solid var(--border);
+  color:var(--text);border-radius:3px;padding:0 6px;
+  font-family:var(--mono);font-size:11px;
+}
+.field input[type=number]:focus,.field select:focus{
+  outline:none;border-color:var(--acc);
+}
+.field input[type=checkbox]{accent-color:var(--acc);width:14px;height:14px}
+
+.info-box{
+  background:var(--s3);border-radius:4px;padding:8px;font-size:10px;
+  color:var(--dim);line-height:1.6;
+}
+.info-box span{color:var(--acc2)}
+
+/* ─── PREVIEW ─────────────────────────────────────────────── */
+.preview-wrap{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--s2);border-radius:4px;overflow:hidden;
+  min-height:120px;position:relative;
+}
+#previewCanvas{border-radius:4px}
+.preview-tag{
+  position:absolute;top:4px;left:4px;font-size:9px;color:var(--acc);
+  letter-spacing:1px;background:rgba(9,9,11,.7);padding:2px 5px;border-radius:2px;
+}
+
+/* ─── STATUS BAR ──────────────────────────────────────────── */
+#statusBar{
+  position:fixed;bottom:0;left:0;right:0;height:22px;
+  background:var(--s1);border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;padding:0 12px;font-size:10px;color:var(--dim);
+  z-index:20;
+}
+#statusBar span{color:var(--text)}
+.stat-item{display:flex;gap:4px;align-items:center}
+
+/* ─── TOAST ───────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--acc);color:#000;padding:8px 18px;border-radius:4px;
+  font-weight:700;font-size:12px;letter-spacing:1px;opacity:0;transition:.3s;pointer-events:none;
+  z-index:100;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── USB Print Modal ─────────────────────────────── */
+#printModal{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.75);align-items:center;justify-content:center;
+}
+#printModal.open{display:flex}
+#printBox{
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:24px;width:420px;max-width:95vw;
+  font-family:var(--mono);display:flex;flex-direction:column;gap:14px;
+}
+#printBox h2{margin:0;font-size:14px;letter-spacing:2px;color:var(--acc);font-weight:700}
+#printLog{
+  background:var(--bg);border:1px solid var(--border);border-radius:4px;
+  height:160px;overflow-y:auto;padding:8px;font-size:10px;color:var(--dim);
+  line-height:1.6;
+}
+#printLog .ok  {color:#4fc}
+#printLog .err {color:#f55}
+#printLog .inf {color:#fa0}
+#printProgress{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+#printProgressBar{height:100%;width:0%;background:var(--acc);transition:width .3s}
+.print-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.print-stat{font-size:11px;color:var(--dim)}
+.print-stat span{color:var(--fg);font-weight:700}
+#printConnectBtn,#printStartBtn,#printCancelBtn,#printCloseBtn,#printPurgeBtn{
+  flex:1;height:46px;border:none;border-radius:6px;cursor:pointer;
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:1px;
+  touch-action:manipulation;
+}
+#printConnectBtn{background:var(--acc);color:#000}
+#printStartBtn  {background:#4fc;color:#000}
+#printCancelBtn {background:#f55;color:#fff}
+#printCloseBtn  {background:var(--s3);color:var(--dim);border:1px solid var(--border)}
+#printConnectBtn:disabled,#printStartBtn:disabled{opacity:.4;cursor:default}
+
+input[type=file]{display:none}
+
+
+/* ── Floating stamp preview ─────────────────────── */
+#floatPreview{
+  position:absolute;bottom:28px;left:12px;z-index:15;
+  background:rgba(13,13,16,.82);border:1px solid var(--border);
+  border-radius:6px;padding:8px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  backdrop-filter:blur(4px);
+  transition:opacity .2s;
+}
+#floatPreview:hover{opacity:.3}
+#floatPreviewLabel{
+  font-family:var(--mono);font-size:8px;letter-spacing:2px;
+  color:var(--acc);font-weight:700;
+}
+#floatPreviewSub{
+  font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:1px;
+}
+#previewCanvas{border-radius:3px;display:block}
+
+
+/* ── OctoPrint Modal ─────────────────────────── */
+#octoModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);align-items:center;justify-content:center}
+#octoModal.open{display:flex}
+#octoBox{
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  padding:24px;width:440px;max-width:96vw;font-family:var(--mono);
+  display:flex;flex-direction:column;gap:14px;
+}
+#octoBox h2{margin:0;font-size:13px;letter-spacing:2px;color:#4fc;font-weight:700}
+.octo-row{display:flex;gap:8px;align-items:center}
+.octo-row label{font-size:11px;color:var(--dim);width:90px;flex-shrink:0}
+.octo-row input[type=text],.octo-row input[type=password]{
+  flex:1;height:30px;background:var(--bg);border:1px solid var(--border);
+  color:var(--fg);border-radius:4px;padding:0 8px;font-family:var(--mono);font-size:11px;
+}
+#octoStatus{font-size:11px;padding:6px 10px;border-radius:4px;background:var(--bg);border:1px solid var(--border);min-height:32px;line-height:1.6;color:var(--dim)}
+#octoStatus .ok {color:#4fc}
+#octoStatus .err{color:#f55}
+#octoStatus .inf{color:#f80}
+.octo-btns{display:flex;gap:8px}
+#octoTestBtn,#octoSendBtn,#octoCloseBtn{
+  flex:1;height:34px;border:none;border-radius:4px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;
+}
+#octoTestBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border)}
+#octoSendBtn{background:#4fc;color:#000}
+#octoCloseBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border)}
+#octoSendBtn:disabled{opacity:.4;cursor:default}
+
+/* ── SVG Import Modal ────────────────────────────── */
+#svgModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);align-items:center;justify-content:center}
+#svgModal.open{display:flex}
+#svgBox{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:24px;width:500px;max-width:96vw;font-family:var(--mono);display:flex;flex-direction:column;gap:14px}
+#svgBox h2{margin:0;font-size:13px;letter-spacing:2px;color:var(--acc);font-weight:700}
+#svgPreviewWrap{background:var(--bg);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;height:220px;overflow:hidden;position:relative}
+#svgPreviewWrap svg{max-width:100%;max-height:100%}
+.svg-controls{display:flex;flex-direction:column;gap:8px}
+.svg-row{display:flex;gap:8px;align-items:center}
+.svg-row label{font-size:11px;color:var(--dim);width:120px;flex-shrink:0}
+.svg-row input[type=range]{flex:1;accent-color:var(--acc)}
+.svg-row span{font-size:11px;color:var(--fg);width:48px;text-align:right}
+#svgConfirmBtn{background:var(--acc);color:#000;height:36px;border:none;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;flex:1}
+#svgCancelBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border);height:36px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;flex:1}
+
+/* ── Layer Preview Modal ─────────────────────────── */
+#layerModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);align-items:center;justify-content:center}
+#layerModal.open{display:flex}
+#layerBox{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:20px;width:580px;max-width:96vw;font-family:var(--mono);display:flex;flex-direction:column;gap:12px}
+#layerBox h2{margin:0;font-size:13px;letter-spacing:2px;color:#4fc;font-weight:700}
+#layerCanvas{background:var(--bg);border:1px solid var(--border);border-radius:4px;display:block;width:100%;max-height:380px}
+.layer-ctrl{display:flex;gap:10px;align-items:center}
+.layer-ctrl label{font-size:11px;color:var(--dim);white-space:nowrap}
+#layerSlider{flex:1;accent-color:#4fc}
+#layerNum{font-size:13px;color:#4fc;font-weight:700;width:80px;text-align:center}
+.layer-legend{display:flex;gap:14px;font-size:10px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+#layerCloseBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border);height:34px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px}
+.layer-stats{display:flex;gap:16px;font-size:10px;color:var(--dim)}
+.layer-stats span{color:var(--fg);font-weight:700}
+
+/* ── Credits footer ──────────────────────────────── */
+#creditsBar{
+  position:fixed;bottom:0;left:0;right:0;height:18px;
+  background:rgba(9,9,11,.92);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9px;color:rgba(120,120,110,.55);
+  letter-spacing:1px;z-index:10;pointer-events:none;
+}
+#creditsBar em{color:rgba(200,150,50,.6);font-style:normal}
+
+
+/* scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────── -->
+<header>
+  <div class="logo">STAMP<em>FORGE</em></div>
+  <div class="sep"></div>
+  <div class="hdr-right">
+    <label class="tiny">COLOR</label>
+    <input type="color" id="colorPick" value="#000000" oninput="updateColor()">
+    <label class="tiny">SIZE</label>
+    <input type="number" class="size-inp" id="brushSize" value="4" min="1" max="60" oninput="updateBrush()">
+    <button class="brush-preset" id="bp-fine"   onclick="setBrushPreset(2)"  title="Fine (2px)"><div class="brush-dot" style="width:3px;height:3px"></div>F</button>
+    <button class="brush-preset active" id="bp-medium" onclick="setBrushPreset(6)"  title="Medium (6px)"><div class="brush-dot" style="width:6px;height:6px"></div>M</button>
+    <button class="brush-preset" id="bp-thick"  onclick="setBrushPreset(16)" title="Thick (16px)"><div class="brush-dot" style="width:10px;height:10px"></div>G</button>
+  </div>
+  <div class="sep"></div>
+  <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="saveProject()" title="Save project">💾</button>
+  <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="loadProject()" title="Load project">📂</button>
+  <div class="sep"></div>
+  <button class="export-btn" style="background:var(--s3);color:var(--acc);border:1px solid var(--acc)" onclick="exportSVG()">SVG</button>
+  <button class="export-btn" id="stlBtn" onclick="exportSTL()">STL</button>
+  <button class="export-btn" id="layerPreviewBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openLayerPreview()">PREV</button>
+  <button class="export-btn" id="gcodeBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="exportGcode()">GCODE</button>
+  <div class="sep"></div>
+  <button class="export-btn" id="usbPrintBtn" style="background:var(--s3);color:#f80;border:1px solid #f80" onclick="openPrintModal()">USB</button>
+  <button class="export-btn" id="octoBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openOctoModal()">OCTOPRINT</button>
+</header>
+
+<!-- ─── MAIN ───────────────────────────────── -->
+<main>
+  <!-- Canvas -->
+  <div class="canvas-wrap" id="canvasWrap">
+    <!-- Vertical tool palette -->
+    <div id="toolPalette">
+      <div id="palHandle" title="Drag to move">· · ·</div>
+      <button class="tool-btn active" id="t-pencil"       onclick="setTool('pencil')"       title="Pencil [P]">✏</button>
+      <button class="tool-btn"        id="t-eraser"        onclick="setTool('eraser')"        title="Eraser [X]">⬜</button>
+      <button class="tool-btn"        id="t-line"          onclick="setTool('line')"          title="Line [L]">╱</button>
+      <button class="tool-btn"        id="t-fill"          onclick="setTool('fill')"          title="Fill [F]">◪</button>
+      <button class="tool-btn"        id="t-rect"          onclick="setTool('rect')"          title="Rect stroke [R]">▭</button>
+      <button class="tool-btn"        id="t-rect-fill"     onclick="setTool('rect-fill')"     title="Rect filled [⇧R]">▬</button>
+      <button class="tool-btn"        id="t-ellipse"       onclick="setTool('ellipse')"       title="Ellipse [E]">◯</button>
+      <button class="tool-btn"        id="t-ellipse-fill"  onclick="setTool('ellipse-fill')"  title="Ellipse filled [⇧E]">⬤</button>
+      <button class="tool-btn"        id="t-text"          onclick="setTool('text')"          title="Text [T]">A</button>
+      <div class="pal-sep"></div>
+      <button class="tool-btn" onclick="undoAction()"  title="Undo [Ctrl+Z]">↩</button>
+      <button class="tool-btn" onclick="redoAction()"  title="Redo [Ctrl+Y]">↪</button>
+      <button class="tool-btn" onclick="clearCanvas()" title="Clear canvas">✕</button>
+      <button class="tool-btn" onclick="importImage()" title="Import image">⬆</button>
+      <button class="tool-btn" onclick="importImage()" title="Import SVG / image" style="color:var(--acc);font-size:9px;font-weight:700">SVG</button>
+      <div class="pal-sep"></div>
+      <button class="tool-btn" id="sym-v" onclick="toggleSym('v')" title="Mirror left↔right">⇔</button>
+      <button class="tool-btn" id="sym-h" onclick="toggleSym('h')" title="Mirror top↔bottom">⇕</button>
+    </div>
+    <span id="projectTitle" contenteditable="true" spellcheck="false" title="Click to rename project">untitled</span>
+    <div class="canvas-frame" id="canvasFrame">
+      <canvas id="drawCanvas"></canvas>
+      <canvas id="overlayCanvas"></canvas>
+      <div class="canvas-label" id="canvasLabel">60 × 60 mm</div>
+      <div id="svgBadge" title="SVG vector active — click to clear" onclick="clearSvgSource()">⬆ SVG VECTOR</div>
+    </div>
+    <div class="zoom-info" id="zoomInfo">100%</div>
+
+    <!-- Floating stamp preview -->
+    <div id="floatPreview">
+      <div id="floatPreviewLabel">STAMP PREVIEW</div>
+      <canvas id="previewCanvas" width="160" height="160"></canvas>
+      <div id="floatPreviewSub">mirror · fabric sim</div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="panel">
+
+    <!-- Physical dimensions -->
+    <div class="panel-section">
+      <div class="section-title">🖨 Physical Size</div>
+      <div class="field"><label>Width (mm)</label><input type="number" id="physW" value="60" min="10" max="200" step="1" oninput="updateDimensions()"></div>
+      <div class="field"><label>Height (mm)</label><input type="number" id="physH" value="60" min="10" max="200" step="1" oninput="updateDimensions()"></div>
+      <div class="field"><label>Resolution</label><select id="canvasRes" onchange="updateDimensions()">
+        <option value="400">400px (fast)</option>
+        <option value="600" selected>600px (std)</option>
+        <option value="800">800px (fine)</option>
+        <option value="1024">1024px (hi)</option>
+      </select></div>
+    </div>
+
+    <!-- Print settings -->
+    <div class="panel-section">
+      <div class="section-title">⚙ Print Settings</div>
+      <div class="quality-btns">
+        <button class="quality-btn" id="q-draft"    onclick="setPrintQuality('draft')"   title="Fast print — solid surface, high speed">DRAFT<span>~8 min</span></button>
+        <button class="quality-btn active" id="q-standard" onclick="setPrintQuality('standard')" title="Balanced quality and speed">STD<span>~15 min</span></button>
+        <button class="quality-btn" id="q-fine"     onclick="setPrintQuality('fine')"    title="Full detail — slow, best for complex designs">FINE<span>~50 min</span></button>
+      </div>
+      <div class="field"><label>Layer Height (mm)</label><input type="number" id="layerH" value="0.20" min="0.05" max="0.5" step="0.01"></div>
+      <div class="field"><label>Nozzle Size (mm)</label><input type="number" id="nozzleD" value="0.40" min="0.2" max="1.2" step="0.05"></div>
+      <div class="field"><label>Base Thickness</label><input type="number" id="baseThick" value="1.2" min="0.4" max="5.0" step="0.2"></div>
+      <div class="field"><label>Design layers</label><input type="number" id="designLayers" value="2" min="1" max="3" step="1"></div>
+      <div class="field"><label>Mirror for stamp</label><input type="checkbox" id="mirrorX"></div>
+      <div class="field"><label>Include base plate</label><input type="checkbox" id="includeBase"></div>
+      <div class="field"><label>Perimeters</label><input type="number" id="numPerimeters" value="2" min="1" max="5" step="1" title="Number of perimeter shells"></div>
+      <div class="field"><label>Simplify (px)</label><input type="number" id="simplifyEps" value="0.8" min="0" max="5" step="0.1"></div>
+      <div class="field" style="flex-direction:column;gap:4px;align-items:stretch">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label>Curve smooth</label>
+          <span id="chaikinVal" style="color:var(--acc);font-family:var(--mono);font-size:11px;font-weight:700">3 passes</span>
+        </div>
+        <input type="range" id="chaikinPasses" value="3" min="0" max="8" step="1"
+          style="width:100%;accent-color:var(--acc);cursor:pointer"
+          oninput="document.getElementById('chaikinVal').textContent=this.value+' pass'+(this.value==1?'':'es')">
+      </div>
+    </div>
+
+    <!-- Printer profile -->
+    <div class="panel-section">
+      <div class="section-title">🖨 Printer Profile</div>
+      <div class="field" style="flex-direction:column;gap:4px;align-items:stretch">
+        <label>Printer</label>
+        <select id="printerSelect" onchange="onPrinterChange()"
+          style="background:var(--s2);color:var(--fg);border:1px solid var(--border);padding:5px 6px;font-family:var(--mono);font-size:11px;border-radius:3px;cursor:pointer">
+          <option value="prusa_mk3s">Prusa i3 MK3S/MK3S+</option>
+          <option value="prusa_mk4">Prusa MK4</option>
+          <option value="prusa_mini">Prusa MINI / MINI+</option>
+          <option value="ender3">Creality Ender-3 / Ender-3 V2</option>
+          <option value="ender3_s1">Creality Ender-3 S1 / S1 Pro</option>
+          <option value="cr10">Creality CR-10 / CR-10S</option>
+          <option value="cr10_v2">Creality CR-10 V2/V3</option>
+          <option value="bambu_p1p">Bambu Lab P1P / P1S</option>
+          <option value="bambu_x1">Bambu Lab X1 / X1C</option>
+          <option value="bambu_a1">Bambu Lab A1 / A1 Mini</option>
+          <option value="artillery_sw">Artillery Sidewinder X1/X2</option>
+          <option value="artillery_genius">Artillery Genius Pro</option>
+          <option value="voron24">Voron 2.4</option>
+          <option value="voron_trident">Voron Trident</option>
+          <option value="anycubic_kobra">Anycubic Kobra / Kobra 2</option>
+          <option value="elegoo_neptune">Elegoo Neptune 3 / 4</option>
+          <option value="longer_lk4">Longer LK4 Pro (Klipper)</option>
+          <option value="generic_reprap">Generic RepRap / Custom</option>
+        </select>
+      </div>
+      <div class="field"><label>Nozzle temp (°C)</label><input type="number" id="gcTempNozzle" value="215" min="150" max="320" step="1"></div>
+      <div class="field"><label>Bed temp (°C)</label><input type="number" id="gcTempBed" value="60" min="0" max="120" step="1"></div>
+      <div class="field"><label>Print speed (mm/s)</label><input type="number" id="gcSpeedPrint" value="50" min="5" max="300" step="5"></div>
+      <div class="field"><label>Travel speed (mm/s)</label><input type="number" id="gcSpeedTravel" value="150" min="50" max="600" step="10"></div>
+      <div class="field"><label>First layer (mm/s)</label><input type="number" id="gcSpeedFirst" value="20" min="5" max="100" step="5"></div>
+      <div class="field"><label>Retraction (mm)</label><input type="number" id="gcRetract" value="0.8" min="0" max="8" step="0.1"></div>
+      <div class="field"><label>Filament ⌀ (mm)</label><input type="number" id="gcFilDia" value="1.75" min="1.5" max="3.0" step="0.05"></div>
+    </div>
+    <!-- Stats -->
+    <div class="panel-section">
+      <div class="section-title">📐 Stamp Info</div>
+      <div class="info-box" id="stampInfo">
+        Design height: <span id="si-dh">0.40 mm</span><br>
+        Total height: <span id="si-th">1.60 mm</span><br>
+        Grid cells: <span id="si-gc">150 × 150</span><br>
+        Print time est: <span id="si-pt">~12 min</span>
+      </div>
+    </div>
+
+
+
+  </div><!-- /panel -->
+</main>
+
+<!-- Status bar -->
+<div id="statusBar">
+  <div class="stat-item">TOOL: <span id="st-tool">pencil</span></div>
+  <div class="stat-item">POS: <span id="st-pos">—</span></div>
+  <div class="stat-item">CANVAS: <span id="st-size">600×600</span></div>
+  <div class="stat-item">SCALE: <span id="st-scale">10px/mm</span></div>
+</div>
+
+<!-- Toast -->
+
+
+<!-- ── OctoPrint Modal ────────────────────────── -->
+<div id="octoModal">
+  <div id="octoBox">
+    <h2>◎ OCTOPRINT</h2>
+    <div class="octo-row">
+      <label>Host URL</label>
+      <input type="text" id="octoHost" value="http://octopi.local" placeholder="http://192.168.1.x or http://octopi.local">
+    </div>
+    <div class="octo-row">
+      <label>API Key</label>
+      <input type="password" id="octoKey" placeholder="Paste your OctoPrint API key">
+    </div>
+    <div id="octoStatus">Enter your OctoPrint host and API key, then test connection.</div>
+    <div class="octo-btns">
+      <button id="octoTestBtn" onclick="octoTest()">⚡ TEST CONNECTION</button>
+      <button id="octoSendBtn" onclick="octoSend()" disabled>▶ SLICE &amp; PRINT</button>
+    </div>
+    <button id="octoCloseBtn" onclick="document.getElementById('octoModal').classList.remove('open')">✕ CLOSE</button>
+    <div style="font-size:9px;color:var(--dim);line-height:1.6">
+      OctoPrint → Settings → Application Keys → generate key.<br>
+      The GCODE will be uploaded and print started automatically.
+    </div>
+  </div>
+</div>
+
+<!-- ── USB Print Modal ───────────────────────────── -->
+<div id="printModal">
+  <div id="printBox">
+    <h2>⚡ PRINT VIA USB — PRUSA MK3S</h2>
+    <div class="print-row">
+      <div class="print-stat">Status: <span id="pStat">disconnected</span></div>
+      <div class="print-stat">Port: <span id="pPort">—</span></div>
+    </div>
+    <div id="printProgress"><div id="printProgressBar"></div></div>
+    <div class="print-row">
+      <div class="print-stat">Line: <span id="pLine">0</span> / <span id="pTotal">0</span></div>
+      <div class="print-stat">ETA: <span id="pEta">—</span></div>
+    </div>
+    <div id="printLog"></div>
+    <div class="print-row" style="gap:8px">
+      <button id="printConnectBtn" onclick="usbConnect()">🔌 CONNECT USB</button>
+      <button id="printPurgeBtn"   onclick="usbPurge()" title="Close open port and try again" style="background:var(--s3);color:#f80;border:1px solid #f80">↺ PURGE</button>
+      <button id="printStartBtn"   onclick="usbStartPrint()" disabled>▶ PRINT</button>
+    </div>
+    <div class="print-row" style="gap:8px">
+      <button id="printCancelBtn"  onclick="usbCancel()" style="display:none">⏹ CANCEL</button>
+      <button id="printCloseBtn"   onclick="closePrintModal()">✕ CLOSE</button>
+    </div>
+    <div style="font-size:9px;color:var(--dim);line-height:1.5">
+      Requires Chrome or Edge. Printer must be connected via USB.<br>
+      Web Serial API — no drivers needed beyond the printer's USB stack.
+    </div>
+  </div>
+</div>
+
+<!-- ── SVG Import Modal ───────────────────────── -->
+<div id="svgModal">
+  <div id="svgBox">
+    <h2>⬆ IMPORT SVG</h2>
+    <div id="svgPreviewWrap"><span style="color:var(--dim);font-size:11px">no file loaded</span></div>
+    <div class="svg-controls">
+      <div class="svg-row">
+        <label>Scale</label>
+        <input type="range" id="svgScale" min="5" max="200" value="100" oninput="svgUpdatePreview()">
+        <span id="svgScaleVal">100%</span>
+      </div>
+      <div class="svg-row">
+        <label>Position X</label>
+        <input type="range" id="svgOffX" min="-100" max="100" value="0" oninput="svgUpdatePreview()">
+        <span id="svgOffXVal">0%</span>
+      </div>
+      <div class="svg-row">
+        <label>Position Y</label>
+        <input type="range" id="svgOffY" min="-100" max="100" value="0" oninput="svgUpdatePreview()">
+        <span id="svgOffYVal">0%</span>
+      </div>
+      <div class="svg-row">
+        <label>Invert colours</label>
+        <input type="checkbox" id="svgInvert" onchange="svgUpdatePreview()" style="accent-color:var(--acc)">
+      </div>
+    </div>
+    <div class="svg-row">
+      <button id="svgConfirmBtn" onclick="svgConfirm()">✓ PLACE ON CANVAS</button>
+      <button id="svgCancelBtn"  onclick="document.getElementById('svgModal').classList.remove('open')">✕ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Layer Preview Modal ───────────────────── -->
+<div id="layerModal">
+  <div id="layerBox">
+    <h2>◈ LAYER PREVIEW</h2>
+    <canvas id="layerCanvas" width="540" height="380"></canvas>
+    <div class="layer-ctrl">
+      <label>Layer</label>
+      <input type="range" id="layerSlider" min="1" value="1" oninput="layerDraw(+this.value)">
+      <span id="layerNum">1 / —</span>
+    </div>
+    <div class="layer-legend">
+      <div class="leg"><div class="leg-dot" style="background:#f80"></div>Perimeter</div>
+      <div class="leg"><div class="leg-dot" style="background:#4fc"></div>Infill</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,80,80,.4)"></div>Travel</div>
+      <div class="leg"><div class="leg-dot" style="background:#666"></div>Base</div>
+    </div>
+    <div class="layer-stats">
+      Total layers: <span id="lsTotalLayers">—</span>&nbsp;&nbsp;
+      Filament: <span id="lsFilament">—</span> mm&nbsp;&nbsp;
+      Est. time: <span id="lsTime">—</span>
+    </div>
+    <button id="layerCloseBtn" onclick="document.getElementById('layerModal').classList.remove('open')">✕ CLOSE</button>
+  </div>
+</div>
+<div id="creditsBar">Idealized &amp; developed by <em>vibe coding with claude.ai</em> &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais &nbsp;·&nbsp; CDI Portugal &nbsp;·&nbsp; Março 2026</div>
+<div id="toast">STL EXPORTED</div>
+
+<!-- Text input overlay (hidden) -->
+<input type="text" id="textInput" style="
+  position:fixed;opacity:0;pointer-events:none;font-family:'JetBrains Mono';font-size:16px;
+" placeholder="Type text + Enter">
+
+<!-- ─── SCRIPT ──────────────────────────────── -->
+<script>
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let tool = 'pencil';
+let color = '#000000';
+let brushSize = 4;
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let symH = false; // horizontal axis mirror (top ↔ bottom)
+let symV = false; // vertical axis mirror  (left ↔ right)
+let startX = 0, startY = 0;
+let savedImageData = null;  // for shape previewing
+let undoStack = [];
+let redoStack = [];
+const MAX_UNDO = 30;
+
+// Canvas
+const canvas = document.getElementById('drawCanvas');
+const overlay = document.getElementById('overlayCanvas');
+const ctx = canvas.getContext('2d');
+const octx = overlay.getContext('2d');
+
+// Settings
+function getProjectSlug() {
+  const el = document.getElementById('projectTitle');
+  const raw = (el ? el.textContent : 'stamp').trim();
+  return raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'stamp';
+}
+
+function getSettings() {
+  return {
+    physW:       parseFloat(document.getElementById('physW').value) || 60,
+    physH:       parseFloat(document.getElementById('physH').value) || 60,
+    layerH:      parseFloat(document.getElementById('layerH').value) || 0.2,
+    nozzle:      parseFloat(document.getElementById('nozzleD').value) || 0.4,
+    baseThick:   parseFloat(document.getElementById('baseThick').value) || 1.2,
+    designLayers:parseInt(document.getElementById('designLayers').value) || 2,
+    mirrorX:     document.getElementById('mirrorX').checked,
+    includeBase:  document.getElementById('includeBase').checked,
+    simplifyEps:  parseFloat(document.getElementById('simplifyEps').value) || 0.8,
+    numPerimeters: parseInt(document.getElementById('numPerimeters').value) || 2,
+    chaikinPasses: parseInt(document.getElementById('chaikinPasses').value) ?? 3,
+    resolution:  parseInt(document.getElementById('canvasRes').value) || 600,
+    gcTempNozzle: parseFloat(document.getElementById('gcTempNozzle').value) || 215,
+    gcTempBed:    parseFloat(document.getElementById('gcTempBed').value) || 60,
+    gcSpeedPrint: parseFloat(document.getElementById('gcSpeedPrint').value) || 50,
+    gcSpeedTravel:parseFloat(document.getElementById('gcSpeedTravel').value) || 150,
+    gcSpeedFirst: parseFloat(document.getElementById('gcSpeedFirst').value) || 20,
+    gcRetract:    parseFloat(document.getElementById('gcRetract').value) ?? 0.8,
+  };
+}
+
+// ══════════════════════════════════════════════════════
+//  CANVAS SETUP
+// ══════════════════════════════════════════════════════
+function initCanvas(size) {
+  canvas.width = size;
+  canvas.height = size;
+  overlay.width = size;
+  overlay.height = size;
+  ctx.fillStyle = '#f5f5f0';
+  ctx.fillRect(0, 0, size, size);
+  fitCanvas();
+  updateInfo();
+}
+
+function fitCanvas() {
+  const wrap = document.getElementById('canvasWrap');
+  const maxW = wrap.clientWidth - 40;
+  const maxH = wrap.clientHeight - 60;
+  const s = getSettings();
+  const aspect = s.physW / s.physH;
+  let dispW = Math.min(maxW, maxH * aspect);
+  let dispH = dispW / aspect;
+  if (dispH > maxH) { dispH = maxH; dispW = dispH * aspect; }
+  dispW = Math.round(dispW);
+  dispH = Math.round(dispH);
+  canvas.style.width  = dispW + 'px';
+  canvas.style.height = dispH + 'px';
+  overlay.style.width  = dispW + 'px';
+  overlay.style.height = dispH + 'px';
+  overlay.style.position = 'absolute';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  const frame = document.getElementById('canvasFrame');
+  frame.style.width  = dispW + 'px';
+  frame.style.height = dispH + 'px';
+  document.getElementById('zoomInfo').textContent =
+    Math.round(dispW / canvas.width * 100) + '%';
+  document.getElementById('st-size').textContent = `${canvas.width}×${canvas.height}`;
+  document.getElementById('canvasLabel').textContent =
+    `${s.physW} × ${s.physH} mm`;
+}
+
+function updateDimensions() {
+  const s = getSettings();
+  // resize canvas preserving content
+  const old = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const offscreen = document.createElement('canvas');
+  offscreen.width = canvas.width;
+  offscreen.height = canvas.height;
+  offscreen.getContext('2d').putImageData(old, 0, 0);
+  const newSize = s.resolution;
+  canvas.width = newSize;
+  canvas.height = newSize;
+  overlay.width = newSize;
+  overlay.height = newSize;
+  ctx.fillStyle = '#f5f5f0';
+  ctx.fillRect(0, 0, newSize, newSize);
+  ctx.drawImage(offscreen, 0, 0, newSize, newSize);
+  fitCanvas();
+  updateInfo();
+}
+
+function updateInfo() {
+  const s = getSettings();
+  const dh = (s.designLayers * s.layerH).toFixed(2);
+  const th = (s.baseThick + parseFloat(dh)).toFixed(2);
+  const gcX = Math.floor(s.physW / s.nozzle);
+  const gcY = Math.floor(s.physH / s.nozzle);
+  const pxMm = (canvas.width / s.physW).toFixed(1);
+  document.getElementById('si-dh').textContent = dh + ' mm';
+  document.getElementById('si-th').textContent = th + ' mm';
+  document.getElementById('si-gc').textContent = `${gcX} × ${gcY}`;
+  document.getElementById('si-pt').textContent = `~${Math.round(gcX*gcY*0.0003 + 8)} min`;
+  document.getElementById('st-scale').textContent = `${pxMm}px/mm`;
+}
+
+// ══════════════════════════════════════════════════════
+//  TOOLS
+// ══════════════════════════════════════════════════════
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.tool-btn[id^="t-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('t-'+t);
+  if (btn) btn.classList.add('active');
+  document.getElementById('st-tool').textContent = t;
+  canvas.style.cursor = t === 'eraser' ? 'cell' : t === 'fill' ? 'copy' : 'crosshair';
+}
+
+function updateColor() { color = document.getElementById('colorPick').value; }
+function updateBrush() {
+  brushSize = parseInt(document.getElementById('brushSize').value) || 4;
+  // Sync preset buttons
+  document.querySelectorAll('.brush-preset').forEach(b => b.classList.remove('active'));
+  if (brushSize <= 3)       { const b=document.getElementById('bp-fine');   if(b) b.classList.add('active'); }
+  else if (brushSize <= 10) { const b=document.getElementById('bp-medium'); if(b) b.classList.add('active'); }
+  else                      { const b=document.getElementById('bp-thick');  if(b) b.classList.add('active'); }
+}
+
+// Coordinate helpers
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / r.width;
+  const scaleY = canvas.height / r.height;
+  // Support mouse, touch, and pointer events
+  const src = e.touches && e.touches.length > 0
+    ? e.touches[0]
+    : e.changedTouches && e.changedTouches.length > 0
+      ? e.changedTouches[0]
+      : e;
+  return {
+    x: (src.clientX - r.left) * scaleX,
+    y: (src.clientY - r.top)  * scaleY
+  };
+}
+
+// ─── Drawing handlers ─────────────────────────────────
+// Events on the draw canvas — overlay has pointer-events:none so it must NOT receive events
+// Mouse events
+canvas.addEventListener('mousedown',  onDown);
+canvas.addEventListener('mousemove',  onMove);
+canvas.addEventListener('mouseup',    onUp);
+canvas.addEventListener('mouseleave', onUp);
+
+// Touch events — use changedTouches on end, prevent scroll/zoom
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  onDown(e);
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  onMove(e);
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  // touchend has empty e.touches — use changedTouches
+  if (e.changedTouches && e.changedTouches.length > 0) {
+    const fakeEvent = {
+      clientX: e.changedTouches[0].clientX,
+      clientY: e.changedTouches[0].clientY,
+      touches: e.changedTouches,
+    };
+    onUp(fakeEvent);
+  } else {
+    onUp(e);
+  }
+}, { passive: false });
+
+// Prevent long-press context menu on touch devices
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+// Single safe refresh — no recursion
+function refreshUI() { updatePreview(); updateInfo(); drawSymmetryGuides(); }
+
+// ─── Symmetry guide overlay ────────────────────────────
+function toggleSym(axis) {
+  if (axis === 'h') { symH = !symH; document.getElementById('sym-h').classList.toggle('active', symH); }
+  else              { symV = !symV; document.getElementById('sym-v').classList.toggle('active', symV); }
+  drawSymmetryGuides();
+}
+
+function drawSymmetryGuides() {
+  const W = overlay.width, H = overlay.height;
+  octx.clearRect(0, 0, W, H);
+  if (!symH && !symV) return;
+  octx.save();
+  octx.setLineDash([6, 4]);
+  octx.lineWidth = 1;
+  octx.strokeStyle = 'rgba(240,112,32,0.6)';
+  if (symV) { // vertical axis = left/right mirror = vertical line at centre
+    octx.beginPath(); octx.moveTo(W/2, 0); octx.lineTo(W/2, H); octx.stroke();
+  }
+  if (symH) { // horizontal axis = top/bottom mirror = horizontal line at centre
+    octx.beginPath(); octx.moveTo(0, H/2); octx.lineTo(W, H/2); octx.stroke();
+  }
+  octx.restore();
+}
+
+// Apply a stroke to ctx, plus mirrored copies if symmetry is on
+function strokeLine(x0, y0, x1, y1) {
+  const W = canvas.width, H = canvas.height;
+  applyStrokeStyle();
+  const draws = [[x0,y0,x1,y1]];
+  if (symV) draws.push([W-x0,y0, W-x1,y1]);
+  if (symH) draws.push([x0,H-y0, x1,H-y1]);
+  if (symV && symH) draws.push([W-x0,H-y0, W-x1,H-y1]);
+  for (const [ax,ay,bx,by] of draws) {
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+  }
+}
+
+function strokeShape(t, x0, y0, x1, y1) {
+  const W = canvas.width, H = canvas.height;
+  applyStrokeStyle();
+  const pairs = [[x0,y0,x1,y1]];
+  if (symV) pairs.push([W-x0,y0, W-x1,y1]);
+  if (symH) pairs.push([x0,H-y0, x1,H-y1]);
+  if (symV && symH) pairs.push([W-x0,H-y0, W-x1,H-y1]);
+  for (const [ax,ay,bx,by] of pairs) drawShape(ctx, t, ax, ay, bx, by);
+}
+
+function onDown(e) {
+  const p = getPos(e);
+  if (tool === 'fill') { floodFill(Math.round(p.x), Math.round(p.y), color); refreshUI(); return; }
+  if (tool === 'text') { placeText(p); return; }
+  pushUndo();
+  isDrawing = true;
+  startX = p.x; startY = p.y;
+  lastX = p.x; lastY = p.y;
+  savedImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  // Pencil: draw initial dot. Eraser: skip initial dot (prevents ghost point).
+  if (tool === 'pencil') {
+    strokeLine(p.x, p.y, p.x + 0.1, p.y);
+  }
+}
+
+function onMove(e) {
+  const p = getPos(e);
+  document.getElementById('st-pos').textContent =
+    `${Math.round(p.x)},${Math.round(p.y)}`;
+
+  if (!isDrawing) return;
+  if (tool === 'pencil' || tool === 'eraser') {
+    strokeLine(lastX, lastY, p.x, p.y);
+    lastX = p.x; lastY = p.y;
+    startX = p.x; startY = p.y;
+  } else {
+    // Shape preview — restore then draw all mirror copies
+    ctx.putImageData(savedImageData, 0, 0);
+    strokeShape(tool, startX, startY, p.x, p.y);
+  }
+}
+
+function onUp(e) {
+  if (!isDrawing) return;
+  isDrawing = false;
+  if (tool !== 'pencil' && tool !== 'eraser') {
+    const p = getPos(e);
+    if (savedImageData) ctx.putImageData(savedImageData, 0, 0);
+    strokeShape(tool, startX, startY, p.x, p.y);
+    savedImageData = null;
+  }
+  refreshUI();
+}
+
+function applyStrokeStyle() {
+  ctx.globalCompositeOperation = 'source-over';
+  if (tool === 'eraser') {
+    ctx.strokeStyle = '#f5f5f0';  // paint background color — transparent-safe
+    ctx.lineWidth = brushSize * 3;
+  } else {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = brushSize;
+  }
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+}
+
+function drawShape(c, t, x0, y0, x1, y1) {
+  c.lineCap = 'round';
+  if (t === 'line') {
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+  } else if (t === 'rect') {
+    c.beginPath(); c.strokeRect(x0, y0, x1-x0, y1-y0);
+  } else if (t === 'rect-fill') {
+    c.fillStyle = c.strokeStyle;
+    c.beginPath(); c.fillRect(Math.min(x0,x1), Math.min(y0,y1), Math.abs(x1-x0), Math.abs(y1-y0));
+  } else if (t === 'ellipse') {
+    const cx=(x0+x1)/2, cy=(y0+y1)/2, rx=Math.abs(x1-x0)/2, ry=Math.abs(y1-y0)/2;
+    c.beginPath(); c.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); c.stroke();
+  } else if (t === 'ellipse-fill') {
+    const cx=(x0+x1)/2, cy=(y0+y1)/2, rx=Math.abs(x1-x0)/2, ry=Math.abs(y1-y0)/2;
+    c.fillStyle = c.strokeStyle;
+    c.beginPath(); c.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); c.fill();
+  }
+}
+
+// ─── Flood fill ────────────────────────────────────────
+function floodFill(sx, sy, fillHex) {
+  pushUndo();
+  const imgd = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imgd.data;
+  const W = canvas.width, H = canvas.height;
+  const idx = (y,x) => (y*W+x)*4;
+  const i0 = idx(sy,sx);
+  const tr=[d[i0],d[i0+1],d[i0+2],d[i0+3]];
+  const fc = parseInt(fillHex.replace('#',''),16);
+  const fr=(fc>>16)&255, fg=(fc>>8)&255, fb=fc&255;
+  if(tr[0]===fr&&tr[1]===fg&&tr[2]===fb&&tr[3]===255) return;
+  const match=i=>(Math.abs(d[i]-tr[0])<15&&Math.abs(d[i+1]-tr[1])<15&&Math.abs(d[i+2]-tr[2])<15&&Math.abs(d[i+3]-tr[3])<15);
+  const stack=[[sx,sy]];
+  const visited=new Uint8Array(W*H);
+  while(stack.length){
+    const [x,y]=stack.pop();
+    if(x<0||x>=W||y<0||y>=H) continue;
+    const i=idx(y,x);
+    if(visited[y*W+x]||!match(i)) continue;
+    visited[y*W+x]=1;
+    d[i]=fr;d[i+1]=fg;d[i+2]=fb;d[i+3]=255;
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+  ctx.putImageData(imgd,0,0);
+}
+
+// ─── Text tool ─────────────────────────────────────────
+let textPos = null;
+function placeText(p) {
+  textPos = p;
+  const inp = document.getElementById('textInput');
+  inp.style.opacity = 1;
+  inp.style.pointerEvents = 'auto';
+  inp.style.left = p.x + 'px';
+  inp.style.top  = p.y + 'px';
+  inp.value = '';
+  inp.focus();
+}
+document.getElementById('textInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    commitText(e.target.value);
+    e.target.style.opacity = 0;
+    e.target.style.pointerEvents = 'none';
+    e.target.blur();
+  }
+  if (e.key === 'Escape') {
+    e.target.style.opacity = 0;
+    e.target.style.pointerEvents = 'none';
+  }
+});
+function commitText(txt) {
+  if (!txt || !textPos) return;
+  pushUndo();
+  ctx.font = `${brushSize * 4}px JetBrains Mono, monospace`;
+  ctx.fillStyle = color;
+  ctx.fillText(txt, textPos.x, textPos.y);
+  refreshUI();
+}
+
+// ─── Undo / Redo ───────────────────────────────────────
+function pushUndo() {
+  undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  redoStack = [];
+}
+function undoAction() {
+  if (!undoStack.length) return;
+  redoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  ctx.putImageData(undoStack.pop(), 0, 0);
+  refreshUI();
+}
+function redoAction() {
+  if (!redoStack.length) return;
+  undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  ctx.putImageData(redoStack.pop(), 0, 0);
+  refreshUI();
+}
+
+function clearCanvas() {
+  _svgActive = false; _svgSrc = null; _svgPlacement = null;
+  const badge=document.getElementById('svgBadge'); if(badge) badge.classList.remove('active');
+  pushUndo();
+  ctx.fillStyle = '#f5f5f0';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  refreshUI();
+}
+
+// ─── Import image ──────────────────────────────────────
+function importImage() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*,.svg,image/svg+xml';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        pushUndo();
+        ctx.fillStyle = '#f5f5f0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const w = img.width * scale, h = img.height * scale;
+        ctx.drawImage(img, (canvas.width-w)/2, (canvas.height-h)/2, w, h);
+        refreshUI();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+// ══════════════════════════════════════════════════════
+//  PREVIEW — simulated stamp impression
+// ══════════════════════════════════════════════════════
+function updatePreview() {
+  const prev = document.getElementById('previewCanvas');
+  const pctx = prev.getContext('2d');
+  const s = getSettings();
+
+  // Draw fabric-like texture
+  pctx.fillStyle = '#e8ddd0';
+  pctx.fillRect(0, 0, 200, 200);
+  // Fabric grain
+  for (let i = 0; i < 200; i += 3) {
+    pctx.strokeStyle = `rgba(0,0,0,${Math.random()*0.04})`;
+    pctx.beginPath(); pctx.moveTo(i, 0); pctx.lineTo(i, 200); pctx.stroke();
+    pctx.beginPath(); pctx.moveTo(0, i); pctx.lineTo(200, i); pctx.stroke();
+  }
+
+  // Get canvas image, mirror if needed, render as ink
+  const offscreen = document.createElement('canvas');
+  offscreen.width = 200; offscreen.height = 200;
+  const octx2 = offscreen.getContext('2d');
+  if (s.mirrorX) {
+    octx2.translate(200, 0);
+    octx2.scale(-1, 1);
+  }
+  octx2.drawImage(canvas, 0, 0, 200, 200);
+
+  // Apply ink effect
+  const id = octx2.getImageData(0, 0, 200, 200);
+  const d = id.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const bright = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114);
+    if (bright < 200 && d[i+3] > 100) {
+      // Ink-like: dark blue/black with slight variation
+      d[i]   = Math.max(0, d[i]   * 0.3 + Math.random()*10);
+      d[i+1] = Math.max(0, d[i+1] * 0.3 + Math.random()*10);
+      d[i+2] = Math.max(0, d[i+2] * 0.3 + 20 + Math.random()*15);
+      d[i+3] = 180 + Math.random() * 60;
+    } else {
+      d[i+3] = 0; // transparent = fabric shows through
+    }
+  }
+  octx2.putImageData(id, 0, 0);
+  pctx.drawImage(offscreen, 0, 0);
+}
+
+// ══════════════════════════════════════════════════════
+//  CURA PROFILE PARSER
+// ══════════════════════════════════════════════════════
+// loadCuraProfile removed — use Printer Profile panel
+function loadCuraProfile_REMOVED(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const text = e.target.result;
+    let settings = {};
+    // Try JSON first (Cura 4+ machine/quality profiles)
+    try {
+      const json = JSON.parse(text);
+      settings = parseCuraJSON(json);
+    } catch {
+      // Fall back to INI/CFG format
+      settings = parseCuraCFG(text);
+    }
+    applyCuraSettings(settings, file.name);
+  };
+  reader.readAsText(file);
+}
+
+function parseCuraJSON(json) {
+  const out = {};
+  const overrides = json.overrides || json.settings || {};
+  const extract = (obj) => {
+    for (const [k, v] of Object.entries(obj)) {
+      const val = v.default_value ?? v.value ?? v.resolved_value;
+      if (val !== undefined) {
+        if (k.includes('layer_height') && !k.includes('range') && !k.includes('min') && !k.includes('max'))
+          out.layerH = parseFloat(val);
+        if (k === 'machine_nozzle_size')
+          out.nozzle = parseFloat(val);
+        if (k === 'machine_width')
+          out.maxW = parseFloat(val);
+        if (k === 'machine_depth')
+          out.maxH = parseFloat(val);
+      }
+      // recurse into nested settings
+      if (typeof v === 'object' && v !== null && !Array.isArray(v) && v.children) {
+        extract(v.children);
+      }
+    }
+  };
+  extract(overrides);
+  // Also check metadata
+  if (json.metadata) {
+    if (json.metadata.quality_type) {} // could use this
+  }
+  return out;
+}
+
+function parseCuraCFG(text) {
+  const out = {};
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const m = line.match(/^\s*([a-zA-Z_]+)\s*=\s*(.+)$/);
+    if (!m) continue;
+    const [,k,v] = m;
+    const fv = parseFloat(v.trim());
+    if (k === 'layer_height' && !isNaN(fv))         out.layerH = fv;
+    if (k === 'machine_nozzle_size' && !isNaN(fv))  out.nozzle = fv;
+    if (k === 'machine_width' && !isNaN(fv))         out.maxW   = fv;
+    if (k === 'machine_depth' && !isNaN(fv))         out.maxH   = fv;
+    if (k === 'line_width' && !isNaN(fv))            out.nozzle = fv;
+  }
+  return out;
+}
+
+function applyCuraSettings(s, filename) {
+  let applied = [];
+  if (s.layerH) {
+    document.getElementById('layerH').value = s.layerH.toFixed(2);
+    applied.push(`layer_height=${s.layerH}`);
+  }
+  if (s.nozzle) {
+    document.getElementById('nozzleD').value = s.nozzle.toFixed(2);
+    applied.push(`nozzle=${s.nozzle}`);
+  }
+  updateInfo();
+  showToast(applied.length ? `PROFILE LOADED: ${applied.join(' | ')}` : 'NO SETTINGS FOUND');
+}
+
+// ── earcut 2.2.4 (inlined) ─────────────────────────────
+
+function earcut(data, holeIndices, dim = 2) {
+
+    const hasHoles = holeIndices && holeIndices.length;
+    const outerLen = hasHoles ? holeIndices[0] * dim : data.length;
+    let outerNode = linkedList(data, 0, outerLen, dim, true);
+    const triangles = [];
+
+    if (!outerNode || outerNode.next === outerNode.prev) return triangles;
+
+    let minX, minY, invSize;
+
+    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);
+
+    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
+    if (data.length > 80 * dim) {
+        minX = data[0];
+        minY = data[1];
+        let maxX = minX;
+        let maxY = minY;
+
+        for (let i = dim; i < outerLen; i += dim) {
+            const x = data[i];
+            const y = data[i + 1];
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+        }
+
+        // minX, minY and invSize are later used to transform coords into integers for z-order calculation
+        invSize = Math.max(maxX - minX, maxY - minY);
+        invSize = invSize !== 0 ? 32767 / invSize : 0;
+    }
+
+    earcutLinked(outerNode, triangles, dim, minX, minY, invSize, 0);
+
+    return triangles;
+}
+
+// create a circular doubly linked list from polygon points in the specified winding order
+function linkedList(data, start, end, dim, clockwise) {
+    let last;
+
+    if (clockwise === (earcutSignedArea(data, start, end, dim) > 0)) {
+        for (let i = start; i < end; i += dim) last = insertNode(i / dim | 0, data[i], data[i + 1], last);
+    } else {
+        for (let i = end - dim; i >= start; i -= dim) last = insertNode(i / dim | 0, data[i], data[i + 1], last);
+    }
+
+    if (last && equals(last, last.next)) {
+        removeNode(last);
+        last = last.next;
+    }
+
+    return last;
+}
+
+// eliminate colinear or duplicate points
+function filterPoints(start, end) {
+    if (!start) return start;
+    if (!end) end = start;
+
+    let p = start,
+        again;
+    do {
+        again = false;
+
+        if (!p.steiner && (equals(p, p.next) || area(p.prev, p, p.next) === 0)) {
+            removeNode(p);
+            p = end = p.prev;
+            if (p === p.next) break;
+            again = true;
+
+        } else {
+            p = p.next;
+        }
+    } while (again || p !== end);
+
+    return end;
+}
+
+// main ear slicing loop which triangulates a polygon (given as a linked list)
+function earcutLinked(ear, triangles, dim, minX, minY, invSize, pass) {
+    if (!ear) return;
+
+    // interlink polygon nodes in z-order
+    if (!pass && invSize) indexCurve(ear, minX, minY, invSize);
+
+    let stop = ear;
+
+    // iterate through ears, slicing them one by one
+    while (ear.prev !== ear.next) {
+        const prev = ear.prev;
+        const next = ear.next;
+
+        if (invSize ? isEarHashed(ear, minX, minY, invSize) : isEar(ear)) {
+            triangles.push(prev.i, ear.i, next.i); // cut off the triangle
+
+            removeNode(ear);
+
+            // skipping the next vertex leads to less sliver triangles
+            ear = next.next;
+            stop = next.next;
+
+            continue;
+        }
+
+        ear = next;
+
+        // if we looped through the whole remaining polygon and can't find any more ears
+        if (ear === stop) {
+            // try filtering points and slicing again
+            if (!pass) {
+                earcutLinked(filterPoints(ear), triangles, dim, minX, minY, invSize, 1);
+
+            // if this didn't work, try curing all small self-intersections locally
+            } else if (pass === 1) {
+                ear = cureLocalIntersections(filterPoints(ear), triangles);
+                earcutLinked(ear, triangles, dim, minX, minY, invSize, 2);
+
+            // as a last resort, try splitting the remaining polygon into two
+            } else if (pass === 2) {
+                splitEarcut(ear, triangles, dim, minX, minY, invSize);
+            }
+
+            break;
+        }
+    }
+}
+
+// check whether a polygon node forms a valid ear with adjacent nodes
+function isEar(ear) {
+    const a = ear.prev,
+        b = ear,
+        c = ear.next;
+
+    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
+
+    // now make sure we don't have other points inside the potential ear
+    const ax = a.x, bx = b.x, cx = c.x, ay = a.y, by = b.y, cy = c.y;
+
+    // triangle bbox
+    const x0 = Math.min(ax, bx, cx),
+        y0 = Math.min(ay, by, cy),
+        x1 = Math.max(ax, bx, cx),
+        y1 = Math.max(ay, by, cy);
+
+    let p = c.next;
+    while (p !== a) {
+        if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 &&
+            pointInTriangleExceptFirst(ax, ay, bx, by, cx, cy, p.x, p.y) &&
+            area(p.prev, p, p.next) >= 0) return false;
+        p = p.next;
+    }
+
+    return true;
+}
+
+function isEarHashed(ear, minX, minY, invSize) {
+    const a = ear.prev,
+        b = ear,
+        c = ear.next;
+
+    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
+
+    const ax = a.x, bx = b.x, cx = c.x, ay = a.y, by = b.y, cy = c.y;
+
+    // triangle bbox
+    const x0 = Math.min(ax, bx, cx),
+        y0 = Math.min(ay, by, cy),
+        x1 = Math.max(ax, bx, cx),
+        y1 = Math.max(ay, by, cy);
+
+    // z-order range for the current triangle bbox;
+    const minZ = zOrder(x0, y0, minX, minY, invSize),
+        maxZ = zOrder(x1, y1, minX, minY, invSize);
+
+    let p = ear.prevZ,
+        n = ear.nextZ;
+
+    // look for points inside the triangle in both directions
+    while (p && p.z >= minZ && n && n.z <= maxZ) {
+        if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c &&
+            pointInTriangleExceptFirst(ax, ay, bx, by, cx, cy, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
+        p = p.prevZ;
+
+        if (n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c &&
+            pointInTriangleExceptFirst(ax, ay, bx, by, cx, cy, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
+    }
+
+    // look for remaining points in decreasing z-order
+    while (p && p.z >= minZ) {
+        if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c &&
+            pointInTriangleExceptFirst(ax, ay, bx, by, cx, cy, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
+        p = p.prevZ;
+    }
+
+    // look for remaining points in increasing z-order
+    while (n && n.z <= maxZ) {
+        if (n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c &&
+            pointInTriangleExceptFirst(ax, ay, bx, by, cx, cy, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
+    }
+
+    return true;
+}
+
+// go through all polygon nodes and cure small local self-intersections
+function cureLocalIntersections(start, triangles) {
+    let p = start;
+    do {
+        const a = p.prev,
+            b = p.next.next;
+
+        if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
+
+            triangles.push(a.i, p.i, b.i);
+
+            // remove two nodes involved
+            removeNode(p);
+            removeNode(p.next);
+
+            p = start = b;
+        }
+        p = p.next;
+    } while (p !== start);
+
+    return filterPoints(p);
+}
+
+// try splitting polygon into two and triangulate them independently
+function splitEarcut(start, triangles, dim, minX, minY, invSize) {
+    // look for a valid diagonal that divides the polygon into two
+    let a = start;
+    do {
+        let b = a.next.next;
+        while (b !== a.prev) {
+            if (a.i !== b.i && isValidDiagonal(a, b)) {
+                // split the polygon in two by the diagonal
+                let c = splitPolygon(a, b);
+
+                // filter colinear points around the cuts
+                a = filterPoints(a, a.next);
+                c = filterPoints(c, c.next);
+
+                // run earcut on each half
+                earcutLinked(a, triangles, dim, minX, minY, invSize, 0);
+                earcutLinked(c, triangles, dim, minX, minY, invSize, 0);
+                return;
+            }
+            b = b.next;
+        }
+        a = a.next;
+    } while (a !== start);
+}
+
+// link every hole into the outer loop, producing a single-ring polygon without holes
+function eliminateHoles(data, holeIndices, outerNode, dim) {
+    const queue = [];
+
+    for (let i = 0, len = holeIndices.length; i < len; i++) {
+        const start = holeIndices[i] * dim;
+        const end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
+        const list = linkedList(data, start, end, dim, false);
+        if (list === list.next) list.steiner = true;
+        queue.push(getLeftmost(list));
+    }
+
+    queue.sort(compareXYSlope);
+
+    // process holes from left to right
+    for (let i = 0; i < queue.length; i++) {
+        outerNode = eliminateHole(queue[i], outerNode);
+    }
+
+    return outerNode;
+}
+
+function compareXYSlope(a, b) {
+    let result = a.x - b.x;
+    // when the left-most point of 2 holes meet at a vertex, sort the holes counterclockwise so that when we find
+    // the bridge to the outer shell is always the point that they meet at.
+    if (result === 0) {
+        result = a.y - b.y;
+        if (result === 0) {
+            const aSlope = (a.next.y - a.y) / (a.next.x - a.x);
+            const bSlope = (b.next.y - b.y) / (b.next.x - b.x);
+            result = aSlope - bSlope;
+        }
+    }
+    return result;
+}
+
+// find a bridge between vertices that connects hole with an outer ring and link it
+function eliminateHole(hole, outerNode) {
+    const bridge = findHoleBridge(hole, outerNode);
+    if (!bridge) {
+        return outerNode;
+    }
+
+    const bridgeReverse = splitPolygon(bridge, hole);
+
+    // filter collinear points around the cuts
+    filterPoints(bridgeReverse, bridgeReverse.next);
+    return filterPoints(bridge, bridge.next);
+}
+
+// David Eberly's algorithm for finding a bridge between hole and outer polygon
+function findHoleBridge(hole, outerNode) {
+    let p = outerNode;
+    const hx = hole.x;
+    const hy = hole.y;
+    let qx = -Infinity;
+    let m;
+
+    // find a segment intersected by a ray from the hole's leftmost point to the left;
+    // segment's endpoint with lesser x will be potential connection point
+    // unless they intersect at a vertex, then choose the vertex
+    if (equals(hole, p)) return p;
+    do {
+        if (equals(hole, p.next)) return p.next;
+        else if (hy <= p.y && hy >= p.next.y && p.next.y !== p.y) {
+            const x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
+            if (x <= hx && x > qx) {
+                qx = x;
+                m = p.x < p.next.x ? p : p.next;
+                if (x === hx) return m; // hole touches outer segment; pick leftmost endpoint
+            }
+        }
+        p = p.next;
+    } while (p !== outerNode);
+
+    if (!m) return null;
+
+    // look for points inside the triangle of hole point, segment intersection and endpoint;
+    // if there are no points found, we have a valid connection;
+    // otherwise choose the point of the minimum angle with the ray as connection point
+
+    const stop = m;
+    const mx = m.x;
+    const my = m.y;
+    let tanMin = Infinity;
+
+    p = m;
+
+    do {
+        if (hx >= p.x && p.x >= mx && hx !== p.x &&
+                pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {
+
+            const tan = Math.abs(hy - p.y) / (hx - p.x); // tangential
+
+            if (locallyInside(p, hole) &&
+                (tan < tanMin || (tan === tanMin && (p.x > m.x || (p.x === m.x && sectorContainsSector(m, p)))))) {
+                m = p;
+                tanMin = tan;
+            }
+        }
+
+        p = p.next;
+    } while (p !== stop);
+
+    return m;
+}
+
+// whether sector in vertex m contains sector in vertex p in the same coordinates
+function sectorContainsSector(m, p) {
+    return area(m.prev, m, p.prev) < 0 && area(p.next, m, m.next) < 0;
+}
+
+// interlink polygon nodes in z-order
+function indexCurve(start, minX, minY, invSize) {
+    let p = start;
+    do {
+        if (p.z === 0) p.z = zOrder(p.x, p.y, minX, minY, invSize);
+        p.prevZ = p.prev;
+        p.nextZ = p.next;
+        p = p.next;
+    } while (p !== start);
+
+    p.prevZ.nextZ = null;
+    p.prevZ = null;
+
+    sortLinked(p);
+}
+
+// Simon Tatham's linked list merge sort algorithm
+// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+function sortLinked(list) {
+    let numMerges;
+    let inSize = 1;
+
+    do {
+        let p = list;
+        let e;
+        list = null;
+        let tail = null;
+        numMerges = 0;
+
+        while (p) {
+            numMerges++;
+            let q = p;
+            let pSize = 0;
+            for (let i = 0; i < inSize; i++) {
+                pSize++;
+                q = q.nextZ;
+                if (!q) break;
+            }
+            let qSize = inSize;
+
+            while (pSize > 0 || (qSize > 0 && q)) {
+
+                if (pSize !== 0 && (qSize === 0 || !q || p.z <= q.z)) {
+                    e = p;
+                    p = p.nextZ;
+                    pSize--;
+                } else {
+                    e = q;
+                    q = q.nextZ;
+                    qSize--;
+                }
+
+                if (tail) tail.nextZ = e;
+                else list = e;
+
+                e.prevZ = tail;
+                tail = e;
+            }
+
+            p = q;
+        }
+
+        tail.nextZ = null;
+        inSize *= 2;
+
+    } while (numMerges > 1);
+
+    return list;
+}
+
+// z-order of a point given coords and inverse of the longer side of data bbox
+function zOrder(x, y, minX, minY, invSize) {
+    // coords are transformed into non-negative 15-bit integer range
+    x = (x - minX) * invSize | 0;
+    y = (y - minY) * invSize | 0;
+
+    x = (x | (x << 8)) & 0x00FF00FF;
+    x = (x | (x << 4)) & 0x0F0F0F0F;
+    x = (x | (x << 2)) & 0x33333333;
+    x = (x | (x << 1)) & 0x55555555;
+
+    y = (y | (y << 8)) & 0x00FF00FF;
+    y = (y | (y << 4)) & 0x0F0F0F0F;
+    y = (y | (y << 2)) & 0x33333333;
+    y = (y | (y << 1)) & 0x55555555;
+
+    return x | (y << 1);
+}
+
+// find the leftmost node of a polygon ring
+function getLeftmost(start) {
+    let p = start,
+        leftmost = start;
+    do {
+        if (p.x < leftmost.x || (p.x === leftmost.x && p.y < leftmost.y)) leftmost = p;
+        p = p.next;
+    } while (p !== start);
+
+    return leftmost;
+}
+
+// check if a point lies within a convex triangle
+function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
+    return (cx - px) * (ay - py) >= (ax - px) * (cy - py) &&
+           (ax - px) * (by - py) >= (bx - px) * (ay - py) &&
+           (bx - px) * (cy - py) >= (cx - px) * (by - py);
+}
+
+// check if a point lies within a convex triangle but false if its equal to the first point of the triangle
+function pointInTriangleExceptFirst(ax, ay, bx, by, cx, cy, px, py) {
+    return !(ax === px && ay === py) && pointInTriangle(ax, ay, bx, by, cx, cy, px, py);
+}
+
+// check if a diagonal between two polygon nodes is valid (lies in polygon interior)
+function isValidDiagonal(a, b) {
+    return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && // doesn't intersect other edges
+           (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && // locally visible
+            (area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
+            equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
+}
+
+// signed area of a triangle
+function area(p, q, r) {
+    return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+}
+
+// check if two points are equal
+function equals(p1, p2) {
+    return p1.x === p2.x && p1.y === p2.y;
+}
+
+// check if two segments intersect
+function intersects(p1, q1, p2, q2) {
+    const o1 = sign(area(p1, q1, p2));
+    const o2 = sign(area(p1, q1, q2));
+    const o3 = sign(area(p2, q2, p1));
+    const o4 = sign(area(p2, q2, q1));
+
+    if (o1 !== o2 && o3 !== o4) return true; // general case
+
+    if (o1 === 0 && onSegment(p1, p2, q1)) return true; // p1, q1 and p2 are collinear and p2 lies on p1q1
+    if (o2 === 0 && onSegment(p1, q2, q1)) return true; // p1, q1 and q2 are collinear and q2 lies on p1q1
+    if (o3 === 0 && onSegment(p2, p1, q2)) return true; // p2, q2 and p1 are collinear and p1 lies on p2q2
+    if (o4 === 0 && onSegment(p2, q1, q2)) return true; // p2, q2 and q1 are collinear and q1 lies on p2q2
+
+    return false;
+}
+
+// for collinear points p, q, r, check if point q lies on segment pr
+function onSegment(p, q, r) {
+    return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
+}
+
+function sign(num) {
+    return num > 0 ? 1 : num < 0 ? -1 : 0;
+}
+
+// check if a polygon diagonal intersects any polygon segments
+function intersectsPolygon(a, b) {
+    let p = a;
+    do {
+        if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
+                intersects(p, p.next, a, b)) return true;
+        p = p.next;
+    } while (p !== a);
+
+    return false;
+}
+
+// check if a polygon diagonal is locally inside the polygon
+function locallyInside(a, b) {
+    return area(a.prev, a, a.next) < 0 ?
+        area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 :
+        area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;
+}
+
+// check if the middle point of a polygon diagonal is inside the polygon
+function middleInside(a, b) {
+    let p = a;
+    let inside = false;
+    const px = (a.x + b.x) / 2;
+    const py = (a.y + b.y) / 2;
+    do {
+        if (((p.y > py) !== (p.next.y > py)) && p.next.y !== p.y &&
+                (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x))
+            inside = !inside;
+        p = p.next;
+    } while (p !== a);
+
+    return inside;
+}
+
+// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;
+// if one belongs to the outer ring and another to a hole, it merges it into a single ring
+function splitPolygon(a, b) {
+    const a2 = createNode(a.i, a.x, a.y),
+        b2 = createNode(b.i, b.x, b.y),
+        an = a.next,
+        bp = b.prev;
+
+    a.next = b;
+    b.prev = a;
+
+    a2.next = an;
+    an.prev = a2;
+
+    b2.next = a2;
+    a2.prev = b2;
+
+    bp.next = b2;
+    b2.prev = bp;
+
+    return b2;
+}
+
+// create a node and optionally link it with previous one (in a circular doubly linked list)
+function insertNode(i, x, y, last) {
+    const p = createNode(i, x, y);
+
+    if (!last) {
+        p.prev = p;
+        p.next = p;
+
+    } else {
+        p.next = last.next;
+        p.prev = last;
+        last.next.prev = p;
+        last.next = p;
+    }
+    return p;
+}
+
+function removeNode(p) {
+    p.next.prev = p.prev;
+    p.prev.next = p.next;
+
+    if (p.prevZ) p.prevZ.nextZ = p.nextZ;
+    if (p.nextZ) p.nextZ.prevZ = p.prevZ;
+}
+
+function createNode(i, x, y) {
+    return {
+        i, // vertex index in coordinates array
+        x, y, // vertex coordinates
+        prev: null, // previous and next vertex nodes in a polygon ring
+        next: null,
+        z: 0, // z-order curve value
+        prevZ: null, // previous and next nodes in z-order
+        nextZ: null,
+        steiner: false // indicates whether this is a steiner point
+    };
+}
+
+// return a percentage difference between the polygon area and its triangulation area;
+// used to verify correctness of triangulation
+function earcutDeviation(data, holeIndices, dim, triangles) {
+    const hasHoles = holeIndices && holeIndices.length;
+    const outerLen = hasHoles ? holeIndices[0] * dim : data.length;
+
+    let polygonArea = Math.abs(earcutSignedArea(data, 0, outerLen, dim));
+    if (hasHoles) {
+        for (let i = 0, len = holeIndices.length; i < len; i++) {
+            const start = holeIndices[i] * dim;
+            const end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
+            polygonArea -= Math.abs(earcutSignedArea(data, start, end, dim));
+        }
+    }
+
+    let trianglesArea = 0;
+    for (let i = 0; i < triangles.length; i += 3) {
+        const a = triangles[i] * dim;
+        const b = triangles[i + 1] * dim;
+        const c = triangles[i + 2] * dim;
+        trianglesArea += Math.abs(
+            (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -
+            (data[a] - data[b]) * (data[c + 1] - data[a + 1]));
+    }
+
+    return polygonArea === 0 && trianglesArea === 0 ? 0 :
+        Math.abs((trianglesArea - polygonArea) / polygonArea);
+}
+
+function earcutSignedArea(data, start, end, dim) {
+    let sum = 0;
+    for (let i = start, j = end - dim; i < end; i += dim) {
+        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+        j = i;
+    }
+    return sum;
+}
+
+// turn a polygon in a multi-dimensional array form (e.g. as in GeoJSON) into a form Earcut accepts
+function earcutFlatten(data) {
+    const vertices = [];
+    const holes = [];
+    const dimensions = data[0][0].length;
+    let holeIndex = 0;
+    let prevLen = 0;
+
+    for (const ring of data) {
+        for (const p of ring) {
+            for (let d = 0; d < dimensions; d++) vertices.push(p[d]);
+        }
+        if (prevLen) {
+            holeIndex += prevLen;
+            holes.push(holeIndex);
+        }
+        prevLen = ring.length;
+    }
+    return {vertices, holes, dimensions};
+}
+
+// ══════════════════════════════════════════════════════
+//  VECTOR STL ENGINE  v4
+//  Pipeline:
+//    1. bitmap → binary mask
+//    2. boundary edge tracing → raw pixel contours
+//    3. Douglas-Peucker simplification
+//    4. Chaikin smoothing (3 passes) → smooth curves
+//    5. classify outer/hole by signed area
+//    6. earcut triangulation (handles holes correctly)
+//    7. extrude: side walls + top/bottom share exact vertices → watertight
+// ══════════════════════════════════════════════════════
+
+// ─── 1. Binary mask ───────────────────────────────────
+
+// ══════════════════════════════════════════════════════
+//  HIGH-RES SVG MASK + UNIFIED CONTOUR BUILDER
+// ══════════════════════════════════════════════════════
+function getSVGMask(s, scale) {
+  return new Promise(resolve => {
+    const W0 = s.resolution || 600;
+    const SC = scale || 4;
+    const W = W0 * SC, H = W;
+    const blob = new Blob([_svgSrc], {type:'image/svg+xml'});
+    const url  = URL.createObjectURL(blob);
+    const img  = new Image();
+    img.onload = () => {
+      const off = document.createElement('canvas');
+      off.width = W; off.height = H;
+      const octx = off.getContext('2d');
+      octx.fillStyle = '#ffffff';
+      octx.fillRect(0,0,W,H);
+      const svgAR = img.naturalWidth / img.naturalHeight;
+      // Apply placement params if available, else center
+      const pl = _svgPlacement || { scale:1, offXPct:0, offYPct:0, invert:false };
+      const fitW = Math.min(W * pl.scale, H * pl.scale * svgAR);
+      const fitH = fitW / svgAR;
+      const cx = W/2 + pl.offXPct * W;
+      const cy = H/2 + pl.offYPct * H;
+      if (s.mirrorX) { octx.save(); octx.translate(W,0); octx.scale(-1,1); }
+      // If inverted: fill black, erase with SVG shape
+      if (pl.invert) {
+        octx.fillStyle = '#000000';
+        octx.fillRect(0,0,W,H);
+        octx.globalCompositeOperation = 'destination-out';
+        octx.drawImage(img, cx-fitW/2, cy-fitH/2, fitW, fitH);
+        octx.globalCompositeOperation = 'source-over';
+        // Now dark pixels = where SVG was white = background → threshold inverted
+      } else {
+        octx.drawImage(img, cx-fitW/2, cy-fitH/2, fitW, fitH);
+      }
+      if (s.mirrorX) octx.restore();
+      URL.revokeObjectURL(url);
+      const d = octx.getImageData(0,0,W,H).data;
+      const raw = new Uint8Array(W*H);
+      for (let i=0;i<W*H;i++)
+        raw[i] = (d[i*4]*0.299+d[i*4+1]*0.587+d[i*4+2]*0.114) < 200 ? 1 : 0;
+      // Morphological closing at scaled radius
+      const R = SC;
+      const tmp = new Uint8Array(W*H);
+      for (let y=0;y<H;y++) for (let x=0;x<W;x++) {
+        if (raw[y*W+x]) { tmp[y*W+x]=1; continue; }
+        let hit=false;
+        for (let dy=-R;dy<=R&&!hit;dy++) for (let dx=-R;dx<=R&&!hit;dx++) {
+          const nx=x+dx,ny=y+dy;
+          if(nx>=0&&nx<W&&ny>=0&&ny<H&&raw[ny*W+nx]) hit=true;
+        }
+        tmp[y*W+x]=hit?1:0;
+      }
+      const mask = new Uint8Array(W*H);
+      for (let y=0;y<H;y++) for (let x=0;x<W;x++) {
+        if (!tmp[y*W+x]) { mask[y*W+x]=0; continue; }
+        let solid=true;
+        for (let dy=-R;dy<=R&&solid;dy++) for (let dx=-R;dx<=R&&solid;dx++) {
+          const nx=x+dx,ny=y+dy;
+          if(nx>=0&&nx<W&&ny>=0&&ny<H&&!tmp[ny*W+nx]) solid=false;
+        }
+        mask[y*W+x]=solid?1:0;
+      }
+      resolve({mask,W,H,scale:SC});
+    };
+    img.onerror = () => {
+      // fallback to normal mask
+      resolve({...getBinaryMask(s), scale:1});
+    };
+    img.src = url;
+  });
+}
+
+async function buildContours(s) {
+  let mask, W, H, scale=1;
+  if (_svgActive && _svgSrc) {
+    ({mask,W,H,scale} = await getSVGMask(s, 4));
+  } else {
+    ({mask,W,H} = getBinaryMask(s));
+  }
+  const raw = extractContours(mask, W, H);
+  // Scale epsilon proportionally to raster scale
+  const eps = (s.simplifyEps || 0.8) * scale;
+  return raw
+    .map(c => {
+      const simp = dpSimplify(c, eps);
+      if (simp.length < 3) return null;
+      const sm = s.smoothMode === 'bezier'
+        ? bezierFitAndTessellate(simp, s.bezierTol ?? 1.5, s.bezierTess ?? 12)
+        : chaikin(simp, s.chaikinPasses ?? 3);
+      return scaleContour(sm, W, H, s.physW, s.physH);
+    })
+    .filter(Boolean);
+}
+
+function getBinaryMask(s) {
+  const W = canvas.width, H = canvas.height;
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const octx = off.getContext('2d');
+  octx.fillStyle = '#ffffff';
+  octx.fillRect(0, 0, W, H);
+  if (s.mirrorX) { octx.translate(W, 0); octx.scale(-1, 1); }
+  octx.drawImage(canvas, 0, 0);
+  const d = octx.getImageData(0, 0, W, H).data;
+
+  // Slightly lower threshold to catch antialiased stroke edges
+  const raw = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++)
+    raw[i] = (d[i*4]*0.299 + d[i*4+1]*0.587 + d[i*4+2]*0.114) < 220 ? 1 : 0;
+
+  // Morphological closing (dilate R px then erode R px)
+  // Fills 1-2px antialiasing gaps between overlapping strokes
+  const R = 2;
+  const tmp = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (raw[y*W+x]) { tmp[y*W+x] = 1; continue; }
+      let hit = false;
+      for (let dy = -R; dy <= R && !hit; dy++)
+        for (let dx = -R; dx <= R && !hit; dx++) {
+          const nx = x+dx, ny = y+dy;
+          if (nx>=0 && nx<W && ny>=0 && ny<H && raw[ny*W+nx]) hit = true;
+        }
+      tmp[y*W+x] = hit ? 1 : 0;
+    }
+  }
+  const mask = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (!tmp[y*W+x]) { mask[y*W+x] = 0; continue; }
+      let solid = true;
+      for (let dy = -R; dy <= R && solid; dy++)
+        for (let dx = -R; dx <= R && solid; dx++) {
+          const nx = x+dx, ny = y+dy;
+          if (nx>=0 && nx<W && ny>=0 && ny<H && !tmp[ny*W+nx]) solid = false;
+        }
+      mask[y*W+x] = solid ? 1 : 0;
+    }
+  }
+
+  return { mask, W, H };
+}
+
+// ─── 2. Boundary edge tracing ─────────────────────────
+function extractContours(mask, W, H) {
+  const get = (x, y) => (x>=0&&y>=0&&x<W&&y<H) ? mask[y*W+x] : 0;
+  const edgeMap = new Map();
+  const add = (x1,y1,x2,y2) => edgeMap.set(`${x1},${y1}|${x2},${y2}`,[x1,y1,x2,y2]);
+  for (let py=0;py<H;py++) for (let px=0;px<W;px++) {
+    if (!get(px,py)) continue;
+    if (!get(px,py-1))   add(px,py,     px+1,py);
+    if (!get(px+1,py))   add(px+1,py,   px+1,py+1);
+    if (!get(px,py+1))   add(px+1,py+1, px,py+1);
+    if (!get(px-1,py))   add(px,py+1,   px,py);
+  }
+  const fromNode = new Map();
+  for (const e of edgeMap.values()) {
+    const k=`${e[0]},${e[1]}`;
+    if (!fromNode.has(k)) fromNode.set(k,[]);
+    fromNode.get(k).push(e);
+  }
+  const polys=[], used=new Set();
+  for (const edge of edgeMap.values()) {
+    if (used.has(`${edge[0]},${edge[1]}|${edge[2]},${edge[3]}`)) continue;
+    const poly=[];
+    let cx=edge[0],cy=edge[1];
+    const sx=cx,sy=cy;
+    for (let s=edgeMap.size+10;s-->0;) {
+      const cands=fromNode.get(`${cx},${cy}`)||[];
+      let nxt=null;
+      for (const e of cands) { if (!used.has(`${e[0]},${e[1]}|${e[2]},${e[3]}`)){nxt=e;break;} }
+      if (!nxt) break;
+      used.add(`${nxt[0]},${nxt[1]}|${nxt[2]},${nxt[3]}`);
+      poly.push({x:nxt[0],y:nxt[1]});
+      cx=nxt[2];cy=nxt[3];
+      if (cx===sx&&cy===sy) break;
+    }
+    if (poly.length>=4) polys.push(poly);
+  }
+  return polys;
+}
+
+// ─── 3. Douglas-Peucker (iterative, no stack overflow) ─
+function dpSimplify(pts, eps) {
+  if (pts.length<=2) return pts;
+  const keep=new Uint8Array(pts.length);
+  keep[0]=keep[pts.length-1]=1;
+  const stack=[[0,pts.length-1]];
+  while (stack.length) {
+    const [si,ei]=stack.pop();
+    if (ei-si<2) continue;
+    const p0=pts[si],p1=pts[ei];
+    const dx=p1.x-p0.x, dy=p1.y-p0.y;
+    const len=Math.sqrt(dx*dx+dy*dy)||1;
+    let maxD=0,maxI=si;
+    for (let i=si+1;i<ei;i++) {
+      const d=Math.abs((pts[i].y-p0.y)*dx-(pts[i].x-p0.x)*dy)/len;
+      if (d>maxD){maxD=d;maxI=i;}
+    }
+    if (maxD>eps){keep[maxI]=1;stack.push([si,maxI],[maxI,ei]);}
+  }
+  return pts.filter((_,i)=>keep[i]);
+}
+
+// ─── 4. Chaikin smoothing ─────────────────────────────
+function chaikin(pts, passes) {
+  let p = pts;
+  for (let pass=0;pass<passes;pass++) {
+    const n=p.length, out=[];
+    for (let i=0;i<n;i++) {
+      const a=p[i], b=p[(i+1)%n];
+      out.push({x:a.x*0.75+b.x*0.25, y:a.y*0.75+b.y*0.25});
+      out.push({x:a.x*0.25+b.x*0.75, y:a.y*0.25+b.y*0.75});
+    }
+    p=out;
+  }
+  return p;
+}
+
+// ─── 5. Scale pixels → mm ─────────────────────────────
+function scaleContour(pts, W, H, physW, physH) {
+  return pts.map(p=>({x:(p.x/W)*physW, y:(p.y/H)*physH}));
+}
+
+// ─── 6. Signed area (positive=CCW, negative=CW) ───────
+function signedArea(poly) {
+  let a=0; const n=poly.length;
+  for (let i=0;i<n;i++){const j=(i+1)%n;a+=poly[i].x*poly[j].y-poly[j].x*poly[i].y;}
+  return a/2;
+}
+
+// ─── 7. Point-in-polygon (ray cast) ───────────────────
+function pointInPoly(px, py, poly) {
+  let inside=false;
+  const n=poly.length;
+  for (let i=0,j=n-1;i<n;j=i++) {
+    const xi=poly[i].x,yi=poly[i].y,xj=poly[j].x,yj=poly[j].y;
+    if (((yi>py)!==(yj>py))&&(px<(xj-xi)*(py-yi)/(yj-yi)+xi)) inside=!inside;
+  }
+  return inside;
+}
+
+// ─── 8. Build full watertight STL ─────────────────────
+async function buildSTL(s) {
+  const contours = await buildContours(s);
+  if (contours.length===0) return [];
+
+  // Normalize winding: ensure outers are CCW, holes CW
+  // The boundary tracer may output all CW — detect by checking nesting
+  // Sort by absolute area descending (largest = outermost)
+  const withArea = contours.map(c=>({c, a:signedArea(c), ab:Math.abs(signedArea(c))}));
+  withArea.sort((x,y)=>y.ab-x.ab);
+
+  // Make largest contour CCW; a contour is a hole if it's inside any larger CCW contour
+  const normalized = [];
+  for (const item of withArea) {
+    // Check if this contour's centroid is inside any already-normalized CCW contour
+    const ref = item.c[0];
+    let isHole = false;
+    for (const prev of normalized) {
+      if (prev.isOuter && pointInPoly(ref.x, ref.y, prev.c)) { isHole=true; break; }
+    }
+    // Ensure correct winding: outer=CCW(area>0), hole=CW(area<0)
+    let poly = item.c;
+    if (!isHole && item.a < 0) poly = [...poly].reverse();
+    if ( isHole && item.a > 0) poly = [...poly].reverse();
+    normalized.push({c:poly, isOuter:!isHole});
+  }
+
+  const outers = normalized.filter(x=> x.isOuter).map(x=>x.c);
+  const holes  = normalized.filter(x=>!x.isOuter).map(x=>x.c);
+
+  const groups = outers.map(o=>({outer:o, holes:[]}));
+  for (const hole of holes) {
+    const ref = hole[0];
+    for (const g of groups) {
+      if (pointInPoly(ref.x, ref.y, g.outer)){g.holes.push(hole);break;}
+    }
+  }
+
+  const tris=[];
+  const push=(nx,ny,nz,ax,ay,az,bx,by,bz,cx,cy,cz)=>
+    tris.push([nx,ny,nz,ax,ay,az,bx,by,bz,cx,cy,cz]);
+
+  const baseZ=0;
+  const midZ = s.includeBase ? s.baseThick : 0;
+  const topZ = midZ + s.designLayers * s.layerH;
+
+  // ── Base plate ────────────────────────────────────────
+  if (s.includeBase) {
+    const bw=s.physW, bh=s.physH;
+    push(0,0,-1, 0,0,baseZ,  bw,0,baseZ,  bw,bh,baseZ);
+    push(0,0,-1, 0,0,baseZ,  bw,bh,baseZ,  0,bh,baseZ);
+    push(0,0, 1, 0,0,midZ,   bw,bh,midZ,  bw,0,midZ);
+    push(0,0, 1, 0,0,midZ,    0,bh,midZ,  bw,bh,midZ);
+    push(0,-1,0, 0,0,baseZ,  bw,0,baseZ,  bw,0,midZ);
+    push(0,-1,0, 0,0,baseZ,  bw,0,midZ,    0,0,midZ);
+    push(0, 1,0, bw,bh,baseZ, 0,bh,baseZ,  0,bh,midZ);
+    push(0, 1,0, bw,bh,baseZ, 0,bh,midZ,  bw,bh,midZ);
+    push(-1,0,0, 0,bh,baseZ,  0,0,baseZ,   0,0,midZ);
+    push(-1,0,0, 0,bh,baseZ,  0,0,midZ,    0,bh,midZ);
+    push( 1,0,0, bw,0,baseZ, bw,bh,baseZ, bw,bh,midZ);
+    push( 1,0,0, bw,0,baseZ, bw,bh,midZ,  bw,0,midZ);
+  }
+
+  // ── Per group: extrude as watertight solid ────────────
+  for (const {outer, holes: groupHoles} of groups) {
+    // earcut expects flat [x,y,x,y,...] + holeIndices array
+    const verts=[];
+    const holeIdx=[];
+    for (const p of outer){ verts.push(p.x,p.y); }
+    for (const h of groupHoles){
+      holeIdx.push(verts.length/2);
+      // holes must be CW for earcut
+      const hw = signedArea(h);
+      const hpts = hw>0 ? [...h].reverse() : h;
+      for (const p of hpts) verts.push(p.x,p.y);
+    }
+
+    // earcut → flat index triplets
+    const idx = earcut(verts, holeIdx.length?holeIdx:null, 2);
+
+    // Top face (CCW from above = +Z normal)
+    for (let i=0;i<idx.length;i+=3) {
+      const ai=idx[i]*2,  bi=idx[i+1]*2, ci=idx[i+2]*2;
+      const ax=verts[ai], ay=verts[ai+1];
+      const bx=verts[bi], by=verts[bi+1];
+      const cx2=verts[ci], cy2=verts[ci+1];
+      push(0,0, 1, ax,ay,topZ, bx,by,topZ, cx2,cy2,topZ);
+      push(0,0,-1, ax,ay,midZ, cx2,cy2,midZ, bx,by,midZ); // bottom reversed
+    }
+
+    // Side walls — all contours (outer + holes)
+    const allRings = [outer, ...groupHoles];
+    for (const ring of allRings) {
+      const n=ring.length;
+      for (let i=0;i<n;i++){
+        const a=ring[i], b=ring[(i+1)%n];
+        const dx=b.x-a.x, dy=b.y-a.y;
+        const l=Math.sqrt(dx*dx+dy*dy)||1;
+        const nx=dy/l, ny=-dx/l;
+        push(nx,ny,0, a.x,a.y,midZ, b.x,b.y,midZ, b.x,b.y,topZ);
+        push(nx,ny,0, a.x,a.y,midZ, b.x,b.y,topZ,  a.x,a.y,topZ);
+      }
+    }
+  }
+
+  return tris;
+}
+
+// ══════════════════════════════════════════════════════
+//  EXPORT: STL binary
+// ══════════════════════════════════════════════════════
+function writeBinarySTL(tris) {
+  const buf = new ArrayBuffer(84 + tris.length * 50);
+  const dv  = new DataView(buf);
+  const hdr = 'StampForge vector stamp';
+  for (let i = 0; i < 80; i++)
+    dv.setUint8(i, i < hdr.length ? hdr.charCodeAt(i) : 0);
+  dv.setUint32(80, tris.length, true);
+  let off = 84;
+  for (const t of tris) {
+    for (let i = 0; i < 12; i++) { dv.setFloat32(off, t[i], true); off += 4; }
+    dv.setUint16(off, 0, true); off += 2;
+  }
+  return buf;
+}
+
+async function exportSTL() {
+  const s = getSettings();
+  const stlBtn = document.getElementById('stlBtn');
+  stlBtn.disabled = true;
+  stlBtn.textContent = '⧗';
+
+  setTimeout(async () => {
+    try {
+      const tris = await buildSTL(s);
+      if (tris.length === 0) {
+        showToast('⚠ No geometry — draw something and try again');
+      } else {
+        const buf  = writeBinarySTL(tris);
+        const blob = new Blob([buf], {type: 'application/octet-stream'});
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `${getProjectSlug()}_${s.physW}x${s.physH}mm_h${(s.designLayers*s.layerH).toFixed(2)}mm.stl`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast(`✓ STL — ${tris.length} triangles`);
+      }
+    } catch(err) {
+      showToast('ERROR: ' + err.message);
+      console.error('StampForge error:', err);
+    }
+    stlBtn.disabled = false;
+    stlBtn.textContent = 'STL';
+  }, 60);
+}
+
+// ══════════════════════════════════════════════════════
+//  EXPORT: SVG
+// ══════════════════════════════════════════════════════
+async function exportSVG() {
+  const s = getSettings();
+  const contours = await buildContours(s);
+  if (!contours.length) { showToast('⚠ No geometry to export'); return; }
+
+  const pathData = contours.map(poly =>
+    'M ' + poly.map(p => `${p.x.toFixed(3)},${p.y.toFixed(3)}`).join(' L ') + ' Z'
+  ).join(' ');
+
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${s.physW}mm" height="${s.physH}mm" viewBox="0 0 ${s.physW} ${s.physH}">
+  <path d="${pathData}" fill="black" fill-rule="evenodd" stroke="none"/>
+</svg>`;
+
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${getProjectSlug()}_${s.physW}x${s.physH}mm.svg`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✓ SVG exported — ${contours.length} paths`);
+}
+
+// ══════════════════════════════════════════════════════
+//  PRINTER PROFILES + G-CODE ENGINE
+// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  PRINTER PROFILES
+// ══════════════════════════════════════════════════════
+const PRINTER_PROFILES = [
+  {
+    id:'prusa_mk3s', name:'Prusa i3 MK3S/MK3S+',
+    bed_x:250,bed_y:210,firmware:'marlin',filament:1.75,
+    temp_nozzle:215,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
+    retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
+    start_gcode:`M862.3 P "[printer_model]" ; printer model check
+M862.1 P[nozzle_diameter] ; nozzle diameter check
+M115 U3.13.3 ; tell printer latest fw version
+G28 ; home all axes
+G1 Z5 F3000 ; lift
+M190 S{bed_temp} ; wait for bed
+M109 S{nozzle_temp} ; wait for nozzle
+G1 X0 Y-3 Z0.3 F3000 ; intro line start
+G1 X60 E9 F1000 ; intro line
+G1 X100 E12.5 F1000 ; intro line
+M82 ; absolute extrusion
+G92 E0 ; reset extruder`,
+    end_gcode:`G4 ; wait
+M221 S100 ; reset flow
+M104 S0 ; nozzle off
+M140 S0 ; bed off
+G1 Z{z_max} F3000 ; raise nozzle
+G28 X Y ; home X Y
+M84 ; motors off`
+  },
+  {
+    id:'prusa_mk4', name:'Prusa MK4',
+    bed_x:250,bed_y:210,firmware:'marlin',filament:1.75,
+    temp_nozzle:220,temp_bed:60,speed_print:50,speed_travel:200,speed_first:20,
+    retract_len:0.6,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28 ; home
+M190 S{bed_temp}
+M109 S{nozzle_temp}
+G1 Z5 F3000
+G92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+  },
+  {
+    id:'ender3', name:'Creality Ender-3 / Ender-3 V2',
+    bed_x:235,bed_y:235,firmware:'marlin',filament:1.75,
+    temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
+    retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
+    start_gcode:`G28
+M190 S{bed_temp}
+M109 S{nozzle_temp}
+G92 E0
+G1 Z2 F3000
+G1 X0.1 Y20 Z0.3 F5000
+G1 X0.1 Y200 Z0.3 E15 F1500
+G1 X0.4 Y200 Z0.3 F5000
+G1 X0.4 Y20 Z0.3 E30 F1500
+G92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'ender3_s1', name:'Creality Ender-3 S1 / S1 Pro',
+    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+    temp_nozzle:210,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
+    retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'cr10', name:'Creality CR-10 / CR-10S',
+    bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
+    temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
+    retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'cr10_v2', name:'Creality CR-10 V2/V3',
+    bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
+    temp_nozzle:205,temp_bed:60,speed_print:50,speed_travel:180,speed_first:20,
+    retract_len:1.5,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'bambu_p1p', name:'Bambu Lab P1P / P1S',
+    bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
+    temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
+    retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
+    start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'bambu_x1', name:'Bambu Lab X1 / X1C',
+    bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
+    temp_nozzle:220,temp_bed:55,speed_print:150,speed_travel:500,speed_first:30,
+    retract_len:0.5,retract_speed:50,fan_speed:255,fan_layer:1,
+    start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'artillery_sw', name:'Artillery Sidewinder X1/X2',
+    bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
+    temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
+    retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'artillery_genius', name:'Artillery Genius Pro',
+    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+    temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
+    retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'voron24', name:'Voron 2.4',
+    bed_x:300,bed_y:300,firmware:'klipper',filament:1.75,
+    temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
+    retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
+    start_gcode:`G28\nQGL\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+  },
+  {
+    id:'voron_trident', name:'Voron Trident',
+    bed_x:250,bed_y:250,firmware:'klipper',filament:1.75,
+    temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
+    retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
+    start_gcode:`G28\nZ_TILT_ADJUST\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+  },
+  {
+    id:'anycubic_kobra', name:'Anycubic Kobra / Kobra 2',
+    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+    temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
+    retract_len:5.0,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'elegoo_neptune', name:'Elegoo Neptune 3 / 4',
+    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+    temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
+    retract_len:1.0,retract_speed:40,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'bambu_a1', name:'Bambu Lab A1 / A1 Mini',
+    bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
+    temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
+    retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
+    start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'prusa_mini', name:'Prusa MINI / MINI+',
+    bed_x:180,bed_y:180,firmware:'marlin',filament:1.75,
+    temp_nozzle:215,temp_bed:60,speed_print:45,speed_travel:150,speed_first:15,
+    retract_len:3.2,retract_speed:35,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  },
+  {
+    id:'longer_lk4', name:'Longer LK4 Pro (Klipper)',
+    bed_x:220,bed_y:220,firmware:'klipper',filament:1.75,
+    temp_nozzle:205,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
+    retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+  },
+  {
+    id:'generic_reprap', name:'Generic RepRap / Custom',
+    bed_x:200,bed_y:200,firmware:'reprap',filament:1.75,
+    temp_nozzle:200,temp_bed:50,speed_print:40,speed_travel:120,speed_first:20,
+    retract_len:2.0,retract_speed:30,fan_speed:255,fan_layer:2,
+    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+  }
+];
+
+function getPrinterProfile(id) {
+  return PRINTER_PROFILES.find(p => p.id === id) || PRINTER_PROFILES[PRINTER_PROFILES.length-1];
+}
+
+// ══════════════════════════════════════════════════════
+//  G-CODE ENGINE
+// ══════════════════════════════════════════════════════
+async function generateGcode(s, printer) {
+  const contours = await buildContours(s);
+  if (!contours.length) return null;
+
+  // Classify outers/holes (same as buildSTL)
+  const withArea = contours.map(c=>({c,a:signedArea(c),ab:Math.abs(signedArea(c))}));
+  withArea.sort((x,y)=>y.ab-x.ab);
+  const normalized=[];
+  for (const item of withArea) {
+    const ref=item.c[0]; let isHole=false;
+    for (const prev of normalized)
+      if (prev.isOuter && pointInPoly(ref.x,ref.y,prev.c)){isHole=true;break;}
+    let poly=item.c;
+    if (!isHole && item.a<0) poly=[...poly].reverse();
+    if ( isHole && item.a>0) poly=[...poly].reverse();
+    normalized.push({c:poly,isOuter:!isHole});
+  }
+  const outers = normalized.filter(x=>x.isOuter).map(x=>x.c);
+
+  // Printer/slicer params
+  const layerH   = s.layerH;
+  const nozzle   = s.nozzle;
+  const filDia   = printer.filament;
+  const filArea  = Math.PI * (filDia/2) ** 2;
+  const extW     = nozzle * 1.1;           // extrusion width = nozzle × 1.1
+  const speedPrint  = (s.gcSpeedPrint  || printer.speed_print)  * 60; // mm/min
+  const speedTravel = (s.gcSpeedTravel || printer.speed_travel) * 60;
+  const speedFirst  = (s.gcSpeedFirst  || printer.speed_first)  * 60;
+  const retLen   = s.gcRetract   ?? printer.retract_len;
+  const retSpeed = printer.retract_speed * 60;
+
+  // Offset stamp to bed centre
+  const offX = (printer.bed_x - s.physW) / 2;
+  const offY = (printer.bed_y - s.physH) / 2;
+
+  const baseZ  = 0;
+  const midZ   = s.includeBase ? s.baseThick : 0;
+  const topZ   = midZ + s.designLayers * layerH;
+  const totalLayers = Math.round(topZ / layerH);
+  const baseLayers  = Math.round(midZ / layerH);
+
+  let E = 0; // cumulative extrusion
+  let curX = 0, curY = 0, curZ = -1;
+  let isRetracted = false;
+  const lines = [];
+
+  const emit = l => lines.push(l);
+
+  const mmpm = v => v.toFixed(0);
+  const mm   = v => v.toFixed(4);
+  const emm  = v => v.toFixed(5);
+
+  // Extrusion amount for a move of given length
+  const extrudeAmt = (len) => (len * layerH * extW) / filArea;
+
+  function moveTo(x, y, speed, comment='') {
+    const dx=x-curX, dy=y-curY;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if (d<0.01) return;
+    curX=x; curY=y;
+    emit(`G1 X${mm(x+offX)} Y${mm(y+offY)} F${mmpm(speed)}${comment?' ;'+comment:''}`);
+  }
+
+  function travelTo(x, y) {
+    if (!isRetracted && retLen>0) {
+      E -= retLen;
+      emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; retract`);
+      isRetracted = true;
+    }
+    moveTo(x, y, speedTravel, 'travel');
+  }
+
+  function lineTo(x, y, speed, layer) {
+    if (isRetracted && retLen>0) {
+      E += retLen;
+      emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; unretract`);
+      isRetracted = false;
+    }
+    const dx=x-curX, dy=y-curY;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if (d<0.15) return; // skip micro-segments < 0.15mm
+    E += extrudeAmt(d);
+    const sp = layer===1 ? speedFirst : speed;
+    emit(`G1 X${mm(x+offX)} Y${mm(y+offY)} E${emm(E)} F${mmpm(sp)}`);
+    curX=x; curY=y;
+  }
+
+  function setLayer(z) {
+    if (Math.abs(z-curZ)<0.001) return;
+    curZ=z;
+    emit(`G1 Z${mm(z)} F3000 ; layer z=${mm(z)}`);
+  }
+
+  // Coalesce ring — remove points closer than minD to previous
+  function coalesceRing(ring, minD) {
+    if (ring.length < 3) return ring;
+    const out = [ring[0]];
+    for (let i = 1; i < ring.length; i++) {
+      const prev = out[out.length-1];
+      const dx = ring[i].x - prev.x, dy = ring[i].y - prev.y;
+      if (Math.sqrt(dx*dx+dy*dy) >= minD) out.push(ring[i]);
+    }
+    return out.length >= 3 ? out : ring;
+  }
+
+  // Minimum G-code segment length (mm) — below this points are merged
+  const MIN_SEG = 0.25;
+
+  // Print a closed polygon ring on current Z
+  function printRing(ring, layer) {
+    ring = coalesceRing(ring, MIN_SEG);
+    const start = ring[0];
+    travelTo(start.x, start.y);
+    setLayer(curZ); // already set before call
+    for (let i=1; i<ring.length; i++) lineTo(ring[i].x, ring[i].y, speedPrint, layer);
+    lineTo(start.x, start.y, speedPrint, layer); // close ring
+  }
+
+  // Rectilinear infill — true boustrophedon, no travel between adjacent lines
+  function printInfill(outerRings, layer, angle=0) {
+    const density = (typeof window._infillDensity === 'number' ? window._infillDensity : 1.0);
+    if (density <= 0) return;
+    const pitch = extW * 1.05 / Math.max(density, 0.05);
+
+    // Bounding box
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    for (const r of outerRings)
+      for (const p of r){
+        if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x;
+        if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y;
+      }
+
+    // Build all scanlines first
+    const scanlines = [];
+    for (let y=minY+pitch/2; y<maxY; y+=pitch) {
+      const xs=[];
+      for (const ring of outerRings) {
+        const n=ring.length;
+        for (let i=0;i<n;i++){
+          const a=ring[i],b=ring[(i+1)%n];
+          if ((a.y<=y&&b.y>y)||(b.y<=y&&a.y>y)){
+            const t=(y-a.y)/(b.y-a.y);
+            xs.push(a.x+t*(b.x-a.x));
+          }
+        }
+      }
+      xs.sort((a,b)=>a-b);
+      if (xs.length >= 2) scanlines.push({y, xs});
+    }
+
+    const sp = layer===1 ? speedFirst : speedPrint;
+    let dir = 1;
+    let prevEndX = null, prevEndY = null;
+
+    for (const {y, xs} of scanlines) {
+      // Segments for this scanline
+      const segs = [];
+      for (let i=0;i+1<xs.length;i+=2) segs.push([xs[i], xs[i+1]]);
+      if (!segs.length) continue;
+
+      if (dir < 0) segs.reverse();
+
+      for (let si=0; si<segs.length; si++) {
+        let x0 = dir>0 ? segs[si][0] : segs[si][1];
+        let x1 = dir>0 ? segs[si][1] : segs[si][0];
+
+        // Can we connect from previous endpoint without travel?
+        const dx = x0-curX, dy = y-curY;
+        const distFromCur = Math.sqrt(dx*dx+dy*dy);
+
+        if (prevEndX !== null && distFromCur < pitch * 2.5) {
+          // Close enough — no retract, just move and continue extruding
+          // Brief unretracted travel along Y to next line
+          if (isRetracted && retLen>0) {
+            E += retLen;
+            emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; unretract`);
+            isRetracted = false;
+          }
+          // Move to line start (short unretracted move)
+          const distMove = Math.sqrt((x0-curX)**2+(y-curY)**2);
+          if (distMove > 0.01) {
+            E += extrudeAmt(distMove) * 0.3; // slight under-extrude on connector
+            emit(`G1 X${mm(x0+offX)} Y${mm(y+offY)} E${emm(E)} F${mmpm(sp)}`);
+            curX=x0; curY=y;
+          }
+        } else {
+          travelTo(x0, y);
+        }
+        lineTo(x1, y, sp, layer);
+        prevEndX = x1; prevEndY = y;
+      }
+      dir = -dir;
+    }
+  }
+
+  // ── Build G-code ─────────────────────────────────────
+
+  // Apply start G-code (substitute placeholders)
+  const startGcode = (printer.start_gcode||'')
+    .replace(/\{nozzle_temp\}/g, s.gcTempNozzle || printer.temp_nozzle)
+    .replace(/\{bed_temp\}/g,    s.gcTempBed    || printer.temp_bed)
+    .replace(/\{z_max\}/g,       mm(topZ + 20));
+  emit('; StampForge v2 — generated G-code');
+  emit(`; Project: ${getProjectSlug()}`);
+  emit(`; Printer: ${printer.name}`);
+  emit(`; Stamp: ${s.physW}x${s.physH}mm, ${totalLayers} layers, layer_h=${layerH}`);
+  emit('; ───────────────────────────────────');
+  emit(startGcode);
+  emit('M82 ; absolute extrusion');
+  emit('G92 E0');
+  emit('');
+
+  for (let layer=1; layer<=totalLayers; layer++) {
+    const z = layer * layerH;
+    const isBase = layer <= baseLayers;
+    const isDesign = !isBase;
+
+    emit(`; ── Layer ${layer}/${totalLayers} z=${mm(z)} ${isBase?'[base]':'[design]'}`);
+
+    // Fan control
+    if (layer === printer.fan_layer)
+      emit(`M106 S${printer.fan_speed} ; fan on`);
+
+    setLayer(z);
+
+    if (isBase && s.includeBase) {
+      // Base plate: solid infill only (rectangle)
+      emit('; base infill');
+      const baseRect = [
+        {x:0,y:0},{x:s.physW,y:0},
+        {x:s.physW,y:s.physH},{x:0,y:s.physH}
+      ];
+      // Perimeter
+      printRing(baseRect, layer);
+      // Infill
+      printInfill([baseRect], layer, layer%2===0?0:90);
+    }
+
+    if (isDesign) {
+      const numPerim = s.numPerimeters || 2;
+      emit('; perimeters');
+      for (const ring of outers) {
+        for (let pi=0; pi<numPerim; pi++) {
+          const pRing = pi===0 ? ring : offsetRingBy(ring, pi*extW);
+          if (pRing.length >= 3) printRing(pRing, layer);
+        }
+      }
+      emit('; infill');
+      const innerRings = outers.map(r => numPerim>1 ? offsetRingBy(r,(numPerim-1)*extW) : r);
+      printInfill(innerRings, layer, layer%2===0?0:90);
+    }
+
+    emit('');
+  }
+
+  // End G-code
+  const endGcode = (printer.end_gcode||'')
+    .replace(/\{z_max\}/g, mm(topZ + 20));
+  emit(endGcode);
+
+  return lines.join('\n');
+}
+
+
+function onPrinterChange() {
+  const p = getPrinterProfile(document.getElementById('printerSelect').value);
+  document.getElementById('gcTempNozzle').value = p.temp_nozzle;
+  document.getElementById('gcTempBed').value    = p.temp_bed;
+  document.getElementById('gcSpeedPrint').value  = p.speed_print;
+  document.getElementById('gcSpeedTravel').value = p.speed_travel;
+  document.getElementById('gcSpeedFirst').value  = p.speed_first;
+  document.getElementById('gcRetract').value     = p.retract_len;
+  document.getElementById('gcFilDia').value      = p.filament;
+  // Also sync nozzle size to print settings panel
+  document.getElementById('nozzleD').value       = p.nozzle;
+}
+
+async function exportGcode() {
+  const s = getPrinterProfile ? getSettings() : getSettings();
+  const printerId = document.getElementById('printerSelect').value;
+  const printer = getPrinterProfile(printerId);
+  // Override filament diameter from UI
+  printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+
+  const btn = document.getElementById('gcodeBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ SLICING...';
+
+  setTimeout(async () => {
+    try {
+      const gcode = await generateGcode(s, printer);
+      if (!gcode) {
+        showToast('⚠ No geometry — draw something first');
+      } else {
+        const blob = new Blob([gcode], {type:'text/plain'});
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `${getProjectSlug()}_${s.physW}x${s.physH}mm.gcode`;
+        a.click();
+        URL.revokeObjectURL(url);
+        const lineCount = gcode.split('\n').length;
+        showToast(`✓ G-code — ${lineCount} lines — ${printer.name}`);
+      }
+    } catch(err) {
+      showToast('ERROR: ' + err.message);
+      console.error(err);
+    }
+    btn.disabled = false;
+    btn.textContent = 'GCODE';
+  }, 50);
+}
+
+
+// ══════════════════════════════════════════════════════
+//  USB SERIAL PRINT ENGINE  (Web Serial API — Chrome/Edge)
+// ══════════════════════════════════════════════════════
+let _port      = null;
+let _writer    = null;
+let _reader    = null;
+let _gcodeLines = [];
+let _printing  = false;
+let _cancelled = false;
+let _lineIdx   = 0;
+let _printStart = 0;
+
+function openPrintModal() {
+  // Clear log each time modal opens
+  document.getElementById('printLog').innerHTML = '';
+  document.getElementById('printProgressBar').style.width = '0%';
+  document.getElementById('pLine').textContent  = '0';
+  document.getElementById('pTotal').textContent = '0';
+  document.getElementById('pEta').textContent   = '—';
+  document.getElementById('printModal').classList.add('open');
+  if (!('serial' in navigator)) {
+    pLog('⚠ Web Serial API not available.', 'err');
+    pLog('Open this file via http://localhost (not file://) and use Chrome or Edge.', 'inf');
+    return;
+  }
+  if (_port) {
+    pLog('Port already open. Ready to print.', 'ok');
+    pStat('connected');
+  } else {
+    pLog('Click CONNECT USB to select the printer port.', 'inf');
+    pLog('Make sure no other app (Repetier, PrusaSlicer, Pronterface) has the port open.', 'inf');
+  }
+}
+
+async function closePrintModal() {
+  document.getElementById('printModal').classList.remove('open');
+  // If not printing, close port so it's free for other apps
+  if (!_printing && _port) {
+    try {
+      if (_reader) { await _reader.cancel(); _reader = null; }
+      await _port.close();
+      _port = null;
+      document.getElementById('printConnectBtn').textContent = '🔌 CONNECT USB';
+      document.getElementById('printConnectBtn').disabled = false;
+      document.getElementById('printStartBtn').disabled = true;
+      pStat('disconnected');
+    } catch(e) { /* ignore */ }
+  }
+}
+
+function pLog(msg, cls='') {
+  const log = document.getElementById('printLog');
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = msg;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+
+function pStat(txt) { document.getElementById('pStat').textContent = txt; }
+function pPort(txt) { document.getElementById('pPort').textContent = txt; }
+
+function pProgress(cur, total) {
+  document.getElementById('pLine').textContent  = cur;
+  document.getElementById('pTotal').textContent = total;
+  const pct = total > 0 ? (cur / total * 100).toFixed(1) : 0;
+  document.getElementById('printProgressBar').style.width = pct + '%';
+  if (_printStart && cur > 0) {
+    const elapsed = (Date.now() - _printStart) / 1000;
+    const rate    = cur / elapsed;
+    const rem     = Math.round((total - cur) / rate);
+    const mm = v => String(Math.floor(v)).padStart(2,'0');
+    document.getElementById('pEta').textContent =
+      rem > 0 ? `${mm(rem/60)}:${mm(rem%60)}` : '—';
+  }
+}
+
+async function usbConnect() {
+  if (!('serial' in navigator)) {
+    pLog('⚠ Web Serial not available — use Chrome or Edge via localhost.', 'err');
+    return;
+  }
+  // Close existing port if any
+  if (_port) {
+    try {
+      if (_reader) { await _reader.cancel(); _reader = null; }
+      await _port.close();
+    } catch(e) {}
+    _port = null;
+  }
+  const btn = document.getElementById('printConnectBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ CONNECTING…';
+  try {
+    _port = await navigator.serial.requestPort();
+    pLog('Port selected. Opening at 115200 baud…', 'inf');
+    await _port.open({ baudRate: 115200, dataBits: 8, stopBits: 1, parity: 'none' });
+    pLog('✓ Port open — waiting for printer greeting…', 'ok');
+    pStat('connected');
+    // Try to get port info for display
+    try {
+      const info = _port.getInfo();
+      pPort(`VID:${info.usbVendorId?.toString(16).padStart(4,'0')} PID:${info.usbProductId?.toString(16).padStart(4,'0')}`);
+    } catch(e) { pPort('USB Serial'); }
+    btn.textContent = '✓ CONNECTED';
+    document.getElementById('printStartBtn').disabled = false;
+    _readLoop();
+    // Send M115 to get firmware info
+    await new Promise(r => setTimeout(r, 1500)); // let printer boot
+    await _sendLine('M115');
+  } catch(e) {
+    _port = null;
+    btn.disabled = false;
+    btn.textContent = '🔌 CONNECT USB';
+    if (e.name === 'NotFoundError') {
+      pLog('No port selected.', 'inf');
+    } else if (e.message && e.message.includes('open')) {
+      pLog('⚠ Could not open port — another app may have it open.', 'err');
+      pLog('Close Repetier-Host, PrusaSlicer, or Pronterface and try again.', 'inf');
+    } else {
+      pLog('Connect error: ' + e.message, 'err');
+    }
+  }
+}
+
+// Accumulate incoming serial data into lines
+let _rxBuf = '';
+let _okResolve = null;
+
+async function _readLoop() {
+  const dec = new TextDecoderStream();
+  _port.readable.pipeTo(dec.writable);
+  _reader = dec.readable.getReader();
+  try {
+    while (true) {
+      const { value, done } = await _reader.read();
+      if (done) break;
+      _rxBuf += value;
+      let nl;
+      while ((nl = _rxBuf.indexOf('\n')) !== -1) {
+        const line = _rxBuf.slice(0, nl).trim();
+        _rxBuf = _rxBuf.slice(nl + 1);
+        _onSerialLine(line);
+      }
+    }
+  } catch(e) {
+    if (_printing) pLog('Read error: ' + e.message, 'err');
+  }
+}
+
+function _onSerialLine(line) {
+  if (!line) return;
+  if (line.startsWith('ok'))     { pLog('← ' + line, 'ok');  if (_okResolve) { _okResolve(); _okResolve = null; } }
+  else if (line.startsWith('T')) { /* temperature, skip */ }
+  else if (line.startsWith('Error') || line.startsWith('!!')) { pLog('← ' + line, 'err'); }
+  else                            { pLog('← ' + line); }
+}
+
+function _waitForOk() {
+  return new Promise(res => { _okResolve = res; });
+}
+
+async function _sendLine(line) {
+  const enc = new TextEncoder();
+  const w   = _port.writable.getWriter();
+  await w.write(enc.encode(line + '\n'));
+  w.releaseLock();
+}
+
+async function usbStartPrint() {
+  if (!_port) { pLog('Not connected.', 'err'); return; }
+
+  // Generate G-code on the fly
+  const s = getSettings();
+  const printerId = document.getElementById('printerSelect').value;
+  const printer = getPrinterProfile(printerId);
+  printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+
+  pLog('Generating G-code…', 'inf');
+  const gcode = await generateGcode(s, printer);
+  if (!gcode) { pLog('No geometry — draw something first.', 'err'); return; }
+
+  // Filter: skip blank lines and pure comments for transmission efficiency
+  _gcodeLines = gcode.split('\n')
+    .map(l => l.split(';')[0].trim())  // strip inline comments
+    .filter(l => l.length > 0);
+
+  _printing   = true;
+  _cancelled  = false;
+  _lineIdx    = 0;
+  _printStart = Date.now();
+
+  document.getElementById('printStartBtn').disabled  = true;
+  document.getElementById('printCancelBtn').style.display = 'flex';
+  document.getElementById('usbPrintBtn').disabled = true;
+  pStat('printing');
+  pLog(`Starting — ${_gcodeLines.length} lines`, 'inf');
+
+  try {
+    while (_lineIdx < _gcodeLines.length && !_cancelled) {
+      const line = _gcodeLines[_lineIdx];
+      await _sendLine(line);
+      pLog('→ ' + line);
+      pProgress(_lineIdx + 1, _gcodeLines.length);
+      await _waitForOk();
+      _lineIdx++;
+    }
+    if (_cancelled) {
+      pLog('Print cancelled by user.', 'err');
+      pStat('cancelled');
+      // Emergency stop
+      await _sendLine('M112');
+    } else {
+      pLog('✓ Print complete!', 'ok');
+      pStat('done');
+    }
+  } catch(e) {
+    pLog('Print error: ' + e.message, 'err');
+    pStat('error');
+  }
+
+  _printing = false;
+  document.getElementById('printCancelBtn').style.display = 'none';
+  document.getElementById('printStartBtn').disabled  = false;
+  document.getElementById('usbPrintBtn').disabled = false;
+}
+
+function usbCancel() {
+  if (_printing) {
+    _cancelled = true;
+    pLog('Cancelling after current line…', 'err');
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  SVG IMPORT
+// ══════════════════════════════════════════════════════
+let _svgDoc = null;      // parsed SVG DOM
+let _svgImg = null;      // rendered Image
+let _svgSrc = null;      // raw SVG text for high-res pipeline
+let _svgActive = false;  // true when last import was SVG
+
+function openSvgImport() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.svg,image/svg+xml';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const text = ev.target.result;
+      _svgSrc = text;
+      const parser = new DOMParser();
+      _svgDoc = parser.parseFromString(text, 'image/svg+xml');
+      // Reset controls
+      document.getElementById('svgScale').value = '100';
+      document.getElementById('svgOffX').value  = '0';
+      document.getElementById('svgOffY').value  = '0';
+      document.getElementById('svgInvert').checked = false;
+      // Render preview
+      const blob = new Blob([text], {type:'image/svg+xml'});
+      const url  = URL.createObjectURL(blob);
+      _svgImg = new Image();
+      _svgImg.onload = () => {
+        svgUpdatePreview();
+        URL.revokeObjectURL(url);
+      };
+      _svgImg.src = url;
+      document.getElementById('svgModal').classList.add('open');
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+function svgUpdatePreview() {
+  if (!_svgImg) return;
+  const scale   = +document.getElementById('svgScale').value / 100;
+  const offXPct = +document.getElementById('svgOffX').value  / 100;
+  const offYPct = +document.getElementById('svgOffY').value  / 100;
+  const invert  = document.getElementById('svgInvert').checked;
+  document.getElementById('svgScaleVal').textContent = document.getElementById('svgScale').value + '%';
+  document.getElementById('svgOffXVal').textContent  = document.getElementById('svgOffX').value + '%';
+  document.getElementById('svgOffYVal').textContent  = document.getElementById('svgOffY').value + '%';
+
+  // Render into preview
+  const wrap = document.getElementById('svgPreviewWrap');
+  wrap.innerHTML = '';
+  const pc = document.createElement('canvas');
+  pc.width  = wrap.clientWidth  || 452;
+  pc.height = wrap.clientHeight || 220;
+  wrap.appendChild(pc);
+  const pctx = pc.getContext('2d');
+  if (invert) {
+    pctx.fillStyle = '#000';
+    pctx.fillRect(0,0,pc.width,pc.height);
+    pctx.globalCompositeOperation = 'destination-out';
+  }
+  const dw = _svgImg.naturalWidth  * scale * (pc.width  / _svgImg.naturalWidth);
+  const dh = _svgImg.naturalHeight * scale * (pc.height / _svgImg.naturalHeight);
+  // Maintain aspect
+  const aspect = _svgImg.naturalWidth / _svgImg.naturalHeight;
+  const fitW = Math.min(pc.width  * scale, pc.height * scale * aspect);
+  const fitH = fitW / aspect;
+  const cx = pc.width/2  + offXPct * pc.width;
+  const cy = pc.height/2 + offYPct * pc.height;
+  pctx.drawImage(_svgImg, cx - fitW/2, cy - fitH/2, fitW, fitH);
+  pctx.globalCompositeOperation = 'source-over';
+}
+
+// SVG placement params — stored for high-res pipeline
+let _svgPlacement = null;
+
+function svgConfirm() {
+  if (!_svgImg) return;
+
+  const scale   = +document.getElementById('svgScale').value / 100;
+  const offXPct = +document.getElementById('svgOffX').value  / 100;
+  const offYPct = +document.getElementById('svgOffY').value  / 100;
+  const invert  = document.getElementById('svgInvert').checked;
+
+  // Store placement for export pipeline — no rasterization
+  _svgPlacement = { scale, offXPct, offYPct, invert };
+  _svgActive = true;
+
+  // Draw crisp preview overlay (doesn't touch the drawing canvas)
+  drawSvgOverlay();
+
+  document.getElementById('svgModal').classList.remove('open');
+  document.getElementById('svgBadge').classList.add('active');
+  showToast('✓ SVG vector active — export uses high-res source');
+}
+
+function drawSvgOverlay() {
+  if (!_svgImg || !_svgPlacement) return;
+  const { scale, offXPct, offYPct, invert } = _svgPlacement;
+  const oc = document.getElementById('overlayCanvas');
+  const octx = oc.getContext('2d');
+  const W = oc.width, H = oc.height;
+
+  // Preserve existing overlay content (symmetry guides etc) — redraw after
+  // For simplicity: draw SVG at bottom of overlay stack using separate layer
+  const aspect = _svgImg.naturalWidth / _svgImg.naturalHeight;
+  const fitW = Math.min(W * scale, H * scale * aspect);
+  const fitH = fitW / aspect;
+  const cx = W/2 + offXPct * W;
+  const cy = H/2 + offYPct * H;
+
+  // Draw to a temp canvas, then composite as tinted overlay
+  const tmp = document.createElement('canvas');
+  tmp.width = W; tmp.height = H;
+  const tctx = tmp.getContext('2d');
+  tctx.drawImage(_svgImg, cx-fitW/2, cy-fitH/2, fitW, fitH);
+
+  // Tint orange with 35% opacity as non-destructive preview
+  octx.save();
+  octx.globalAlpha = 0.35;
+  if (invert) {
+    octx.globalCompositeOperation = 'screen';
+  }
+  octx.drawImage(tmp, 0, 0);
+  octx.restore();
+}
+
+function clearSvgSource() {
+  _svgActive = false;
+  _svgSrc = null;
+  _svgPlacement = null;
+  _svgImg = null;
+  document.getElementById('svgBadge').classList.remove('active');
+  // Redraw overlay without SVG layer
+  const oc = document.getElementById('overlayCanvas');
+  oc.getContext('2d').clearRect(0,0,oc.width,oc.height);
+  showToast('SVG vector cleared');
+}
+
+
+// ══════════════════════════════════════════════════════
+//  SAVE / LOAD PROJECT
+// ══════════════════════════════════════════════════════
+function saveProject() {
+  const s = getSettings();
+  const name = document.getElementById('projectTitle').textContent.trim() || 'untitled';
+  const project = {
+    version: 2,
+    name,
+    settings: s,
+    printer: document.getElementById('printerSelect').value,
+    canvas: canvas.toDataURL('image/png'),
+    saved: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(project, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `${getProjectSlug()}.stampforge`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✓ Project saved — ${name}.stampforge`);
+}
+
+function loadProject() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.stampforge,application/json';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const p = JSON.parse(ev.target.result);
+        if (!p.canvas) throw new Error('Invalid project file');
+        // Restore title
+        document.getElementById('projectTitle').textContent = p.name || 'untitled';
+        // Restore printer
+        if (p.printer) {
+          document.getElementById('printerSelect').value = p.printer;
+          onPrinterChange();
+        }
+        // Restore settings overrides
+        const s = p.settings || {};
+        if (s.physW)         document.getElementById('physW').value         = s.physW;
+        if (s.physH)         document.getElementById('physH').value         = s.physH;
+        if (s.layerH)        document.getElementById('layerH').value        = s.layerH;
+        if (s.nozzle)        document.getElementById('nozzleD').value       = s.nozzle;
+        if (s.baseThick)     document.getElementById('baseThick').value     = s.baseThick;
+        if (s.designLayers)  document.getElementById('designLayers').value  = s.designLayers;
+        if (s.simplifyEps != null) document.getElementById('simplifyEps').value = s.simplifyEps;
+        if (s.numPerimeters) document.getElementById('numPerimeters').value = s.numPerimeters;
+        if (s.chaikinPasses != null) {
+          document.getElementById('chaikinPasses').value = s.chaikinPasses;
+          document.getElementById('chaikinVal').textContent = s.chaikinPasses + ' passes';
+        }
+        if (s.mirrorX  != null) document.getElementById('mirrorX').checked  = s.mirrorX;
+        if (s.includeBase != null) document.getElementById('includeBase').checked = s.includeBase;
+        // Restore canvas
+        const img = new Image();
+        img.onload = () => {
+          pushUndo();
+          // Resize canvas if needed
+          const res = s.resolution || 600;
+          if (canvas.width !== res) {
+            document.getElementById('canvasRes').value = res;
+            initCanvas(res);
+          }
+          ctx.fillStyle = '#f5f5f0';
+          ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.drawImage(img,0,0,canvas.width,canvas.height);
+          updateInfo();
+          showToast(`✓ Loaded: ${p.name}`);
+        };
+        img.src = p.canvas;
+      } catch(err) {
+        showToast('ERROR loading project: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+
+// ══════════════════════════════════════════════════════
+//  LAYER PREVIEW
+// ══════════════════════════════════════════════════════
+let _layerData = null;
+
+async function openLayerPreview() {
+  const btn = document.getElementById('layerPreviewBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ SLICING...';
+  setTimeout(async () => {
+    try {
+      const s = getSettings();
+      const printer = getPrinterProfile(document.getElementById('printerSelect').value);
+      printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+      _layerData = await buildLayerData(s, printer);
+      if (!_layerData || !_layerData.length) { showToast('⚠ No geometry — draw something first'); return; }
+      const total = _layerData.length;
+      const slider = document.getElementById('layerSlider');
+      slider.max = total; slider.value = total;
+      let totalE = 0;
+      _layerData.forEach(l => totalE += l.filament);
+      const estMin = Math.round(_layerData.reduce((a,l)=>a+l.time,0)/60);
+      document.getElementById('lsTotalLayers').textContent = total;
+      document.getElementById('lsFilament').textContent    = totalE.toFixed(1);
+      document.getElementById('lsTime').textContent        = estMin + ' min';
+      document.getElementById('layerModal').classList.add('open');
+      layerDraw(total);
+    } catch(e) { showToast('ERROR: '+e.message); console.error(e); }
+    finally { btn.disabled=false; btn.textContent='◈ PREVIEW'; }
+  }, 50);
+}
+
+function layerDraw(idx) {
+  if (!_layerData) return;
+  const ld = _layerData[idx-1]; if (!ld) return;
+  document.getElementById('layerNum').textContent = idx+' / '+_layerData.length;
+  const cv = document.getElementById('layerCanvas');
+  const lctx = cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const s=ld.settings;
+  const margin=24, sc=Math.min((W-margin*2)/s.physW,(H-margin*2)/s.physH);
+  const ox=(W-s.physW*sc)/2, oy=(H-s.physH*sc)/2;
+  const tx=x=>ox+x*sc, ty=y=>H-oy-y*sc;
+  lctx.clearRect(0,0,W,H);
+  lctx.fillStyle='#0d0d10'; lctx.fillRect(0,0,W,H);
+  lctx.strokeStyle='rgba(255,255,255,.1)'; lctx.lineWidth=1;
+  lctx.strokeRect(tx(0),ty(s.physH),s.physW*sc,s.physH*sc);
+  for (let li=Math.max(0,idx-4);li<idx-1;li++) {
+    const a=0.06+0.03*(li-(idx-5));
+    drawLayerPaths(lctx,_layerData[li],tx,ty,a);
+  }
+  drawLayerPaths(lctx,ld,tx,ty,1);
+  lctx.fillStyle='rgba(100,200,100,.7)'; lctx.font='10px monospace';
+  lctx.fillText('Z = '+ld.z.toFixed(3)+' mm  |  '+(ld.isBase?'BASE':'DESIGN'), tx(0)+4, ty(s.physH)+14);
+}
+
+function drawLayerPaths(lctx,ld,tx,ty,alpha) {
+  if (alpha>=0.9) {
+    lctx.strokeStyle='rgba(255,60,60,'+(alpha*0.35)+')';
+    lctx.lineWidth=0.5; lctx.setLineDash([2,4]);
+    for (const seg of ld.travels) {
+      lctx.beginPath(); lctx.moveTo(tx(seg[0].x),ty(seg[0].y));
+      lctx.lineTo(tx(seg[1].x),ty(seg[1].y)); lctx.stroke();
+    }
+    lctx.setLineDash([]);
+  }
+  lctx.strokeStyle='rgba(80,255,180,'+(alpha*0.55)+')'; lctx.lineWidth=0.8;
+  for (const seg of ld.infill) {
+    lctx.beginPath(); lctx.moveTo(tx(seg[0].x),ty(seg[0].y));
+    lctx.lineTo(tx(seg[1].x),ty(seg[1].y)); lctx.stroke();
+  }
+  lctx.strokeStyle=ld.isBase?'rgba(120,120,120,'+(alpha*0.8)+')':'rgba(255,140,0,'+alpha+')';
+  lctx.lineWidth=alpha>=0.9?1.5:0.8;
+  for (const ring of ld.perimeters) {
+    lctx.beginPath(); lctx.moveTo(tx(ring[0].x),ty(ring[0].y));
+    for (let i=1;i<ring.length;i++) lctx.lineTo(tx(ring[i].x),ty(ring[i].y));
+    lctx.closePath(); lctx.stroke();
+  }
+}
+
+function offsetRingBy(ring, dist) {
+  const cx=ring.reduce((s,p)=>s+p.x,0)/ring.length;
+  const cy=ring.reduce((s,p)=>s+p.y,0)/ring.length;
+  return ring.map(p=>{const dx=p.x-cx,dy=p.y-cy,d=Math.sqrt(dx*dx+dy*dy)||1;return{x:p.x-(dx/d)*dist,y:p.y-(dy/d)*dist};});
+}
+
+function infillSegments(outerRings, pitch) {
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for (const r of outerRings) for (const p of r){if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;}
+  const segs=[];
+  for (let y=minY+pitch/2;y<maxY;y+=pitch) {
+    const xs=[];
+    for (const ring of outerRings){const n=ring.length;for(let i=0;i<n;i++){const a=ring[i],b=ring[(i+1)%n];if((a.y<=y&&b.y>y)||(b.y<=y&&a.y>y)){const t=(y-a.y)/(b.y-a.y);xs.push(a.x+t*(b.x-a.x));}}}
+    xs.sort((a,b)=>a-b);
+    for(let i=0;i+1<xs.length;i+=2) segs.push([{x:xs[i],y},{x:xs[i+1],y}]);
+  }
+  return segs;
+}
+
+async function buildLayerData(s, printer) {
+  const contours = await buildContours(s);
+  if(!contours.length) return null;
+  const withArea=contours.map(c=>({c,a:signedArea(c),ab:Math.abs(signedArea(c))}));
+  withArea.sort((x,y)=>y.ab-x.ab);
+  const norm=[];
+  for(const item of withArea){
+    const ref=item.c[0];let isHole=false;
+    for(const prev of norm) if(prev.isOuter&&pointInPoly(ref.x,ref.y,prev.c)){isHole=true;break;}
+    let poly=item.c;
+    if(!isHole&&item.a<0)poly=[...poly].reverse();
+    if(isHole&&item.a>0)poly=[...poly].reverse();
+    norm.push({c:poly,isOuter:!isHole});
+  }
+  const outers=norm.filter(x=>x.isOuter).map(x=>x.c);
+  const layerH=s.layerH, nozzle=s.nozzle, extW=nozzle*1.1;
+  const filArea=Math.PI*(printer.filament/2)**2;
+  const sp=s.gcSpeedPrint||printer.speed_print;
+  const spFirst=s.gcSpeedFirst||printer.speed_first;
+  const midZ=s.includeBase?s.baseThick:0;
+  const topZ=midZ+s.designLayers*layerH;
+  const totalLayers=Math.round(topZ/layerH);
+  const baseLayers=Math.round(midZ/layerH);
+  const numPerim=s.numPerimeters||2;
+  const _density = (typeof window._infillDensity === 'number' ? window._infillDensity : 1.0);
+  const pitch = _density <= 0 ? Infinity : extW * 1.05 / Math.max(_density, 0.05);
+  const extAmt=len=>(len*layerH*extW)/filArea;
+  const segLen=(a,b)=>Math.sqrt((b.x-a.x)**2+(b.y-a.y)**2);
+  const layers=[];
+  let cx=0,cy=0;
+  for(let layer=1;layer<=totalLayers;layer++){
+    const z=layer*layerH, isBase=layer<=baseLayers;
+    const perimeters=[],infill=[],travels=[];
+    let filament=0;
+    const addTravel=(x,y)=>{travels.push([{x:cx,y:cy},{x,y}]);cx=x;cy=y;};
+    const addLine=(x0,y0,x1,y1)=>{filament+=extAmt(segLen({x:x0,y:y0},{x:x1,y:y1}));cx=x1;cy=y1;};
+    if(isBase&&s.includeBase){
+      const br=[{x:0,y:0},{x:s.physW,y:0},{x:s.physW,y:s.physH},{x:0,y:s.physH}];
+      perimeters.push(br);
+      addTravel(br[0].x,br[0].y);
+      for(let i=1;i<=br.length;i++){const p=br[i%br.length];addLine(cx,cy,p.x,p.y);}
+      for(const seg of infillSegments([br],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);}
+    }
+    if(!isBase){
+      for(const ring of outers){
+        for(let pi=0;pi<numPerim;pi++){
+          const pRing=pi===0?ring:offsetRingBy(ring,pi*extW);
+          if(pRing.length<3)continue;
+          perimeters.push(pRing);
+          addTravel(pRing[0].x,pRing[0].y);
+          for(let i=1;i<=pRing.length;i++){const p=pRing[i%pRing.length];addLine(cx,cy,p.x,p.y);}
+        }
+      }
+      const innerRings=outers.map(r=>numPerim>1?offsetRingBy(r,(numPerim-1)*extW):r);
+      if (_density > 0) { for(const seg of infillSegments(innerRings,pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
+    }
+    const timeS=filament/sp*60;
+    // allRings for preview even-odd fill: all original contours (outers + holes)
+    const allRingsForPreview = norm.map(x=>x.c);
+    layers.push({z,isBase,perimeters,infill,travels,filament,time:timeS,settings:s,allRings:allRingsForPreview});
+  }
+  return layers;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  BEZIER CURVE FITTING  (Schneider algorithm, simplified)
+//  Fits cubic bezier curves to a point sequence,
+//  then tessellates at configurable resolution.
+// ══════════════════════════════════════════════════════
+
+function updateSmoothUI() {
+  const mode = document.getElementById('smoothMode').value;
+  document.getElementById('chaikinUI').style.display = mode==='chaikin' ? '' : 'none';
+  document.getElementById('bezierUI').style.display  = mode==='bezier'  ? '' : 'none';
+}
+
+// Cubic bezier point at parameter t
+function bezierPoint(p0,p1,p2,p3,t) {
+  const mt=1-t, mt2=mt*mt, mt3=mt2*mt, t2=t*t, t3=t2*t;
+  return {
+    x: mt3*p0.x + 3*mt2*t*p1.x + 3*mt*t2*p2.x + t3*p3.x,
+    y: mt3*p0.y + 3*mt2*t*p1.y + 3*mt*t2*p2.y + t3*p3.y
+  };
+}
+
+// Tessellate a single cubic bezier into N+1 points (not including p0)
+function tessellateCubic(p0,p1,p2,p3, N) {
+  const pts=[];
+  for (let i=1;i<=N;i++) pts.push(bezierPoint(p0,p1,p2,p3,i/N));
+  return pts;
+}
+
+// Chord-length parameterisation
+function chordParams(pts) {
+  const u=[0];
+  for (let i=1;i<pts.length;i++) {
+    const dx=pts[i].x-pts[i-1].x, dy=pts[i].y-pts[i-1].y;
+    u.push(u[i-1]+Math.sqrt(dx*dx+dy*dy));
+  }
+  const total=u[u.length-1]||1;
+  return u.map(v=>v/total);
+}
+
+// Fit one cubic bezier segment to pts[0..n-1] with given tangents t1,t2
+function fitCubicSegment(pts, u, t1, t2) {
+  const n=pts.length;
+  if (n===2) {
+    const d=Math.sqrt((pts[1].x-pts[0].x)**2+(pts[1].y-pts[0].y)**2)/3;
+    return [pts[0], {x:pts[0].x+t1.x*d,y:pts[0].y+t1.y*d},
+                    {x:pts[1].x-t2.x*d,y:pts[1].y-t2.y*d}, pts[1]];
+  }
+  // Build A matrix
+  let C00=0,C01=0,C11=0,X0=0,X1=0;
+  for (let i=0;i<n;i++) {
+    const t=u[i], mt=1-t;
+    const b1=3*mt*mt*t, b2=3*mt*t*t;
+    const a0x=b1*t1.x, a0y=b1*t1.y;
+    const a1x=b2*t2.x, a1y=b2*t2.y;
+    C00+=a0x*a0x+a0y*a0y;
+    C01+=a0x*a1x+a0y*a1y;
+    C11+=a1x*a1x+a1y*a1y;
+    const bx=pts[i].x-(mt*mt*mt*pts[0].x+3*mt*mt*t*pts[0].x+3*mt*t*t*pts[n-1].x+t*t*t*pts[n-1].x);
+    const by=pts[i].y-(mt*mt*mt*pts[0].y+3*mt*mt*t*pts[0].y+3*mt*t*t*pts[n-1].y+t*t*t*pts[n-1].y);
+    X0+=a0x*bx+a0y*by;
+    X1+=a1x*bx+a1y*by;
+  }
+  const det=C00*C11-C01*C01;
+  const alpha0 = Math.abs(det)<1e-10 ? 0 : (X0*C11-X1*C01)/det;
+  const alpha1 = Math.abs(det)<1e-10 ? 0 : (C00*X1-C01*X0)/det;
+  const dmin = Math.sqrt((pts[n-1].x-pts[0].x)**2+(pts[n-1].y-pts[0].y)**2)/3;
+  const a0=alpha0>0?alpha0:dmin, a1=alpha1>0?alpha1:dmin;
+  return [
+    pts[0],
+    {x:pts[0].x+t1.x*a0, y:pts[0].y+t1.y*a0},
+    {x:pts[n-1].x-t2.x*a1, y:pts[n-1].y-t2.y*a1},
+    pts[n-1]
+  ];
+}
+
+// Max error of cubic bezier vs pts
+function bezierMaxError(pts, u, bez) {
+  let maxErr=0, maxIdx=0;
+  for (let i=1;i<pts.length-1;i++) {
+    const q=bezierPoint(bez[0],bez[1],bez[2],bez[3],u[i]);
+    const dx=pts[i].x-q.x, dy=pts[i].y-q.y;
+    const e=dx*dx+dy*dy;
+    if(e>maxErr){maxErr=e;maxIdx=i;}
+  }
+  return {err:Math.sqrt(maxErr),idx:maxIdx};
+}
+
+// Normalise a 2D vector
+function norm2(v){const l=Math.sqrt(v.x*v.x+v.y*v.y)||1;return{x:v.x/l,y:v.y/l};}
+
+// Recursive bezier fit — splits at max-error point when tolerance exceeded
+function fitCubicRec(pts, tol, t1, t2, depth) {
+  const u=chordParams(pts);
+  const bez=fitCubicSegment(pts,u,t1,t2);
+  const {err,idx}=bezierMaxError(pts,u,bez);
+  if (err < tol || depth > 8) return [bez];
+  // Split and recurse
+  const mid=idx;
+  const left=pts.slice(0,mid+1), right=pts.slice(mid);
+  const tMid=norm2({x:pts[mid+1>pts.length-1?pts.length-1:mid+1].x-pts[mid===0?0:mid-1].x,
+                    y:pts[mid+1>pts.length-1?pts.length-1:mid+1].y-pts[mid===0?0:mid-1].y});
+  return [
+    ...fitCubicRec(left, tol, t1, tMid, depth+1),
+    ...fitCubicRec(right, tol, tMid, t2, depth+1)
+  ];
+}
+
+// Main entry: fit beziers to an open ring, tessellate at N pts/segment
+function bezierFitAndTessellate(pts, tol, tessN) {
+  if (pts.length < 4) return pts;
+  // Close ring for tangent computation: last→first
+  const n=pts.length;
+  // Endpoint tangents
+  const t1=norm2({x:pts[1].x-pts[0].x, y:pts[1].y-pts[0].y});
+  const t2=norm2({x:pts[n-1].x-pts[n-2].x, y:pts[n-1].y-pts[n-2].y});
+  // Fit segments
+  let segments;
+  try {
+    segments = fitCubicRec(pts, tol, t1, t2, 0);
+  } catch(e) {
+    return pts; // fallback
+  }
+  // Tessellate
+  const out=[pts[0]];
+  for (const seg of segments) {
+    out.push(...tessellateCubic(seg[0],seg[1],seg[2],seg[3], tessN));
+  }
+  return out;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  OCTOPRINT INTEGRATION
+// ══════════════════════════════════════════════════════
+let _octoConnected = false;
+
+function openOctoModal() {
+  document.getElementById('octoModal').classList.add('open');
+}
+
+function octoLog(msg, cls='') {
+  const el = document.getElementById('octoStatus');
+  el.innerHTML = cls ? `<span class="${cls}">${msg}</span>` : msg;
+}
+
+async function octoTest() {
+  const host = document.getElementById('octoHost').value.trim().replace(/\/$/, '');
+  const key  = document.getElementById('octoKey').value.trim();
+  if (!host || !key) { octoLog('Host and API key are required.', 'err'); return; }
+
+  octoLog('Connecting…', 'inf');
+  document.getElementById('octoTestBtn').disabled = true;
+
+  try {
+    const r = await fetch(`${host}/api/version`, {
+      headers: { 'X-Api-Key': key, 'Content-Type': 'application/json' }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    _octoConnected = true;
+    octoLog(`<span class="ok">✓ Connected — OctoPrint ${data.server || ''}, API ${data.api || ''}</span>`);
+    document.getElementById('octoSendBtn').disabled = false;
+  } catch(e) {
+    _octoConnected = false;
+    octoLog(`<span class="err">✗ Failed: ${e.message}</span><br>Check host URL, API key, and that OctoPrint is running.`);
+    document.getElementById('octoSendBtn').disabled = true;
+  }
+  document.getElementById('octoTestBtn').disabled = false;
+}
+
+async function octoSend() {
+  const host = document.getElementById('octoHost').value.trim().replace(/\/$/, '');
+  const key  = document.getElementById('octoKey').value.trim();
+  const btn  = document.getElementById('octoSendBtn');
+
+  btn.disabled = true;
+  btn.textContent = '⧗';
+  octoLog('Generating G-code…', 'inf');
+
+  try {
+    const s = getSettings();
+    const printer = getPrinterProfile(document.getElementById('printerSelect').value);
+    printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+    const gcode = await generateGcode(s, printer);
+    if (!gcode) { octoLog('No geometry — draw something first.', 'err'); return; }
+
+    const slug = getProjectSlug();
+    const filename = `${slug}_${s.physW}x${s.physH}mm.gcode`;
+
+    octoLog('Uploading to OctoPrint…', 'inf');
+
+    // Upload file
+    const formData = new FormData();
+    const blob = new Blob([gcode], { type: 'text/plain' });
+    formData.append('file', blob, filename);
+    formData.append('select', 'true');
+    formData.append('print', 'true');  // start print immediately
+
+    const r = await fetch(`${host}/api/files/local`, {
+      method: 'POST',
+      headers: { 'X-Api-Key': key },
+      body: formData
+    });
+
+    if (!r.ok) {
+      const err = await r.text();
+      throw new Error(`Upload failed: HTTP ${r.status} — ${err.slice(0,120)}`);
+    }
+
+    const data = await r.json();
+    octoLog(`<span class="ok">✓ Uploaded & printing: ${filename}<br>${Math.round(gcode.length/1024)}KB · ${gcode.split('\\n').length} lines</span>`);
+  } catch(e) {
+    octoLog(`<span class="err">✗ ${e.message}</span>`);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ SLICE & PRINT';
+}
+
+
+// ── Brush size presets ────────────────────────────────
+function setBrushPreset(size) {
+  brushSize = size;
+  document.getElementById('brushSize').value = size;
+  // Update active state
+  document.querySelectorAll('.brush-preset').forEach(b => b.classList.remove('active'));
+  if (size <= 3)       document.getElementById('bp-fine').classList.add('active');
+  else if (size <= 10) document.getElementById('bp-medium').classList.add('active');
+  else                 document.getElementById('bp-thick').classList.add('active');
+}
+
+// Keep presets in sync when input changes manually
+const _origUpdateBrush = window.updateBrush;
+
+// ── USB port purge + reconnect ────────────────────────
+async function usbPurge() {
+  pLog('Purging port…', 'inf');
+  // Close any open port
+  if (_port) {
+    try {
+      if (_reader) {
+        try { await _reader.cancel(); } catch(e) {}
+        _reader = null;
+      }
+      try { await _port.close(); } catch(e) {}
+      _port = null;
+    } catch(e) {}
+  }
+  // Try to release any forgotten ports via getPorts()
+  if ('serial' in navigator) {
+    try {
+      const ports = await navigator.serial.getPorts();
+      for (const p of ports) {
+        try { await p.close(); } catch(e) {}
+      }
+      pLog('Ports released. Click CONNECT USB to try again.', 'ok');
+    } catch(e) {
+      pLog('Purge done. Click CONNECT USB to try again.', 'ok');
+    }
+  }
+  // Reset UI
+  const btn = document.getElementById('printConnectBtn');
+  btn.textContent = '🔌 CONNECT USB';
+  btn.disabled = false;
+  document.getElementById('printStartBtn').disabled = true;
+  pStat('disconnected');
+  pPort('—');
+}
+
+
+// ══════════════════════════════════════════════════════
+//  PRINT QUALITY PRESETS
+// ══════════════════════════════════════════════════════
+
+// infillDensity: 0 = perimeters only, 1 = full solid
+// Stored as s.infillDensity and used in generateGcode + buildLayerData
+let _printQuality = 'standard';
+
+const QUALITY_PRESETS = {
+  draft: {
+    simplifyEps:   3.0,   // aggressive simplification
+    smoothMode:    'chaikin',
+    chaikinPasses: 2,
+    bezierTess:    4,
+    numPerimeters: 1,     // single shell
+    infillDensity: 1.0,   // solid surface — required for ink transfer
+    gcSpeedPrint:  100,   // fast
+    gcSpeedTravel: 250,
+    gcSpeedFirst:  35,
+  },
+  standard: {
+    simplifyEps:   1.5,
+    smoothMode:    'bezier',
+    bezierTol:     1.5,
+    bezierTess:    8,
+    numPerimeters: 2,
+    infillDensity: 1.0,   // solid — stamps need full surface
+    gcSpeedPrint:  70,
+    gcSpeedTravel: 180,
+    gcSpeedFirst:  25,
+  },
+  fine: {
+    simplifyEps:   0.8,
+    smoothMode:    'bezier',
+    bezierTol:     1.0,
+    bezierTess:    16,
+    numPerimeters: 3,
+    infillDensity: 1.0,   // 100% solid
+    gcSpeedPrint:  40,
+    gcSpeedTravel: 120,
+    gcSpeedFirst:  15,
+  },
+};
+
+function setPrintQuality(q) {
+  _printQuality = q;
+  const p = QUALITY_PRESETS[q];
+  if (!p) return;
+
+  // Update quality button states
+  document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
+  const qBtn = document.getElementById('q-' + q);
+  if (qBtn) qBtn.classList.add('active');
+
+  // Apply settings to UI fields
+  document.getElementById('simplifyEps').value   = p.simplifyEps;
+  document.getElementById('smoothMode').value    = p.smoothMode;
+  updateSmoothUI();
+
+  if (p.smoothMode === 'chaikin')
+    document.getElementById('chaikinPasses').value = p.chaikinPasses;
+  if (p.smoothMode === 'bezier' && p.bezierTess)
+    document.getElementById('bezierTess').value = p.bezierTess;
+  if (p.bezierTol)
+    document.getElementById('bezierTol').value = p.bezierTol;
+
+  document.getElementById('numPerimeters').value   = p.numPerimeters;
+  document.getElementById('gcSpeedPrint').value    = p.gcSpeedPrint;
+  document.getElementById('gcSpeedTravel').value   = p.gcSpeedTravel;
+  document.getElementById('gcSpeedFirst').value    = p.gcSpeedFirst;
+
+  // Store infill density so gcode engine picks it up
+  window._infillDensity = p.infillDensity;
+
+  showToast('Quality: ' + q.toUpperCase() + ' — infill ' + Math.round(p.infillDensity*100) + '%');
+}
+
+// Init default
+window._infillDensity = QUALITY_PRESETS.standard.infillDensity;
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Project title — no newlines, blur on Enter
+document.getElementById('projectTitle').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.target.isContentEditable) return;
+  const map = {'p':'pencil','l':'line','r':'rect','e':'ellipse','f':'fill','x':'eraser','t':'text'};
+  if (map[e.key] && !e.shiftKey) { setTool(map[e.key]); return; }
+  if (e.shiftKey && e.key === 'R') { setTool('rect-fill'); return; }
+  if (e.shiftKey && e.key === 'E') { setTool('ellipse-fill'); return; }
+  if (e.ctrlKey && e.key === 'z') { undoAction(); return; }
+  if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) { redoAction(); return; }
+  if (e.key === 'Delete') clearCanvas();
+});
+
+// Resize observer
+const ro = new ResizeObserver(fitCanvas);
+ro.observe(document.getElementById('canvasWrap'));
+
+
+// ── Draggable tool palette ────────────────────────────
+(function() {
+  const pal = document.getElementById('toolPalette');
+  const handle = document.getElementById('palHandle');
+  let dragging = false, startX, startY, origLeft, origTop;
+
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    const r = pal.getBoundingClientRect();
+    const wrap = pal.parentElement.getBoundingClientRect();
+    origLeft = r.left - wrap.left;
+    origTop  = r.top  - wrap.top;
+    handle.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    pal.style.left = Math.max(4, origLeft + dx) + 'px';
+    pal.style.top  = Math.max(4, origTop  + dy) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    dragging = false;
+    handle.style.cursor = 'grab';
+  });
+})();
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+initCanvas(600);
+</script>
+</body>
+</html>
