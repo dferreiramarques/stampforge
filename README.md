@@ -1,30 +1,39 @@
-# StampForge v3
+# StampForge — Beta
 
 **Browser-based fabric stamp designer — draw, slice, and print in one tool.**
 
-Design stamps directly in the browser, export SVG/STL/GCODE, or send directly to your 3D printer via USB. Single HTML file, zero dependencies, works fully offline.
+Design stamps directly in the browser, export SVG / STL / GCODE, or send directly to your 3D printer via USB or OctoPrint. Single HTML file, zero dependencies, works fully offline.
 
-![Version](https://img.shields.io/badge/version-3.0-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)
+> **⚠ This is a public beta.** Features are stable but still being refined. Feedback welcome.
+
+![Version](https://img.shields.io/badge/version-3.0--beta-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)
 
 ---
 
-## Builds
+## Author & Credits
 
-| File | Description |
-|---|---|
-| `stampforge.html` | Full local version — all features including USB print |
-| `stampforge-free.html` | Cloud/Railway version — SVG + STL export only |
-| `octoprint-plugin/stampforge-octoprint-plugin.zip` | Plugin for existing OctoPrint installs |
-| `octoprint-plugin/stampforge-full-installer.zip` | Full installer — OctoPrint + StampForge from scratch |
+**David Marques**  
+Centro de Inovação Carlos Fiolhais — CDI Portugal  
+MIT License — 2026
+
+---
+
+## Quick start (Railway / cloud)
+
+The app runs as a single static HTML file served by a minimal Python server.  
+Deploy to Railway and open the URL — no configuration needed.
+
+```
+railway up
+```
 
 ---
 
 ## Quick start (local)
 
 ```bash
-# Serve locally (required for USB printing via Web Serial API)
 python3 -m http.server 7842
-# Open http://localhost:7842/stampforge.html in Chrome or Edge
+# Open http://localhost:7842 in Chrome or Edge
 ```
 
 **USB printing on Linux** — add your user to the `dialout` group:
@@ -50,7 +59,7 @@ sudo usermod -a -G dialout $USER
 
 ### SVG Import
 - Load any SVG file as drawing layer
-- Scale slider (5%–200%), X/Y offset, colour invert
+- Scale slider (5–200 %), X/Y offset, colour invert
 - Preview before placing on canvas
 - High-res pipeline: SVG rasterised at 4× resolution for clean contour tracing
 
@@ -67,10 +76,11 @@ Canvas pixels (or SVG at 4× resolution)
 ```
 
 ### Print settings
+
 | Parameter | Default | Description |
 |---|---|---|
 | Width / Height (mm) | 60 × 60 | Physical stamp dimensions |
-| Resolution | 1200px | Canvas resolution |
+| Resolution | 1200 px | Canvas resolution |
 | Layer Height | 0.20 mm | Slice thickness |
 | Nozzle Size | 0.40 mm | Extrusion width reference |
 | Base Thickness | 1.2 mm | Solid base plate |
@@ -83,6 +93,7 @@ Canvas pixels (or SVG at 4× resolution)
 | Bezier tessellation | 12 pts | Points per bezier segment |
 
 ### Printer profiles (18 included)
+
 | Brand | Models |
 |---|---|
 | Prusa | i3 MK3S/MK3S+, MK4, MINI/MINI+ |
@@ -113,14 +124,19 @@ Canvas pixels (or SVG at 4× resolution)
 
 ### USB direct print (Web Serial API)
 - Connect directly to printer USB — no drivers, no software
-- Line-by-line transmission with Marlin `ok` handshake (flow control)
+- Line-by-line transmission with Marlin ok handshake (flow control)
 - Live log with colour-coded responses
 - Progress bar + ETA
-- Emergency cancel (`M112`)
+- Emergency cancel (M112)
 - Port released on close
 
+### OctoPrint integration
+- Send GCODE directly to OctoPrint REST API
+- Configure host + API key in-app
+- Starts print immediately after upload
+
 ### Save / Load project
-- Saves complete state as `.stampforge` JSON
+- Saves complete state as .stampforge JSON
 - Restores canvas, all settings, printer selection, project name
 
 ---
@@ -129,63 +145,17 @@ Canvas pixels (or SVG at 4× resolution)
 
 | Key | Action |
 |---|---|
-| `P` | Pencil |
-| `L` | Line |
-| `R` / `Shift+R` | Rectangle stroke / filled |
-| `E` / `Shift+E` | Ellipse stroke / filled |
-| `F` | Fill |
-| `X` | Eraser |
-| `T` | Text |
-| `Ctrl+Z` | Undo |
-| `Ctrl+Y` | Redo |
-| `Delete` | Clear canvas |
-| `Esc` | Close any modal |
-
----
-
-## OctoPrint Plugin
-
-For labs with OctoPrint already running:
-
-```bash
-unzip stampforge-octoprint-plugin.zip
-cd octoprint_stampforge
-chmod +x install.sh && ./install.sh
-sudo systemctl restart octoprint
-```
-
-StampForge appears as a native tab in OctoPrint. The **▶ PRINT** button generates GCODE and sends it directly to the print queue — no API key, no CORS, no separate server.
-
-### Full installer (OctoPrint + StampForge from scratch)
-
-```bash
-# Linux
-unzip stampforge-full-installer.zip
-chmod +x full_installer/install-linux.sh
-./full_installer/install-linux.sh
-
-# Windows — run as Administrator
-powershell -ExecutionPolicy Bypass -File full_installer\install-windows.ps1
-
-# macOS — double-click
-full_installer/install-macos.command
-```
-
----
-
-## File structure
-
-```
-stampforge.html              ← entire app (~143KB, single file, offline)
-stampforge-free.html         ← cloud build, SVG+STL only
-octoprint-plugin/
-  stampforge-octoprint-plugin.zip   ← plugin only
-  stampforge-full-installer.zip     ← OctoPrint + plugin full install
-README.md
-```
-
-No build step. No package.json. No node_modules.  
-earcut 2.2.4 and bezier fitting are inlined — zero network requests.
+| P | Pencil |
+| L | Line |
+| R / Shift+R | Rectangle stroke / filled |
+| E / Shift+E | Ellipse stroke / filled |
+| F | Fill |
+| X | Eraser |
+| T | Text |
+| Ctrl+Z | Undo |
+| Ctrl+Y | Redo |
+| Delete | Clear canvas |
+| Esc | Close any modal |
 
 ---
 
@@ -201,29 +171,57 @@ Suggested: 100% infill on stamp face, print face-down for best surface quality.
 
 ---
 
-## Known limitations (v3)
+## File structure
+
+```
+index.html               <- full app (beta) — all features including USB + OctoPrint
+stampforge-free.html     <- future free tier — SVG + STL export only
+serve.py                 <- minimal Python static server (Railway)
+railway.toml             <- Railway deploy config
+nixpacks.toml            <- Railway build config
+README.md
+INSTALL.md
+USER_GUIDE.md
+TECHNICAL.md
+OCTOPRINT_API.md
+```
+
+No build step. No package.json. No node_modules.
+earcut 2.2.4 and Bezier fitting are inlined — zero network requests at runtime.
+
+---
+
+## Known limitations (beta)
 
 - Text tool does not follow symmetry axes
 - USB print tested with Marlin firmware — Klipper via serial should work but is untested
-- OctoPrint plugin geometry issues with complex designs (use standalone + USB instead)
+- USB print requires Chrome or Edge (Web Serial API) — Firefox not supported
+- OctoPrint integration requires same-network access or a public OctoPrint URL
+
+---
+
+## Roadmap
+
+- [ ] Free / Pro split — free tier: SVG + STL; Pro tier: direct print + OctoPrint
+- [ ] Send directly to OctoPrint from the cloud (Pro)
+- [ ] User accounts and saved projects
 
 ---
 
 ## Changelog
 
-### v3.0 (March 2026)
+### v3.0-beta (March 2026)
 - Bezier curve fitting (Schneider algorithm) replaces Chaikin as default smoothing
-- SVG import with scale/offset/invert controls + 4× high-res pipeline
+- SVG import with scale/offset/invert controls + 4x high-res pipeline
 - Layer-by-layer G-code preview with colour-coded move types
 - Save/Load project state (.stampforge JSON)
 - Multiple perimeter shells with inward offset
 - Draggable vertical tool palette (Photoshop-style)
-- Light theme for OctoPrint plugin
-- Touch + stylus support (touchstart/touchmove/touchend + changedTouches)
+- Touch + stylus support
 - Eraser ghost dot fix
 - Removed Google Fonts dependency — fully offline
-- OctoPrint plugin with fullscreen overlay modal
-- Cross-platform installers: Linux / Windows / macOS
+- OctoPrint modal with host + API key config
+- Public beta release on Railway
 
 ### v2.0
 - 18 printer profiles with auto-fill
@@ -237,14 +235,9 @@ Suggested: 100% infill on stamp face, print face-down for best surface quality.
 - Inline project name
 - Watertight STL export (earcut triangulation)
 - SVG export
-- Cura profile import
 
 ---
 
 ## License
 
-MIT — do whatever you want with it.
-
----
-
-*Idealized & developed by vibe coding with claude.ai — Centro de Inovação Carlos Fiolhais / CDI Portugal — Março 2026*
+MIT — David Marques · Centro de Inovação Carlos Fiolhais · CDI Portugal · 2026

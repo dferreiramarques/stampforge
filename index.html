@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StampForge — 3D Print Stamp Designer</title>
+<title>StampForge BETA — 3D Print Stamp Designer</title>
 <style>
 :root {
   --bg:       #09090b;
@@ -352,7 +352,7 @@ input[type=file]{display:none}
 
 <!-- ─── HEADER ─────────────────────────────── -->
 <header>
-  <div class="logo">STAMP<em>FORGE</em></div>
+  <div class="logo">STAMP<em>FORGE</em> <span style="font-size:8px;background:#f07020;color:#000;padding:1px 5px;border-radius:3px;letter-spacing:1px;font-weight:700;vertical-align:middle">BETA</span></div>
   <div class="sep"></div>
   <div class="hdr-right">
     <label class="tiny">COLOR</label>
@@ -636,7 +636,7 @@ input[type=file]{display:none}
     <button id="layerCloseBtn" onclick="document.getElementById('layerModal').classList.remove('open')">✕ CLOSE</button>
   </div>
 </div>
-<div id="creditsBar">Idealized &amp; developed by <em>vibe coding with claude.ai</em> &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais &nbsp;·&nbsp; CDI Portugal &nbsp;·&nbsp; Março 2026</div>
+<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais &nbsp;·&nbsp; CDI Portugal &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <em style="color:rgba(200,150,50,.5)">beta — report issues to the team</em></div>
 <div id="toast">STL EXPORTED</div>
 
 <!-- Text input overlay (hidden) -->
@@ -2032,34 +2032,27 @@ function getBinaryMask(s) {
   for (let i = 0; i < W * H; i++)
     raw[i] = (d[i*4]*0.299 + d[i*4+1]*0.587 + d[i*4+2]*0.114) < 220 ? 1 : 0;
 
-  // Morphological closing (dilate R px then erode R px)
-  // Fills 1-2px antialiasing gaps between overlapping strokes
-  const R = 2;
+  // Morphological closing R=1 (fills antialiasing gaps, preserves open spaces)
+  const R = 1;
   const tmp = new Uint8Array(W * H);
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      if (raw[y*W+x]) { tmp[y*W+x] = 1; continue; }
-      let hit = false;
-      for (let dy = -R; dy <= R && !hit; dy++)
-        for (let dx = -R; dx <= R && !hit; dx++) {
-          const nx = x+dx, ny = y+dy;
-          if (nx>=0 && nx<W && ny>=0 && ny<H && raw[ny*W+nx]) hit = true;
-        }
-      tmp[y*W+x] = hit ? 1 : 0;
+  for (let y=0;y<H;y++) for (let x=0;x<W;x++) {
+    if (raw[y*W+x]) { tmp[y*W+x]=1; continue; }
+    let hit=false;
+    for (let dy=-R;dy<=R&&!hit;dy++) for (let dx=-R;dx<=R&&!hit;dx++) {
+      const nx=x+dx,ny=y+dy;
+      if(nx>=0&&nx<W&&ny>=0&&ny<H&&raw[ny*W+nx]) hit=true;
     }
+    tmp[y*W+x]=hit?1:0;
   }
   const mask = new Uint8Array(W * H);
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      if (!tmp[y*W+x]) { mask[y*W+x] = 0; continue; }
-      let solid = true;
-      for (let dy = -R; dy <= R && solid; dy++)
-        for (let dx = -R; dx <= R && solid; dx++) {
-          const nx = x+dx, ny = y+dy;
-          if (nx>=0 && nx<W && ny>=0 && ny<H && !tmp[ny*W+nx]) solid = false;
-        }
-      mask[y*W+x] = solid ? 1 : 0;
+  for (let y=0;y<H;y++) for (let x=0;x<W;x++) {
+    if (!tmp[y*W+x]) { mask[y*W+x]=0; continue; }
+    let solid=true;
+    for (let dy=-R;dy<=R&&solid;dy++) for (let dx=-R;dx<=R&&solid;dx++) {
+      const nx=x+dx,ny=y+dy;
+      if(nx>=0&&nx<W&&ny>=0&&ny<H&&!tmp[ny*W+nx]) solid=false;
     }
+    mask[y*W+x]=solid?1:0;
   }
 
   return { mask, W, H };
@@ -2278,7 +2271,7 @@ async function buildSTL(s) {
 function writeBinarySTL(tris) {
   const buf = new ArrayBuffer(84 + tris.length * 50);
   const dv  = new DataView(buf);
-  const hdr = 'StampForge vector stamp';
+  const hdr = 'StampForge — David Marques / CDI Portugal';
   for (let i = 0; i < 80; i++)
     dv.setUint8(i, i < hdr.length ? hdr.charCodeAt(i) : 0);
   dv.setUint32(80, tris.length, true);
@@ -3829,21 +3822,6 @@ function setPrintQuality(q) {
 // Init default
 window._infillDensity = QUALITY_PRESETS.standard.infillDensity;
 
-// ══════════════════════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// Project title — no newlines, blur on Enter
-document.getElementById('projectTitle').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
-});
 
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
