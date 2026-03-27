@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StampForge BETA — 3D Print Stamp Designer</title>
+<title>StampForge — 3D Print Stamp Designer</title>
 <style>
 :root {
   --bg:       #09090b;
@@ -352,7 +352,7 @@ input[type=file]{display:none}
 
 <!-- ─── HEADER ─────────────────────────────── -->
 <header>
-  <div class="logo">STAMP<em>FORGE</em> <span style="font-size:8px;background:#f07020;color:#000;padding:1px 5px;border-radius:3px;letter-spacing:1px;font-weight:700;vertical-align:middle">BETA</span></div>
+  <div class="logo">STAMP<em>FORGE</em></div>
   <div class="sep"></div>
   <div class="hdr-right">
     <label class="tiny">COLOR</label>
@@ -636,7 +636,7 @@ input[type=file]{display:none}
     <button id="layerCloseBtn" onclick="document.getElementById('layerModal').classList.remove('open')">✕ CLOSE</button>
   </div>
 </div>
-<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais &nbsp;·&nbsp; CDI Portugal &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <em style="color:rgba(200,150,50,.5)">beta — report issues to the team</em></div>
+<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; vibe coded with claude.ai &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais · CDI Portugal &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026</div>
 <div id="toast">STL EXPORTED</div>
 
 <!-- Text input overlay (hidden) -->
@@ -2549,6 +2549,7 @@ async function generateGcode(s, printer) {
     normalized.push({c:poly,isOuter:!isHole});
   }
   const outers = normalized.filter(x=>x.isOuter).map(x=>x.c);
+  const holes  = normalized.filter(x=>!x.isOuter).map(x=>x.c);
 
   // Printer/slicer params
   const layerH   = s.layerH;
@@ -2778,9 +2779,14 @@ async function generateGcode(s, printer) {
           if (pRing.length >= 3) printRing(pRing, layer);
         }
       }
+      // Hole perimeters — one ring per hole boundary
+      for (const ring of holes) {
+        if (ring.length >= 3) printRing(ring, layer);
+      }
       emit('; infill');
       const innerRings = outers.map(r => numPerim>1 ? offsetRingBy(r,(numPerim-1)*extW) : r);
-      printInfill(innerRings, layer, layer%2===0?0:90);
+      // Pass outerRings + holeRings together so even-odd scanline excludes hole areas
+      printInfill([...innerRings, ...holes], layer, layer%2===0?0:90);
     }
 
     emit('');
@@ -3422,6 +3428,7 @@ async function buildLayerData(s, printer) {
     norm.push({c:poly,isOuter:!isHole});
   }
   const outers=norm.filter(x=>x.isOuter).map(x=>x.c);
+  const holes =norm.filter(x=>!x.isOuter).map(x=>x.c);
   const layerH=s.layerH, nozzle=s.nozzle, extW=nozzle*1.1;
   const filArea=Math.PI*(printer.filament/2)**2;
   const sp=s.gcSpeedPrint||printer.speed_print;
@@ -3460,8 +3467,16 @@ async function buildLayerData(s, printer) {
           for(let i=1;i<=pRing.length;i++){const p=pRing[i%pRing.length];addLine(cx,cy,p.x,p.y);}
         }
       }
+      // Hole perimeters — draw one ring per hole so they appear in the preview
+      for(const ring of holes){
+        if(ring.length<3) continue;
+        perimeters.push(ring);
+        addTravel(ring[0].x,ring[0].y);
+        for(let i=1;i<=ring.length;i++){const p=ring[i%ring.length];addLine(cx,cy,p.x,p.y);}
+      }
       const innerRings=outers.map(r=>numPerim>1?offsetRingBy(r,(numPerim-1)*extW):r);
-      if (_density > 0) { for(const seg of infillSegments(innerRings,pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
+      // Pass outerRings + holeRings together so even-odd ray casting excludes holes
+      if (_density > 0) { for(const seg of infillSegments([...innerRings,...holes],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
     }
     const timeS=filament/sp*60;
     // allRings for preview even-odd fill: all original contours (outers + holes)
