@@ -186,7 +186,6 @@ main{display:flex;height:calc(100vh - 46px);overflow:hidden}
   background:var(--s2);border-radius:4px;overflow:hidden;
   min-height:120px;position:relative;
 }
-#previewCanvas{border-radius:4px}
 .preview-tag{
   position:absolute;top:4px;left:4px;font-size:9px;color:var(--acc);
   letter-spacing:1px;background:rgba(9,9,11,.7);padding:2px 5px;border-radius:2px;
@@ -250,24 +249,7 @@ main{display:flex;height:calc(100vh - 46px);overflow:hidden}
 input[type=file]{display:none}
 
 
-/* ── Floating stamp preview ─────────────────────── */
-#floatPreview{
-  position:absolute;bottom:28px;left:12px;z-index:15;
-  background:rgba(13,13,16,.82);border:1px solid var(--border);
-  border-radius:6px;padding:8px;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  backdrop-filter:blur(4px);
-  transition:opacity .2s;
-}
-#floatPreview:hover{opacity:.3}
-#floatPreviewLabel{
-  font-family:var(--mono);font-size:8px;letter-spacing:2px;
-  color:var(--acc);font-weight:700;
-}
-#floatPreviewSub{
-  font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:1px;
-}
-#previewCanvas{border-radius:3px;display:block}
+
 
 
 /* ── OctoPrint Modal ─────────────────────────── */
@@ -358,10 +340,10 @@ input[type=file]{display:none}
     <label class="tiny">COLOR</label>
     <input type="color" id="colorPick" value="#000000" oninput="updateColor()">
     <label class="tiny">SIZE</label>
-    <input type="number" class="size-inp" id="brushSize" value="10" min="1" max="60" oninput="updateBrush()">
+    <input type="number" class="size-inp" id="brushSize" value="4" min="1" max="60" oninput="updateBrush()">
     <button class="brush-preset" id="bp-fine"   onclick="setBrushPreset(2)"  title="Fine (2px)"><div class="brush-dot" style="width:3px;height:3px"></div>F</button>
-    <button class="brush-preset active" id="bp-medium" onclick="setBrushPreset(10)" title="Medium (10px)"><div class="brush-dot" style="width:8px;height:8px"></div>M</button>
-    <button class="brush-preset" id="bp-thick"  onclick="setBrushPreset(20)" title="Thick (20px)"><div class="brush-dot" style="width:13px;height:13px"></div>G</button>
+    <button class="brush-preset active" id="bp-medium" onclick="setBrushPreset(6)"  title="Medium (6px)"><div class="brush-dot" style="width:6px;height:6px"></div>M</button>
+    <button class="brush-preset" id="bp-thick"  onclick="setBrushPreset(16)" title="Thick (16px)"><div class="brush-dot" style="width:10px;height:10px"></div>G</button>
   </div>
   <div class="sep"></div>
   <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="saveProject()" title="Save project">💾</button>
@@ -412,11 +394,7 @@ input[type=file]{display:none}
     <div class="zoom-info" id="zoomInfo">100%</div>
 
     <!-- Floating stamp preview -->
-    <div id="floatPreview">
-      <div id="floatPreviewLabel">STAMP PREVIEW</div>
-      <canvas id="previewCanvas" width="160" height="160"></canvas>
-      <div id="floatPreviewSub">mirror · fabric sim</div>
-    </div>
+
   </div>
 
   <!-- Right Panel -->
@@ -792,7 +770,7 @@ function updateBrush() {
   // Sync preset buttons
   document.querySelectorAll('.brush-preset').forEach(b => b.classList.remove('active'));
   if (brushSize <= 3)       { const b=document.getElementById('bp-fine');   if(b) b.classList.add('active'); }
-  else if (brushSize <= 14) { const b=document.getElementById('bp-medium'); if(b) b.classList.add('active'); }
+  else if (brushSize <= 10) { const b=document.getElementById('bp-medium'); if(b) b.classList.add('active'); }
   else                      { const b=document.getElementById('bp-thick');  if(b) b.classList.add('active'); }
 }
 
@@ -851,7 +829,7 @@ canvas.addEventListener('touchend', e => {
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 // Single safe refresh — no recursion
-function refreshUI() { updatePreview(); updateInfo(); drawSymmetryGuides(); }
+function refreshUI() { updateInfo(); drawSymmetryGuides(); }
 
 // ─── Symmetry guide overlay ────────────────────────────
 function toggleSym(axis) {
@@ -1093,49 +1071,7 @@ function importImage() {
 // ══════════════════════════════════════════════════════
 //  PREVIEW — simulated stamp impression
 // ══════════════════════════════════════════════════════
-function updatePreview() {
-  const prev = document.getElementById('previewCanvas');
-  const pctx = prev.getContext('2d');
-  const s = getSettings();
 
-  // Draw fabric-like texture
-  pctx.fillStyle = '#e8ddd0';
-  pctx.fillRect(0, 0, 200, 200);
-  // Fabric grain
-  for (let i = 0; i < 200; i += 3) {
-    pctx.strokeStyle = `rgba(0,0,0,${Math.random()*0.04})`;
-    pctx.beginPath(); pctx.moveTo(i, 0); pctx.lineTo(i, 200); pctx.stroke();
-    pctx.beginPath(); pctx.moveTo(0, i); pctx.lineTo(200, i); pctx.stroke();
-  }
-
-  // Get canvas image, mirror if needed, render as ink
-  const offscreen = document.createElement('canvas');
-  offscreen.width = 200; offscreen.height = 200;
-  const octx2 = offscreen.getContext('2d');
-  if (s.mirrorX) {
-    octx2.translate(200, 0);
-    octx2.scale(-1, 1);
-  }
-  octx2.drawImage(canvas, 0, 0, 200, 200);
-
-  // Apply ink effect
-  const id = octx2.getImageData(0, 0, 200, 200);
-  const d = id.data;
-  for (let i = 0; i < d.length; i += 4) {
-    const bright = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114);
-    if (bright < 200 && d[i+3] > 100) {
-      // Ink-like: dark blue/black with slight variation
-      d[i]   = Math.max(0, d[i]   * 0.3 + Math.random()*10);
-      d[i+1] = Math.max(0, d[i+1] * 0.3 + Math.random()*10);
-      d[i+2] = Math.max(0, d[i+2] * 0.3 + 20 + Math.random()*15);
-      d[i+3] = 180 + Math.random() * 60;
-    } else {
-      d[i+3] = 0; // transparent = fabric shows through
-    }
-  }
-  octx2.putImageData(id, 0, 0);
-  pctx.drawImage(offscreen, 0, 0);
-}
 
 // ══════════════════════════════════════════════════════
 //  CURA PROFILE PARSER
@@ -2136,8 +2072,7 @@ function chaikin(pts, passes) {
 
 // ─── 5. Scale pixels → mm ─────────────────────────────
 function scaleContour(pts, W, H, physW, physH) {
-  // Flip Y: canvas Y=0 is top of drawing; physical Y=0 is front of printer (bottom of drawing)
-  return pts.map(p=>({x:(p.x/W)*physW, y:physH-(p.y/H)*physH}));
+  return pts.map(p=>({x:(p.x/W)*physW, y:(p.y/H)*physH}));
 }
 
 // ─── 6. Signed area (positive=CCW, negative=CW) ───────
@@ -3700,7 +3635,7 @@ function setBrushPreset(size) {
   // Update active state
   document.querySelectorAll('.brush-preset').forEach(b => b.classList.remove('active'));
   if (size <= 3)       document.getElementById('bp-fine').classList.add('active');
-  else if (size <= 14) document.getElementById('bp-medium').classList.add('active');
+  else if (size <= 10) document.getElementById('bp-medium').classList.add('active');
   else                 document.getElementById('bp-thick').classList.add('active');
 }
 
