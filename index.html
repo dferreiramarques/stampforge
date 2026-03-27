@@ -351,7 +351,7 @@ input[type=file]{display:none}
   <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="saveProject()" title="Save project">💾</button>
   <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="loadProject()" title="Load project">📂</button>
   <div class="sep"></div>
-  <button class="export-btn" style="background:var(--s3);color:var(--acc);border:1px solid var(--acc)" onclick="exportSVG()">SVG</button>
+  <button class="export-btn" id="svgBtn" style="background:var(--s3);color:var(--acc);border:1px solid var(--acc)" onclick="exportSVG()">SVG</button>
   <button class="export-btn" id="stlBtn" onclick="exportSTL()">STL</button>
   <button class="export-btn" id="layerPreviewBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openLayerPreview()">PREV</button>
   <button class="export-btn" id="gcodeBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="exportGcode()">GCODE</button>
@@ -689,6 +689,7 @@ function initCanvas(size) {
   ctx.fillRect(0, 0, size, size);
   fitCanvas();
   updateInfo();
+  updateExportButtons();
 }
 
 function fitCanvas() {
@@ -751,6 +752,25 @@ function updateInfo() {
   document.getElementById('si-gc').textContent = `${gcX} × ${gcY}`;
   document.getElementById('si-pt').textContent = `~${Math.round(gcX*gcY*0.0003 + 8)} min`;
   document.getElementById('st-scale').textContent = `${pxMm}px/mm`;
+}
+
+function isCanvasEmpty() {
+  if (_svgActive) return false; // SVG source active — always has content
+  const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  const bg = [245, 245, 240]; // canvas background colour #f5f5f0
+  const step = 64; // sample every 64th pixel for speed
+  for (let i = 0; i < d.length; i += step * 4) {
+    if (Math.abs(d[i]-bg[0])>8 || Math.abs(d[i+1]-bg[1])>8 || Math.abs(d[i+2]-bg[2])>8) return false;
+  }
+  return true;
+}
+
+function updateExportButtons() {
+  const empty = isCanvasEmpty();
+  ['svgBtn','stlBtn','layerPreviewBtn','gcodeBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = empty;
+  });
 }
 
 // ══════════════════════════════════════════════════════
@@ -830,7 +850,7 @@ canvas.addEventListener('touchend', e => {
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 // Single safe refresh — no recursion
-function refreshUI() { updateInfo(); drawSymmetryGuides(); }
+function refreshUI() { updateInfo(); updateExportButtons(); drawSymmetryGuides(); }
 
 // ─── Symmetry guide overlay ────────────────────────────
 function toggleSym(axis) {
