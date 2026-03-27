@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StampForge — 3D Print Stamp Designer</title>
+<title>StampForge BETA — 3D Print Stamp Designer</title>
 <style>
 :root {
   --bg:       #09090b;
@@ -122,19 +122,21 @@ main{display:flex;height:calc(100vh - 46px);overflow:hidden}
   padding-left:100px;
 }
 #projectTitle{
-  position:absolute;top:16px;left:88px;z-index:20;
-  font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:3px;
+  position:absolute;top:-34px;left:0;right:0;z-index:20;
+  text-align:center;
+  font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:2px;
   color:rgba(160,160,150,0.55);
   background:none;border:none;outline:none;
-  cursor:text;padding:2px 4px;border-radius:3px;
+  cursor:text;padding:2px 8px;border-radius:3px;
   transition:color .2s, background .2s;
-  min-width:60px;max-width:320px;
-  white-space:nowrap;overflow:hidden;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;
 }
 #projectTitle:hover{ color:rgba(200,200,190,0.75); }
 #projectTitle:focus{
   color:var(--fg);background:rgba(255,255,255,0.06);
   outline:1px solid var(--acc);
+  white-space:nowrap;
 }
 .canvas-frame{
   position:relative;box-shadow:0 0 0 1px var(--border),0 4px 32px rgba(0,0,0,.6);
@@ -334,16 +336,16 @@ input[type=file]{display:none}
 
 <!-- ─── HEADER ─────────────────────────────── -->
 <header>
-  <div class="logo">STAMP<em>FORGE</em></div>
+  <div class="logo">STAMP<em>FORGE</em> <span style="font-size:8px;background:#f07020;color:#000;padding:1px 5px;border-radius:3px;letter-spacing:1px;font-weight:700;vertical-align:middle">BETA</span></div>
   <div class="sep"></div>
   <div class="hdr-right">
     <label class="tiny">COLOR</label>
     <input type="color" id="colorPick" value="#000000" oninput="updateColor()">
     <label class="tiny">SIZE</label>
-    <input type="number" class="size-inp" id="brushSize" value="4" min="1" max="60" oninput="updateBrush()">
+    <input type="number" class="size-inp" id="brushSize" value="10" min="1" max="60" oninput="updateBrush()">
     <button class="brush-preset" id="bp-fine"   onclick="setBrushPreset(2)"  title="Fine (2px)"><div class="brush-dot" style="width:3px;height:3px"></div>F</button>
-    <button class="brush-preset active" id="bp-medium" onclick="setBrushPreset(6)"  title="Medium (6px)"><div class="brush-dot" style="width:6px;height:6px"></div>M</button>
-    <button class="brush-preset" id="bp-thick"  onclick="setBrushPreset(16)" title="Thick (16px)"><div class="brush-dot" style="width:10px;height:10px"></div>G</button>
+    <button class="brush-preset active" id="bp-medium" onclick="setBrushPreset(10)" title="Medium (10px)"><div class="brush-dot" style="width:8px;height:8px"></div>M</button>
+    <button class="brush-preset" id="bp-thick"  onclick="setBrushPreset(20)" title="Thick (20px)"><div class="brush-dot" style="width:13px;height:13px"></div>G</button>
   </div>
   <div class="sep"></div>
   <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="saveProject()" title="Save project">💾</button>
@@ -384,8 +386,8 @@ input[type=file]{display:none}
       <button class="tool-btn" id="sym-v" onclick="toggleSym('v')" title="Mirror left↔right">⇔</button>
       <button class="tool-btn" id="sym-h" onclick="toggleSym('h')" title="Mirror top↔bottom">⇕</button>
     </div>
-    <span id="projectTitle" contenteditable="true" spellcheck="false" title="Click to rename project">untitled</span>
     <div class="canvas-frame" id="canvasFrame">
+      <span id="projectTitle" contenteditable="true" spellcheck="false" title="Click to rename project">untitled</span>
       <canvas id="drawCanvas"></canvas>
       <canvas id="overlayCanvas"></canvas>
       <div class="canvas-label" id="canvasLabel">60 × 60 mm</div>
@@ -393,7 +395,6 @@ input[type=file]{display:none}
     </div>
     <div class="zoom-info" id="zoomInfo">100%</div>
 
-    <!-- Floating stamp preview -->
 
   </div>
 
@@ -614,7 +615,7 @@ input[type=file]{display:none}
     <button id="layerCloseBtn" onclick="document.getElementById('layerModal').classList.remove('open')">✕ CLOSE</button>
   </div>
 </div>
-<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; vibe coded with claude.ai &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais · CDI Portugal &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026</div>
+<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais &nbsp;·&nbsp; CDI Portugal &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <em style="color:rgba(200,150,50,.5)">beta — report issues to the team</em></div>
 <div id="toast">STL EXPORTED</div>
 
 <!-- Text input overlay (hidden) -->
@@ -770,7 +771,7 @@ function updateBrush() {
   // Sync preset buttons
   document.querySelectorAll('.brush-preset').forEach(b => b.classList.remove('active'));
   if (brushSize <= 3)       { const b=document.getElementById('bp-fine');   if(b) b.classList.add('active'); }
-  else if (brushSize <= 10) { const b=document.getElementById('bp-medium'); if(b) b.classList.add('active'); }
+  else if (brushSize <= 14) { const b=document.getElementById('bp-medium'); if(b) b.classList.add('active'); }
   else                      { const b=document.getElementById('bp-thick');  if(b) b.classList.add('active'); }
 }
 
@@ -977,6 +978,15 @@ function floodFill(sx, sy, fillHex) {
     visited[y*W+x]=1;
     d[i]=fr;d[i+1]=fg;d[i+2]=fb;d[i+3]=255;
     stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+  // 1px dilation — cobre halo antialiased na fronteira do traço
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++) {
+    if(visited[y*W+x]) continue;
+    const i=idx(y,x);
+    if(d[i+3]<10) continue;
+    const nb=(x>0&&visited[y*W+x-1])||(x<W-1&&visited[y*W+x+1])||
+             (y>0&&visited[(y-1)*W+x])||(y<H-1&&visited[(y+1)*W+x]);
+    if(nb){d[i]=fr;d[i+1]=fg;d[i+2]=fb;d[i+3]=255;}
   }
   ctx.putImageData(imgd,0,0);
 }
@@ -2072,7 +2082,8 @@ function chaikin(pts, passes) {
 
 // ─── 5. Scale pixels → mm ─────────────────────────────
 function scaleContour(pts, W, H, physW, physH) {
-  return pts.map(p=>({x:(p.x/W)*physW, y:(p.y/H)*physH}));
+  // Flip Y: canvas Y=0 is top; physical Y=0 is front of printer (bed ejects forward)
+  return pts.map(p=>({x:(p.x/W)*physW, y:physH-(p.y/H)*physH}));
 }
 
 // ─── 6. Signed area (positive=CCW, negative=CW) ───────
@@ -2485,6 +2496,7 @@ async function generateGcode(s, printer) {
     normalized.push({c:poly,isOuter:!isHole});
   }
   const outers = normalized.filter(x=>x.isOuter).map(x=>x.c);
+  const holes  = normalized.filter(x=>!x.isOuter).map(x=>x.c);
 
   // Printer/slicer params
   const layerH   = s.layerH;
@@ -2714,9 +2726,12 @@ async function generateGcode(s, printer) {
           if (pRing.length >= 3) printRing(pRing, layer);
         }
       }
+      for (const ring of holes) {
+        if (ring.length >= 3) printRing(ring, layer);
+      }
       emit('; infill');
       const innerRings = outers.map(r => numPerim>1 ? offsetRingBy(r,(numPerim-1)*extW) : r);
-      printInfill(innerRings, layer, layer%2===0?0:90);
+      printInfill([...innerRings, ...holes], layer, layer%2===0?0:90);
     }
 
     emit('');
@@ -3358,6 +3373,7 @@ async function buildLayerData(s, printer) {
     norm.push({c:poly,isOuter:!isHole});
   }
   const outers=norm.filter(x=>x.isOuter).map(x=>x.c);
+  const holes =norm.filter(x=>!x.isOuter).map(x=>x.c);
   const layerH=s.layerH, nozzle=s.nozzle, extW=nozzle*1.1;
   const filArea=Math.PI*(printer.filament/2)**2;
   const sp=s.gcSpeedPrint||printer.speed_print;
@@ -3396,8 +3412,14 @@ async function buildLayerData(s, printer) {
           for(let i=1;i<=pRing.length;i++){const p=pRing[i%pRing.length];addLine(cx,cy,p.x,p.y);}
         }
       }
+      for(const ring of holes){
+        if(ring.length<3) continue;
+        perimeters.push(ring);
+        addTravel(ring[0].x,ring[0].y);
+        for(let i=1;i<=ring.length;i++){const p=ring[i%ring.length];addLine(cx,cy,p.x,p.y);}
+      }
       const innerRings=outers.map(r=>numPerim>1?offsetRingBy(r,(numPerim-1)*extW):r);
-      if (_density > 0) { for(const seg of infillSegments(innerRings,pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
+      if (_density > 0) { for(const seg of infillSegments([...innerRings,...holes],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
     }
     const timeS=filament/sp*60;
     // allRings for preview even-odd fill: all original contours (outers + holes)
@@ -3635,7 +3657,7 @@ function setBrushPreset(size) {
   // Update active state
   document.querySelectorAll('.brush-preset').forEach(b => b.classList.remove('active'));
   if (size <= 3)       document.getElementById('bp-fine').classList.add('active');
-  else if (size <= 10) document.getElementById('bp-medium').classList.add('active');
+  else if (size <= 14) document.getElementById('bp-medium').classList.add('active');
   else                 document.getElementById('bp-thick').classList.add('active');
 }
 
