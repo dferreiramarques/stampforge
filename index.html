@@ -2327,13 +2327,16 @@ G28 ; home all axes
 G1 Z5 F3000 ; lift
 M190 S{bed_temp} ; wait for bed
 M109 S{nozzle_temp} ; wait for nozzle
+M83 ; relative extrusion for intro line
 G1 X0 Y-3 Z0.3 F3000 ; intro line start
 G1 X60 E9 F1000 ; intro line
-G1 X100 E12.5 F1000 ; intro line
-M82 ; absolute extrusion
+G1 X100 E3.5 F1000 ; intro line
+G1 E-1 F2100 ; retract after intro
+M82 ; back to absolute extrusion
 G92 E0 ; reset extruder`,
     end_gcode:`G4 ; wait
 M221 S100 ; reset flow
+G1 E-2 F2100 ; retract to avoid ooze
 M104 S0 ; nozzle off
 M140 S0 ; bed off
 G1 Z{z_max} F3000 ; raise nozzle
@@ -2350,7 +2353,7 @@ M190 S{bed_temp}
 M109 S{nozzle_temp}
 G1 Z5 F3000
 G92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
   },
   {
     id:'ender3', name:'Creality Ender-3 / Ender-3 V2',
@@ -2367,7 +2370,7 @@ G1 X0.1 Y200 Z0.3 E15 F1500
 G1 X0.4 Y200 Z0.3 F5000
 G1 X0.4 Y20 Z0.3 E30 F1500
 G92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'ender3_s1', name:'Creality Ender-3 S1 / S1 Pro',
@@ -2375,7 +2378,7 @@ G92 E0`,
     temp_nozzle:210,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
     retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'cr10', name:'Creality CR-10 / CR-10S',
@@ -2383,7 +2386,7 @@ G92 E0`,
     temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
     retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'cr10_v2', name:'Creality CR-10 V2/V3',
@@ -2391,7 +2394,7 @@ G92 E0`,
     temp_nozzle:205,temp_bed:60,speed_print:50,speed_travel:180,speed_first:20,
     retract_len:1.5,retract_speed:40,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'bambu_p1p', name:'Bambu Lab P1P / P1S',
@@ -2399,7 +2402,7 @@ G92 E0`,
     temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
     retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
     start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'bambu_x1', name:'Bambu Lab X1 / X1C',
@@ -2407,7 +2410,7 @@ G92 E0`,
     temp_nozzle:220,temp_bed:55,speed_print:150,speed_travel:500,speed_first:30,
     retract_len:0.5,retract_speed:50,fan_speed:255,fan_layer:1,
     start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'artillery_sw', name:'Artillery Sidewinder X1/X2',
@@ -2415,7 +2418,7 @@ G92 E0`,
     temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
     retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'artillery_genius', name:'Artillery Genius Pro',
@@ -2423,7 +2426,7 @@ G92 E0`,
     temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
     retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'voron24', name:'Voron 2.4',
@@ -2431,7 +2434,7 @@ G92 E0`,
     temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
     retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
     start_gcode:`G28\nQGL\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
   },
   {
     id:'voron_trident', name:'Voron Trident',
@@ -2439,7 +2442,7 @@ G92 E0`,
     temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
     retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
     start_gcode:`G28\nZ_TILT_ADJUST\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
   },
   {
     id:'anycubic_kobra', name:'Anycubic Kobra / Kobra 2',
@@ -2447,7 +2450,7 @@ G92 E0`,
     temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
     retract_len:5.0,retract_speed:40,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'elegoo_neptune', name:'Elegoo Neptune 3 / 4',
@@ -2455,7 +2458,7 @@ G92 E0`,
     temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
     retract_len:1.0,retract_speed:40,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'bambu_a1', name:'Bambu Lab A1 / A1 Mini',
@@ -2463,7 +2466,7 @@ G92 E0`,
     temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
     retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
     start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'prusa_mini', name:'Prusa MINI / MINI+',
@@ -2471,7 +2474,7 @@ G92 E0`,
     temp_nozzle:215,temp_bed:60,speed_print:45,speed_travel:150,speed_first:15,
     retract_len:3.2,retract_speed:35,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   },
   {
     id:'longer_lk4', name:'Longer LK4 Pro (Klipper)',
@@ -2479,7 +2482,7 @@ G92 E0`,
     temp_nozzle:205,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
     retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X Y\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
   },
   {
     id:'generic_reprap', name:'Generic RepRap / Custom',
@@ -2487,7 +2490,7 @@ G92 E0`,
     temp_nozzle:200,temp_bed:50,speed_print:40,speed_travel:120,speed_first:20,
     retract_len:2.0,retract_speed:30,fan_speed:255,fan_layer:2,
     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`M104 S0\nM140 S0\nG28 X\nM84`
+    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
   }
 ];
 
@@ -2700,10 +2703,17 @@ async function generateGcode(s, printer) {
   const startGcode = (printer.start_gcode||'')
     .replace(/\{nozzle_temp\}/g, s.gcTempNozzle || printer.temp_nozzle)
     .replace(/\{bed_temp\}/g,    s.gcTempBed    || printer.temp_bed)
-    .replace(/\{z_max\}/g,       mm(topZ + 20));
-  emit('; StampForge v2 — generated G-code');
+    .replace(/\{z_max\}/g,       mm(topZ + 20))
+    .replace(/\[nozzle_diameter\]/g, mm(s.nozzle || printer.nozzle || 0.4))
+    .replace(/\{nozzle\}/g,          mm(s.nozzle || printer.nozzle || 0.4))
+    .replace(/\[printer_model\]/g,   printer.id || 'generic')
+    .replace(/\[filament_type\]/g,   'PLA')
+    .replace(/\[bed_temperature\]/g, s.gcTempBed    || printer.temp_bed)
+    .replace(/\[nozzle_temperature\]/g, s.gcTempNozzle || printer.temp_nozzle);
+  emit('; StampForge — generated G-code');
   emit(`; Project: ${getProjectSlug()}`);
   emit(`; Printer: ${printer.name}`);
+  emit(`; Nozzle: ${(s.nozzle || 0.4).toFixed(2)}mm  Filament: ${printer.filament}mm`);
   emit(`; Stamp: ${s.physW}x${s.physH}mm, ${totalLayers} layers, layer_h=${layerH}`);
   emit('; ───────────────────────────────────');
   emit(startGcode);
