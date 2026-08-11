@@ -1,19 +1,20 @@
 # StampForge — Beta
 
-**Browser-based fabric stamp designer — draw, slice, and print in one tool.**
+**Browser-based fabric stamp designer — draw a design, export a print-ready STL.**
 
-Design stamps directly in the browser, export SVG / STL / GCODE, or send directly to your 3D printer via USB or OctoPrint. Single HTML file, zero dependencies, works fully offline.
+Design stamps directly in the browser and export a watertight STL, ready to slice and print with any 3D printer / slicer. Single HTML file, zero dependencies, works fully offline.
 
 > **⚠ This is a public beta.** Features are stable but still being refined. Feedback welcome.
+>
+> This release is intentionally simplified to the core design → STL workflow. In-app G-code generation, printer profiles, USB printing and OctoPrint integration are still in the codebase (commented out) and planned for a future release — see [Planned for a future release](#planned-for-a-future-release) below.
 
-![Version](https://img.shields.io/badge/version-3.0--beta-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)
+![Version](https://img.shields.io/badge/version-3.1--beta-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)
 
 ---
 
 ## Author & Credits
 
 **David Marques**  
-Centro de Inovação Carlos Fiolhais — CDI Portugal  
 MIT License — 2026
 
 ---
@@ -33,13 +34,7 @@ railway up
 
 ```bash
 python3 -m http.server 7842
-# Open http://localhost:7842 in Chrome or Edge
-```
-
-**USB printing on Linux** — add your user to the `dialout` group:
-```bash
-sudo usermod -a -G dialout $USER
-# Log out and back in
+# Open http://localhost:7842 in any modern browser
 ```
 
 ---
@@ -69,75 +64,44 @@ Canvas pixels (or SVG at 4× resolution)
   → Binary mask  (morphological closing)
   → Boundary edge tracing
   → Douglas-Peucker simplification
-  → Bezier curve fitting (Schneider algorithm) or Chaikin smoothing
+  → Chaikin smoothing
   → Outer / hole classification (even-odd)
   → earcut triangulation (v2.2.4, inlined)
-  → Watertight STL / GCODE / SVG
+  → Watertight STL
 ```
 
-### Print settings
+### Model settings
 
 | Parameter | Default | Description |
 |---|---|---|
 | Width / Height (mm) | 60 × 60 | Physical stamp dimensions |
-| Resolution | 1200 px | Canvas resolution |
-| Layer Height | 0.20 mm | Slice thickness |
-| Nozzle Size | 0.40 mm | Extrusion width reference |
+| Resolution | 600 px | Canvas resolution |
+| Layer Height (mm) | 0.20 | Relief step height, feeds mesh geometry |
 | Base Thickness | 1.2 mm | Solid base plate |
 | Design Layers | 2 | Raised stamp surface |
 | Mirror for stamp | ☐ | Flip X for correct impression |
 | Include base plate | ☐ | Add solid base to model |
-| Perimeters | 2 | Number of perimeter shells |
-| Smooth mode | Bezier fit | Bezier (Schneider) or Chaikin |
-| Bezier tolerance | 1.5 | Curve fit precision |
-| Bezier tessellation | 12 pts | Points per bezier segment |
-
-### Printer profiles (18 included)
-
-| Brand | Models |
-|---|---|
-| Prusa | i3 MK3S/MK3S+, MK4, MINI/MINI+ |
-| Creality | Ender-3/V2, Ender-3 S1/Pro, CR-10, CR-10 V2/V3 |
-| Bambu Lab | P1P, P1S, X1, X1C, A1, A1 Mini |
-| Artillery | Sidewinder X1/X2, Genius Pro |
-| Voron | 2.4, Trident |
-| Anycubic | Kobra, Kobra 2 |
-| Elegoo | Neptune 3, Neptune 4 |
-| Longer | LK4 Pro (Klipper) |
-| Generic | RepRap / Custom |
-
-### G-code engine
-- Perimeter paths from smooth bezier-fitted vector contours
-- Multiple perimeter shells with inward offset
-- Rectilinear infill via scanline ray-casting (alternating direction per layer)
-- Correct extrusion: `E = (length × layerH × extW) / filArea`
-- Retraction / unretraction between moves
-- Auto-centred on printer bed
-- Start / end G-code per printer profile
-
-### Layer preview
-- Interactive layer-by-layer visualisation before printing
-- Slider to navigate layers
-- Colour-coded: orange = perimeters, green = infill, red dashed = travels
-- Ghost rendering of previous layers for depth context
-- Stats: total layers, filament estimate, print time estimate
-
-### USB direct print (Web Serial API)
-- Connect directly to printer USB — no drivers, no software
-- Line-by-line transmission with Marlin ok handshake (flow control)
-- Live log with colour-coded responses
-- Progress bar + ETA
-- Emergency cancel (M112)
-- Port released on close
-
-### OctoPrint integration
-- Send GCODE directly to OctoPrint REST API
-- Configure host + API key in-app
-- Starts print immediately after upload
+| Simplify (px) | 0.8 | Contour simplification tolerance |
+| Curve smooth | 3 passes | Chaikin smoothing passes |
 
 ### Save / Load project
 - Saves complete state as .stampforge JSON
-- Restores canvas, all settings, printer selection, project name
+- Restores canvas, all settings, project name
+
+---
+
+## Planned for a future release
+
+The following were part of the original beta and are still present in `index.html` (commented out, marked `FUTURE RELEASE`), but are disabled in this build to keep the product focused on the core design → STL workflow:
+
+- **G-code engine** — perimeters, bezier-fitted contours, rectilinear infill, retraction, printer start/end G-code
+- **18 printer profiles** — Prusa, Creality, Bambu Lab, Artillery, Voron, Anycubic, Elegoo, Longer, generic RepRap
+- **Layer-by-layer print preview** — slider, perimeter/infill/travel visualisation, filament & time estimates
+- **USB direct print** — Web Serial API connection straight to the printer (Marlin flow control)
+- **OctoPrint integration** — upload + start print via the OctoPrint REST API
+- **SVG export** and **print-quality presets** (draft/standard/fine)
+
+Re-enabling any of these is a matter of un-commenting the relevant block and restoring its UI — nothing was deleted.
 
 ---
 
@@ -174,8 +138,8 @@ Suggested: 100% infill on stamp face, print face-down for best surface quality.
 ## File structure
 
 ```
-index.html               <- full app (beta) — all features including USB + OctoPrint
-stampforge-free.html     <- future free tier — SVG + STL export only
+index.html               <- the app — draw + export STL (print/G-code code kept, disabled — see "Planned for a future release")
+stampforge-free.html     <- earlier free-tier draft, superseded by the above
 serve.py                 <- minimal Python static server (Railway)
 railway.toml             <- Railway deploy config
 nixpacks.toml            <- Railway build config
@@ -194,21 +158,24 @@ earcut 2.2.4 and Bezier fitting are inlined — zero network requests at runtime
 ## Known limitations (beta)
 
 - Text tool does not follow symmetry axes
-- USB print tested with Marlin firmware — Klipper via serial should work but is untested
-- USB print requires Chrome or Edge (Web Serial API) — Firefox not supported
-- OctoPrint integration requires same-network access or a public OctoPrint URL
+- G-code generation, printer profiles, USB printing and OctoPrint are disabled in this release (see [Planned for a future release](#planned-for-a-future-release))
 
 ---
 
 ## Roadmap
 
-- [ ] Free / Pro split — free tier: SVG + STL; Pro tier: direct print + OctoPrint
-- [ ] Send directly to OctoPrint from the cloud (Pro)
+- [ ] Re-enable direct print (USB + OctoPrint) as an opt-in "Pro" workflow once G-code output has had more testing
 - [ ] User accounts and saved projects
 
 ---
 
 ## Changelog
+
+### v3.1 (August 2026)
+- Simplified to a single focused workflow: draw → export STL
+- Removed printing UI from the app (G-code export, printer profiles, USB print, OctoPrint, layer preview, SVG export) — code kept in place, commented out, for a future release
+- Fixed a bug where the toast notification helper was never defined, which left the STL export button stuck disabled after use
+- New colour palette aligned to the shared design system (Figtree/Fluent 2 tokens, Laranja accent)
 
 ### v3.0-beta (March 2026)
 - Bezier curve fitting (Schneider algorithm) replaces Chaikin as default smoothing
@@ -240,4 +207,4 @@ earcut 2.2.4 and Bezier fitting are inlined — zero network requests at runtime
 
 ## License
 
-MIT — David Marques · Centro de Inovação Carlos Fiolhais · CDI Portugal · 2026
+MIT — David Marques · 2026

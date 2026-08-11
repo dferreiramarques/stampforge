@@ -6,17 +6,18 @@
 <title>StampForge BETA — 3D Print Stamp Designer</title>
 <style>
 :root {
-  --bg:       #09090b;
-  --s1:       #111116;
-  --s2:       #18181f;
-  --s3:       #22222c;
-  --border:   #2c2c38;
-  --acc:      #f07020;
-  --acc2:     #ffaa44;
-  --acc-dim:  #7a3910;
-  --text:     #d0d0d8;
-  --dim:      #5a5a68;
-  --green:    #3ddc84;
+  --bg:       #141414;   /* design system f-bg1 */
+  --s1:       #1f1f1f;   /* design system f-bg2 */
+  --s2:       #292929;   /* design system f-bg3 */
+  --s3:       #333333;   /* design system f-bg4 */
+  --border:   #404040;   /* design system f-stroke1 */
+  --acc:      #ca5010;   /* design system f-brand (Laranja) */
+  --acc2:     #b24800;   /* design system f-brand-h (hover) */
+  --acc-dim:  #672908;   /* dark-theme derivation of f-brand subtle/active */
+  --text:     #d6d6d6;   /* design system f-fg2 */
+  --fg:       #ffffff;   /* design system f-fg1 (emphasis text) */
+  --dim:      #707070;   /* design system f-fg4 */
+  --green:    #54b054;   /* design system f-success (dark) */
   --blue:     #4a9eff;
   --canvas-bg:#f5f5f0;
   --mono:     'JetBrains Mono', 'Cascadia Code', 'Fira Mono', 'Consolas', 'Liberation Mono', monospace;
@@ -79,17 +80,17 @@ label.tiny{color:var(--dim);font-size:11px;white-space:nowrap}
 
 
 /* Print quality selector */
-.quality-btns{display:flex;gap:4px;margin-bottom:6px}
-.quality-btn{
-  flex:1;height:38px;border:1px solid var(--border);background:var(--s3);
-  color:var(--dim);border-radius:6px;cursor:pointer;
-  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;
-  transition:.15s;touch-action:manipulation;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-}
-.quality-btn:hover{border-color:var(--acc-dim);color:var(--acc)}
-.quality-btn.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
-.quality-btn span{font-size:8px;font-weight:400;opacity:.7}
+/* .quality-btns{display:flex;gap:4px;margin-bottom:6px} */
+/* .quality-btn{ */
+/*   flex:1;height:38px;border:1px solid var(--border);background:var(--s3); */
+/*   color:var(--dim);border-radius:6px;cursor:pointer; */
+/*   font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px; */
+/*   transition:.15s;touch-action:manipulation; */
+/*   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px; */
+/* } */
+/* .quality-btn:hover{border-color:var(--acc-dim);color:var(--acc)} */
+/* .quality-btn.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)} */
+/* .quality-btn span{font-size:8px;font-weight:400;opacity:.7} */
 
 /* Brush preset buttons */
 .brush-preset{
@@ -104,7 +105,7 @@ label.tiny{color:var(--dim);font-size:11px;white-space:nowrap}
 .brush-dot{border-radius:50%;background:currentColor;flex-shrink:0;}
 
 .export-btn{
-  height:42px;padding:0 14px;background:var(--acc);color:#000;font-weight:700;
+  height:42px;padding:0 14px;background:var(--acc);color:#fff;font-weight:700;
   border:none;border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:12px;
   letter-spacing:1px;transition:.15s;white-space:nowrap;
   font-variant-emoji:text;touch-action:manipulation;
@@ -122,15 +123,16 @@ main{display:flex;height:calc(100vh - 46px);overflow:hidden}
   padding-left:100px;
 }
 #projectTitle{
-  position:absolute;top:-34px;left:0;right:0;z-index:20;
-  text-align:center;
+  position:absolute;top:-34px;left:50%;transform:translateX(-50%);z-index:20;
+  display:inline-flex;align-items:center;
+  text-align:center;line-height:1;
   font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:2px;
   color:rgba(160,160,150,0.55);
   background:none;border:none;outline:none;
-  cursor:text;padding:2px 8px;border-radius:3px;
+  cursor:text;padding:4px 8px;border-radius:3px;
   transition:color .2s, background .2s;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:100%;
+  max-width:90%;
 }
 #projectTitle:hover{ color:rgba(200,200,190,0.75); }
 #projectTitle:focus{
@@ -143,7 +145,7 @@ main{display:flex;height:calc(100vh - 46px);overflow:hidden}
 }
 #drawCanvas{display:block;cursor:crosshair}
 #overlayCanvas{position:absolute;top:0;left:0;pointer-events:none;cursor:inherit}
-#svgBadge{position:absolute;top:8px;right:8px;background:rgba(255,140,0,.9);color:#000;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 7px;border-radius:3px;display:none;z-index:10;cursor:pointer;}#svgBadge.active{display:block}
+#svgBadge{position:absolute;top:8px;right:8px;background:rgba(202,80,16,.9);color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 7px;border-radius:3px;display:none;z-index:10;cursor:pointer;}#svgBadge.active{display:block}
 .canvas-label{
   position:absolute;bottom:-22px;left:0;width:100%;text-align:center;
   color:var(--dim);font-size:10px;letter-spacing:1px;
@@ -206,47 +208,47 @@ main{display:flex;height:calc(100vh - 46px);overflow:hidden}
 /* ─── TOAST ───────────────────────────────────────────────── */
 #toast{
   position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--acc);color:#000;padding:8px 18px;border-radius:4px;
+  background:var(--acc);color:#fff;padding:8px 18px;border-radius:4px;
   font-weight:700;font-size:12px;letter-spacing:1px;opacity:0;transition:.3s;pointer-events:none;
   z-index:100;
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── USB Print Modal ─────────────────────────────── */
-#printModal{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.75);align-items:center;justify-content:center;
-}
-#printModal.open{display:flex}
-#printBox{
-  background:var(--s2);border:1px solid var(--border);border-radius:8px;
-  padding:24px;width:420px;max-width:95vw;
-  font-family:var(--mono);display:flex;flex-direction:column;gap:14px;
-}
-#printBox h2{margin:0;font-size:14px;letter-spacing:2px;color:var(--acc);font-weight:700}
-#printLog{
-  background:var(--bg);border:1px solid var(--border);border-radius:4px;
-  height:160px;overflow-y:auto;padding:8px;font-size:10px;color:var(--dim);
-  line-height:1.6;
-}
-#printLog .ok  {color:#4fc}
-#printLog .err {color:#f55}
-#printLog .inf {color:#fa0}
-#printProgress{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-#printProgressBar{height:100%;width:0%;background:var(--acc);transition:width .3s}
-.print-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
-.print-stat{font-size:11px;color:var(--dim)}
-.print-stat span{color:var(--fg);font-weight:700}
-#printConnectBtn,#printStartBtn,#printCancelBtn,#printCloseBtn,#printPurgeBtn{
-  flex:1;height:46px;border:none;border-radius:6px;cursor:pointer;
-  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:1px;
-  touch-action:manipulation;
-}
-#printConnectBtn{background:var(--acc);color:#000}
-#printStartBtn  {background:#4fc;color:#000}
-#printCancelBtn {background:#f55;color:#fff}
-#printCloseBtn  {background:var(--s3);color:var(--dim);border:1px solid var(--border)}
-#printConnectBtn:disabled,#printStartBtn:disabled{opacity:.4;cursor:default}
+/* #printModal{ */
+/*   display:none;position:fixed;inset:0;z-index:200; */
+/*   background:rgba(0,0,0,.75);align-items:center;justify-content:center; */
+/* } */
+/* #printModal.open{display:flex} */
+/* #printBox{ */
+/*   background:var(--s2);border:1px solid var(--border);border-radius:8px; */
+/*   padding:24px;width:420px;max-width:95vw; */
+/*   font-family:var(--mono);display:flex;flex-direction:column;gap:14px; */
+/* } */
+/* #printBox h2{margin:0;font-size:14px;letter-spacing:2px;color:var(--acc);font-weight:700} */
+/* #printLog{ */
+/*   background:var(--bg);border:1px solid var(--border);border-radius:4px; */
+/*   height:160px;overflow-y:auto;padding:8px;font-size:10px;color:var(--dim); */
+/*   line-height:1.6; */
+/* } */
+/* #printLog .ok  {color:#4fc} */
+/* #printLog .err {color:#f55} */
+/* #printLog .inf {color:#fa0} */
+/* #printProgress{height:4px;background:var(--border);border-radius:2px;overflow:hidden} */
+/* #printProgressBar{height:100%;width:0%;background:var(--acc);transition:width .3s} */
+/* .print-row{display:flex;gap:8px;align-items:center;justify-content:space-between} */
+/* .print-stat{font-size:11px;color:var(--dim)} */
+/* .print-stat span{color:var(--fg);font-weight:700} */
+/* #printConnectBtn,#printStartBtn,#printCancelBtn,#printCloseBtn,#printPurgeBtn{ */
+/*   flex:1;height:46px;border:none;border-radius:6px;cursor:pointer; */
+/*   font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:1px; */
+/*   touch-action:manipulation; */
+/* } */
+/* #printConnectBtn{background:var(--acc);color:#000} */
+/* #printStartBtn  {background:#4fc;color:#000} */
+/* #printCancelBtn {background:#f55;color:#fff} */
+/* #printCloseBtn  {background:var(--s3);color:var(--dim);border:1px solid var(--border)} */
+/* #printConnectBtn:disabled,#printStartBtn:disabled{opacity:.4;cursor:default} */
 
 input[type=file]{display:none}
 
@@ -255,33 +257,33 @@ input[type=file]{display:none}
 
 
 /* ── OctoPrint Modal ─────────────────────────── */
-#octoModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);align-items:center;justify-content:center}
-#octoModal.open{display:flex}
-#octoBox{
-  background:var(--s2);border:1px solid var(--border);border-radius:8px;
-  padding:24px;width:440px;max-width:96vw;font-family:var(--mono);
-  display:flex;flex-direction:column;gap:14px;
-}
-#octoBox h2{margin:0;font-size:13px;letter-spacing:2px;color:#4fc;font-weight:700}
-.octo-row{display:flex;gap:8px;align-items:center}
-.octo-row label{font-size:11px;color:var(--dim);width:90px;flex-shrink:0}
-.octo-row input[type=text],.octo-row input[type=password]{
-  flex:1;height:30px;background:var(--bg);border:1px solid var(--border);
-  color:var(--fg);border-radius:4px;padding:0 8px;font-family:var(--mono);font-size:11px;
-}
-#octoStatus{font-size:11px;padding:6px 10px;border-radius:4px;background:var(--bg);border:1px solid var(--border);min-height:32px;line-height:1.6;color:var(--dim)}
-#octoStatus .ok {color:#4fc}
-#octoStatus .err{color:#f55}
-#octoStatus .inf{color:#f80}
-.octo-btns{display:flex;gap:8px}
-#octoTestBtn,#octoSendBtn,#octoCloseBtn{
-  flex:1;height:34px;border:none;border-radius:4px;cursor:pointer;
-  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;
-}
-#octoTestBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border)}
-#octoSendBtn{background:#4fc;color:#000}
-#octoCloseBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border)}
-#octoSendBtn:disabled{opacity:.4;cursor:default}
+/* #octoModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);align-items:center;justify-content:center} */
+/* #octoModal.open{display:flex} */
+/* #octoBox{ */
+/*   background:var(--s2);border:1px solid var(--border);border-radius:8px; */
+/*   padding:24px;width:440px;max-width:96vw;font-family:var(--mono); */
+/*   display:flex;flex-direction:column;gap:14px; */
+/* } */
+/* #octoBox h2{margin:0;font-size:13px;letter-spacing:2px;color:#4fc;font-weight:700} */
+/* .octo-row{display:flex;gap:8px;align-items:center} */
+/* .octo-row label{font-size:11px;color:var(--dim);width:90px;flex-shrink:0} */
+/* .octo-row input[type=text],.octo-row input[type=password]{ */
+/*   flex:1;height:30px;background:var(--bg);border:1px solid var(--border); */
+/*   color:var(--fg);border-radius:4px;padding:0 8px;font-family:var(--mono);font-size:11px; */
+/* } */
+/* #octoStatus{font-size:11px;padding:6px 10px;border-radius:4px;background:var(--bg);border:1px solid var(--border);min-height:32px;line-height:1.6;color:var(--dim)} */
+/* #octoStatus .ok {color:#4fc} */
+/* #octoStatus .err{color:#f55} */
+/* #octoStatus .inf{color:#f80} */
+/* .octo-btns{display:flex;gap:8px} */
+/* #octoTestBtn,#octoSendBtn,#octoCloseBtn{ */
+/*   flex:1;height:34px;border:none;border-radius:4px;cursor:pointer; */
+/*   font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px; */
+/* } */
+/* #octoTestBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border)} */
+/* #octoSendBtn{background:#4fc;color:#000} */
+/* #octoCloseBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border)} */
+/* #octoSendBtn:disabled{opacity:.4;cursor:default} */
 
 /* ── SVG Import Modal ────────────────────────────── */
 #svgModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);align-items:center;justify-content:center}
@@ -295,25 +297,38 @@ input[type=file]{display:none}
 .svg-row label{font-size:11px;color:var(--dim);width:120px;flex-shrink:0}
 .svg-row input[type=range]{flex:1;accent-color:var(--acc)}
 .svg-row span{font-size:11px;color:var(--fg);width:48px;text-align:right}
-#svgConfirmBtn{background:var(--acc);color:#000;height:36px;border:none;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;flex:1}
+#svgConfirmBtn{background:var(--acc);color:#fff;height:36px;border:none;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;flex:1}
 #svgCancelBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border);height:36px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;flex:1}
 
+/* ── About Modal ─────────────────────────────────── */
+.logo{cursor:pointer}
+#aboutModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+#aboutModal.open{display:flex}
+#aboutBox{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:24px;width:400px;max-width:92vw;font-family:var(--mono);display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
+#aboutBox h2{margin:0;font-size:16px;letter-spacing:3px;color:var(--text);font-weight:700}
+#aboutBox h2 em{color:var(--acc);font-style:normal}
+#aboutBox .about-tagline{font-size:11px;color:var(--dim);line-height:1.6;margin-top:-8px}
+#aboutBox .about-credits{font-size:11px;color:var(--dim);line-height:1.8}
+#aboutBox .about-credits a{color:var(--acc);text-decoration:none}
+#aboutBox .about-credits a:hover{text-decoration:underline}
+#aboutCloseBtn{background:var(--acc);color:#fff;height:34px;border:none;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px;width:100%}
+
 /* ── Layer Preview Modal ─────────────────────────── */
-#layerModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);align-items:center;justify-content:center}
-#layerModal.open{display:flex}
-#layerBox{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:20px;width:580px;max-width:96vw;font-family:var(--mono);display:flex;flex-direction:column;gap:12px}
-#layerBox h2{margin:0;font-size:13px;letter-spacing:2px;color:#4fc;font-weight:700}
-#layerCanvas{background:var(--bg);border:1px solid var(--border);border-radius:4px;display:block;width:100%;max-height:380px}
-.layer-ctrl{display:flex;gap:10px;align-items:center}
-.layer-ctrl label{font-size:11px;color:var(--dim);white-space:nowrap}
-#layerSlider{flex:1;accent-color:#4fc}
-#layerNum{font-size:13px;color:#4fc;font-weight:700;width:80px;text-align:center}
-.layer-legend{display:flex;gap:14px;font-size:10px}
-.leg{display:flex;align-items:center;gap:4px}
-.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-#layerCloseBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border);height:34px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px}
-.layer-stats{display:flex;gap:16px;font-size:10px;color:var(--dim)}
-.layer-stats span{color:var(--fg);font-weight:700}
+/* #layerModal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);align-items:center;justify-content:center} */
+/* #layerModal.open{display:flex} */
+/* #layerBox{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:20px;width:580px;max-width:96vw;font-family:var(--mono);display:flex;flex-direction:column;gap:12px} */
+/* #layerBox h2{margin:0;font-size:13px;letter-spacing:2px;color:#4fc;font-weight:700} */
+/* #layerCanvas{background:var(--bg);border:1px solid var(--border);border-radius:4px;display:block;width:100%;max-height:380px} */
+/* .layer-ctrl{display:flex;gap:10px;align-items:center} */
+/* .layer-ctrl label{font-size:11px;color:var(--dim);white-space:nowrap} */
+/* #layerSlider{flex:1;accent-color:#4fc} */
+/* #layerNum{font-size:13px;color:#4fc;font-weight:700;width:80px;text-align:center} */
+/* .layer-legend{display:flex;gap:14px;font-size:10px} */
+/* .leg{display:flex;align-items:center;gap:4px} */
+/* .leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0} */
+/* #layerCloseBtn{background:var(--s3);color:var(--dim);border:1px solid var(--border);height:34px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1px} */
+/* .layer-stats{display:flex;gap:16px;font-size:10px;color:var(--dim)} */
+/* .layer-stats span{color:var(--fg);font-weight:700} */
 
 /* ── Credits footer ──────────────────────────────── */
 #creditsBar{
@@ -336,7 +351,7 @@ input[type=file]{display:none}
 
 <!-- ─── HEADER ─────────────────────────────── -->
 <header>
-  <div class="logo">STAMP<em>FORGE</em> <span style="font-size:8px;background:#f07020;color:#000;padding:1px 5px;border-radius:3px;letter-spacing:1px;font-weight:700;vertical-align:middle">BETA</span></div>
+  <div class="logo" onclick="openAboutModal()" title="About StampForge">STAMP<em>FORGE</em> <span style="font-size:8px;background:var(--acc);color:#fff;padding:1px 5px;border-radius:3px;letter-spacing:1px;font-weight:700;vertical-align:middle">BETA</span></div>
   <div class="sep"></div>
   <div class="hdr-right">
     <label class="tiny">COLOR</label>
@@ -351,13 +366,13 @@ input[type=file]{display:none}
   <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="saveProject()" title="Save project">💾</button>
   <button class="export-btn" style="background:var(--s3);color:#aaa;border:1px solid #555" onclick="loadProject()" title="Load project">📂</button>
   <div class="sep"></div>
-  <button class="export-btn" id="svgBtn" style="background:var(--s3);color:var(--acc);border:1px solid var(--acc)" onclick="exportSVG()">SVG</button>
+<!--   <button class="export-btn" id="svgBtn" style="background:var(--s3);color:var(--acc);border:1px solid var(--acc)" onclick="exportSVG()">SVG</button> -->
   <button class="export-btn" id="stlBtn" onclick="exportSTL()">STL</button>
-  <button class="export-btn" id="layerPreviewBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openLayerPreview()">PREV</button>
+<!--   <button class="export-btn" id="layerPreviewBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openLayerPreview()">PREV</button>
   <button class="export-btn" id="gcodeBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="exportGcode()">GCODE</button>
   <div class="sep"></div>
   <button class="export-btn" id="usbPrintBtn" style="background:var(--s3);color:#f80;border:1px solid #f80" onclick="openPrintModal()">USB</button>
-  <button class="export-btn" id="octoBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openOctoModal()">OCTOPRINT</button>
+  <button class="export-btn" id="octoBtn" style="background:var(--s3);color:#4fc;border:1px solid #4fc" onclick="openOctoModal()">OCTOPRINT</button> -->
 </header>
 
 <!-- ─── MAIN ───────────────────────────────── -->
@@ -403,7 +418,7 @@ input[type=file]{display:none}
 
     <!-- Physical dimensions -->
     <div class="panel-section">
-      <div class="section-title">🖨 Physical Size</div>
+      <div class="section-title">📏 Physical Size</div>
       <div class="field"><label>Width (mm)</label><input type="number" id="physW" value="60" min="10" max="200" step="1" oninput="updateDimensions()"></div>
       <div class="field"><label>Height (mm)</label><input type="number" id="physH" value="60" min="10" max="200" step="1" oninput="updateDimensions()"></div>
       <div class="field"><label>Resolution</label><select id="canvasRes" onchange="updateDimensions()">
@@ -416,19 +431,19 @@ input[type=file]{display:none}
 
     <!-- Print settings -->
     <div class="panel-section">
-      <div class="section-title">⚙ Print Settings</div>
-      <div class="quality-btns">
+      <div class="section-title">⚙ Model Settings</div>
+<!--       <div class="quality-btns">
         <button class="quality-btn" id="q-draft"    onclick="setPrintQuality('draft')"   title="Fast print — solid surface, high speed">DRAFT<span>~8 min</span></button>
         <button class="quality-btn active" id="q-standard" onclick="setPrintQuality('standard')" title="Balanced quality and speed">STD<span>~15 min</span></button>
         <button class="quality-btn" id="q-fine"     onclick="setPrintQuality('fine')"    title="Full detail — slow, best for complex designs">FINE<span>~50 min</span></button>
-      </div>
+      </div> -->
       <div class="field"><label>Layer Height (mm)</label><input type="number" id="layerH" value="0.20" min="0.05" max="0.5" step="0.01"></div>
-      <div class="field"><label>Nozzle Size (mm)</label><input type="number" id="nozzleD" value="0.40" min="0.2" max="1.2" step="0.05"></div>
+<!--       <div class="field"><label>Nozzle Size (mm)</label><input type="number" id="nozzleD" value="0.40" min="0.2" max="1.2" step="0.05"></div> -->
       <div class="field"><label>Base Thickness</label><input type="number" id="baseThick" value="1.2" min="0.4" max="5.0" step="0.2"></div>
       <div class="field"><label>Design layers</label><input type="number" id="designLayers" value="2" min="1" max="3" step="1"></div>
       <div class="field"><label>Mirror for stamp</label><input type="checkbox" id="mirrorX"></div>
       <div class="field"><label>Include base plate</label><input type="checkbox" id="includeBase"></div>
-      <div class="field"><label>Perimeters</label><input type="number" id="numPerimeters" value="2" min="1" max="5" step="1" title="Number of perimeter shells"></div>
+<!--       <div class="field"><label>Perimeters</label><input type="number" id="numPerimeters" value="2" min="1" max="5" step="1" title="Number of perimeter shells"></div> -->
       <div class="field"><label>Simplify (px)</label><input type="number" id="simplifyEps" value="0.8" min="0" max="5" step="0.1"></div>
       <div class="field" style="flex-direction:column;gap:4px;align-items:stretch">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -442,7 +457,7 @@ input[type=file]{display:none}
     </div>
 
     <!-- Printer profile -->
-    <div class="panel-section">
+<!--     <div class="panel-section">
       <div class="section-title">🖨 Printer Profile</div>
       <div class="field" style="flex-direction:column;gap:4px;align-items:stretch">
         <label>Printer</label>
@@ -475,15 +490,15 @@ input[type=file]{display:none}
       <div class="field"><label>First layer (mm/s)</label><input type="number" id="gcSpeedFirst" value="20" min="5" max="100" step="5"></div>
       <div class="field"><label>Retraction (mm)</label><input type="number" id="gcRetract" value="0.8" min="0" max="8" step="0.1"></div>
       <div class="field"><label>Filament ⌀ (mm)</label><input type="number" id="gcFilDia" value="1.75" min="1.5" max="3.0" step="0.05"></div>
-    </div>
+    </div> -->
     <!-- Stats -->
     <div class="panel-section">
       <div class="section-title">📐 Stamp Info</div>
       <div class="info-box" id="stampInfo">
         Design height: <span id="si-dh">0.40 mm</span><br>
         Total height: <span id="si-th">1.60 mm</span><br>
-        Grid cells: <span id="si-gc">150 × 150</span><br>
-        Print time est: <span id="si-pt">~12 min</span>
+<!--         Grid cells: <span id="si-gc">150 × 150</span><br> -->
+<!--         Print time est: <span id="si-pt">~12 min</span> -->
       </div>
     </div>
 
@@ -504,7 +519,7 @@ input[type=file]{display:none}
 
 
 <!-- ── OctoPrint Modal ────────────────────────── -->
-<div id="octoModal">
+<!-- <div id="octoModal">
   <div id="octoBox">
     <h2>◎ OCTOPRINT</h2>
     <div class="octo-row">
@@ -526,10 +541,10 @@ input[type=file]{display:none}
       The GCODE will be uploaded and print started automatically.
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- ── USB Print Modal ───────────────────────────── -->
-<div id="printModal">
+<!-- <div id="printModal">
   <div id="printBox">
     <h2>⚡ PRINT VIA USB — PRUSA MK3S</h2>
     <div class="print-row">
@@ -556,7 +571,7 @@ input[type=file]{display:none}
       Web Serial API — no drivers needed beyond the printer's USB stack.
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- ── SVG Import Modal ───────────────────────── -->
 <div id="svgModal">
@@ -591,8 +606,25 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- ── About Modal ──────────────────────────── -->
+<div id="aboutModal">
+  <div id="aboutBox">
+    <h2>STAMP<em>FORGE</em></h2>
+    <div class="about-tagline">Browser-based fabric stamp designer<br>draw a design, export a print-ready STL.</div>
+    <div class="about-credits">
+      vibe coded by
+      <a href="https://www.linkedin.com/in/dferreiramarques/" target="_blank" rel="noopener">David Marques</a>
+      ·
+      <a href="https://ko-fi.com/dferreiramarques" target="_blank" rel="noopener">☕ ko-fi</a>
+      <br>
+      MIT License · 2026
+    </div>
+    <button id="aboutCloseBtn" onclick="document.getElementById('aboutModal').classList.remove('open')">✕ CLOSE</button>
+  </div>
+</div>
+
 <!-- ── Layer Preview Modal ───────────────────── -->
-<div id="layerModal">
+<!-- <div id="layerModal">
   <div id="layerBox">
     <h2>◈ LAYER PREVIEW</h2>
     <canvas id="layerCanvas" width="540" height="380"></canvas>
@@ -614,8 +646,8 @@ input[type=file]{display:none}
     </div>
     <button id="layerCloseBtn" onclick="document.getElementById('layerModal').classList.remove('open')">✕ CLOSE</button>
   </div>
-</div>
-<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; Centro de Inovação Carlos Fiolhais &nbsp;·&nbsp; CDI Portugal &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <em style="color:rgba(200,150,50,.5)">beta — report issues to the team</em></div>
+</div> -->
+<div id="creditsBar"><em>David Marques</em> &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; <em style="color:rgba(200,150,50,.5)">beta — report issues to the team</em></div>
 <div id="toast">STL EXPORTED</div>
 
 <!-- Text input overlay (hidden) -->
@@ -659,21 +691,21 @@ function getSettings() {
     physW:       parseFloat(document.getElementById('physW').value) || 60,
     physH:       parseFloat(document.getElementById('physH').value) || 60,
     layerH:      parseFloat(document.getElementById('layerH').value) || 0.2,
-    nozzle:      parseFloat(document.getElementById('nozzleD').value) || 0.4,
+    // nozzle:      parseFloat(document.getElementById('nozzleD').value) || 0.4,
     baseThick:   parseFloat(document.getElementById('baseThick').value) || 1.2,
     designLayers:parseInt(document.getElementById('designLayers').value) || 2,
     mirrorX:     document.getElementById('mirrorX').checked,
     includeBase:  document.getElementById('includeBase').checked,
     simplifyEps:  parseFloat(document.getElementById('simplifyEps').value) || 0.8,
-    numPerimeters: parseInt(document.getElementById('numPerimeters').value) || 2,
+    // numPerimeters: parseInt(document.getElementById('numPerimeters').value) || 2,
     chaikinPasses: parseInt(document.getElementById('chaikinPasses').value) ?? 3,
     resolution:  parseInt(document.getElementById('canvasRes').value) || 600,
-    gcTempNozzle: parseFloat(document.getElementById('gcTempNozzle').value) || 215,
-    gcTempBed:    parseFloat(document.getElementById('gcTempBed').value) || 60,
-    gcSpeedPrint: parseFloat(document.getElementById('gcSpeedPrint').value) || 50,
-    gcSpeedTravel:parseFloat(document.getElementById('gcSpeedTravel').value) || 150,
-    gcSpeedFirst: parseFloat(document.getElementById('gcSpeedFirst').value) || 20,
-    gcRetract:    parseFloat(document.getElementById('gcRetract').value) ?? 0.8,
+    // gcTempNozzle: parseFloat(document.getElementById('gcTempNozzle').value) || 215,
+    // gcTempBed:    parseFloat(document.getElementById('gcTempBed').value) || 60,
+    // gcSpeedPrint: parseFloat(document.getElementById('gcSpeedPrint').value) || 50,
+    // gcSpeedTravel:parseFloat(document.getElementById('gcSpeedTravel').value) || 150,
+    // gcSpeedFirst: parseFloat(document.getElementById('gcSpeedFirst').value) || 20,
+    // gcRetract:    parseFloat(document.getElementById('gcRetract').value) ?? 0.8,
   };
 }
 
@@ -744,13 +776,13 @@ function updateInfo() {
   const s = getSettings();
   const dh = (s.designLayers * s.layerH).toFixed(2);
   const th = (s.baseThick + parseFloat(dh)).toFixed(2);
-  const gcX = Math.floor(s.physW / s.nozzle);
-  const gcY = Math.floor(s.physH / s.nozzle);
+  // const gcX = Math.floor(s.physW / s.nozzle);
+  // const gcY = Math.floor(s.physH / s.nozzle);
   const pxMm = (canvas.width / s.physW).toFixed(1);
   document.getElementById('si-dh').textContent = dh + ' mm';
   document.getElementById('si-th').textContent = th + ' mm';
-  document.getElementById('si-gc').textContent = `${gcX} × ${gcY}`;
-  document.getElementById('si-pt').textContent = `~${Math.round(gcX*gcY*0.0003 + 8)} min`;
+  // document.getElementById('si-gc').textContent = `${gcX} × ${gcY}`;
+  // document.getElementById('si-pt').textContent = `~${Math.round(gcX*gcY*0.0003 + 8)} min`;
   document.getElementById('st-scale').textContent = `${pxMm}px/mm`;
 }
 
@@ -767,10 +799,23 @@ function isCanvasEmpty() {
 
 function updateExportButtons() {
   const empty = isCanvasEmpty();
-  ['svgBtn','stlBtn','layerPreviewBtn','gcodeBtn'].forEach(id => {
+  ['stlBtn' /* , 'svgBtn','layerPreviewBtn','gcodeBtn' — future release */].forEach(id => {
     const btn = document.getElementById(id);
     if (btn) btn.disabled = empty;
   });
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function openAboutModal() {
+  document.getElementById('aboutModal').classList.add('open');
 }
 
 // ══════════════════════════════════════════════════════
@@ -2238,7 +2283,7 @@ async function buildSTL(s) {
 function writeBinarySTL(tris) {
   const buf = new ArrayBuffer(84 + tris.length * 50);
   const dv  = new DataView(buf);
-  const hdr = 'StampForge — David Marques / CDI Portugal';
+  const hdr = 'StampForge — David Marques';
   for (let i = 0; i < 80; i++)
     dv.setUint8(i, i < hdr.length ? hdr.charCodeAt(i) : 0);
   dv.setUint32(80, tris.length, true);
@@ -2308,757 +2353,759 @@ async function exportSVG() {
   showToast(`✓ SVG exported — ${contours.length} paths`);
 }
 
-// ══════════════════════════════════════════════════════
-//  PRINTER PROFILES + G-CODE ENGINE
-// ══════════════════════════════════════════════════════
-// ══════════════════════════════════════════════════════
-//  PRINTER PROFILES
-// ══════════════════════════════════════════════════════
-const PRINTER_PROFILES = [
-  {
-    id:'prusa_mk3s', name:'Prusa i3 MK3S/MK3S+',
-    bed_x:250,bed_y:210,firmware:'marlin',filament:1.75,
-    temp_nozzle:215,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
-    retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
-    start_gcode:`M862.3 P "[printer_model]" ; printer model check
-M862.1 P[nozzle_diameter] ; nozzle diameter check
-M115 U3.13.3 ; tell printer latest fw version
-G28 ; home all axes
-G1 Z5 F3000 ; lift
-M190 S{bed_temp} ; wait for bed
-M109 S{nozzle_temp} ; wait for nozzle
-M83 ; relative extrusion for intro line
-G1 X0 Y-3 Z0.3 F3000 ; intro line start
-G1 X60 E9 F1000 ; intro line
-G1 X100 E3.5 F1000 ; intro line
-G1 E-1 F2100 ; retract after intro
-M82 ; back to absolute extrusion
-G92 E0 ; reset extruder`,
-    end_gcode:`G4 ; wait
-M221 S100 ; reset flow
-G1 E-2 F2100 ; retract to avoid ooze
-M104 S0 ; nozzle off
-M140 S0 ; bed off
-G1 Z{z_max} F3000 ; raise nozzle
-G28 X Y ; home X Y
-M84 ; motors off`
-  },
-  {
-    id:'prusa_mk4', name:'Prusa MK4',
-    bed_x:250,bed_y:210,firmware:'marlin',filament:1.75,
-    temp_nozzle:220,temp_bed:60,speed_print:50,speed_travel:200,speed_first:20,
-    retract_len:0.6,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28 ; home
-M190 S{bed_temp}
-M109 S{nozzle_temp}
-G1 Z5 F3000
-G92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
-  },
-  {
-    id:'ender3', name:'Creality Ender-3 / Ender-3 V2',
-    bed_x:235,bed_y:235,firmware:'marlin',filament:1.75,
-    temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
-    retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
-    start_gcode:`G28
-M190 S{bed_temp}
-M109 S{nozzle_temp}
-G92 E0
-G1 Z2 F3000
-G1 X0.1 Y20 Z0.3 F5000
-G1 X0.1 Y200 Z0.3 E15 F1500
-G1 X0.4 Y200 Z0.3 F5000
-G1 X0.4 Y20 Z0.3 E30 F1500
-G92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'ender3_s1', name:'Creality Ender-3 S1 / S1 Pro',
-    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
-    temp_nozzle:210,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
-    retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'cr10', name:'Creality CR-10 / CR-10S',
-    bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
-    temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
-    retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'cr10_v2', name:'Creality CR-10 V2/V3',
-    bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
-    temp_nozzle:205,temp_bed:60,speed_print:50,speed_travel:180,speed_first:20,
-    retract_len:1.5,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'bambu_p1p', name:'Bambu Lab P1P / P1S',
-    bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
-    temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
-    retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
-    start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'bambu_x1', name:'Bambu Lab X1 / X1C',
-    bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
-    temp_nozzle:220,temp_bed:55,speed_print:150,speed_travel:500,speed_first:30,
-    retract_len:0.5,retract_speed:50,fan_speed:255,fan_layer:1,
-    start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'artillery_sw', name:'Artillery Sidewinder X1/X2',
-    bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
-    temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
-    retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'artillery_genius', name:'Artillery Genius Pro',
-    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
-    temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
-    retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'voron24', name:'Voron 2.4',
-    bed_x:300,bed_y:300,firmware:'klipper',filament:1.75,
-    temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
-    retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
-    start_gcode:`G28\nQGL\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
-  },
-  {
-    id:'voron_trident', name:'Voron Trident',
-    bed_x:250,bed_y:250,firmware:'klipper',filament:1.75,
-    temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
-    retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
-    start_gcode:`G28\nZ_TILT_ADJUST\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
-  },
-  {
-    id:'anycubic_kobra', name:'Anycubic Kobra / Kobra 2',
-    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
-    temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
-    retract_len:5.0,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'elegoo_neptune', name:'Elegoo Neptune 3 / 4',
-    bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
-    temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
-    retract_len:1.0,retract_speed:40,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'bambu_a1', name:'Bambu Lab A1 / A1 Mini',
-    bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
-    temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
-    retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
-    start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'prusa_mini', name:'Prusa MINI / MINI+',
-    bed_x:180,bed_y:180,firmware:'marlin',filament:1.75,
-    temp_nozzle:215,temp_bed:60,speed_print:45,speed_travel:150,speed_first:15,
-    retract_len:3.2,retract_speed:35,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  },
-  {
-    id:'longer_lk4', name:'Longer LK4 Pro (Klipper)',
-    bed_x:220,bed_y:220,firmware:'klipper',filament:1.75,
-    temp_nozzle:205,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
-    retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
-  },
-  {
-    id:'generic_reprap', name:'Generic RepRap / Custom',
-    bed_x:200,bed_y:200,firmware:'reprap',filament:1.75,
-    temp_nozzle:200,temp_bed:50,speed_print:40,speed_travel:120,speed_first:20,
-    retract_len:2.0,retract_speed:30,fan_speed:255,fan_layer:2,
-    start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
-    end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
-  }
-];
-
-function getPrinterProfile(id) {
-  return PRINTER_PROFILES.find(p => p.id === id) || PRINTER_PROFILES[PRINTER_PROFILES.length-1];
-}
-
-// ══════════════════════════════════════════════════════
-//  G-CODE ENGINE
-// ══════════════════════════════════════════════════════
-async function generateGcode(s, printer) {
-  const contours = await buildContours(s);
-  if (!contours.length) return null;
-
-  // Classify outers/holes (same as buildSTL)
-  const withArea = contours.map(c=>({c,a:signedArea(c),ab:Math.abs(signedArea(c))}));
-  withArea.sort((x,y)=>y.ab-x.ab);
-  const normalized=[];
-  for (const item of withArea) {
-    const ref=item.c[0]; let isHole=false;
-    for (const prev of normalized)
-      if (prev.isOuter && pointInPoly(ref.x,ref.y,prev.c)){isHole=true;break;}
-    let poly=item.c;
-    if (!isHole && item.a<0) poly=[...poly].reverse();
-    if ( isHole && item.a>0) poly=[...poly].reverse();
-    normalized.push({c:poly,isOuter:!isHole});
-  }
-  const outers = normalized.filter(x=>x.isOuter).map(x=>x.c);
-  const holes  = normalized.filter(x=>!x.isOuter).map(x=>x.c);
-
-  // Printer/slicer params
-  const layerH   = s.layerH;
-  const nozzle   = s.nozzle;
-  const filDia   = printer.filament;
-  const filArea  = Math.PI * (filDia/2) ** 2;
-  const extW     = nozzle * 1.1;           // extrusion width = nozzle × 1.1
-  const speedPrint  = (s.gcSpeedPrint  || printer.speed_print)  * 60; // mm/min
-  const speedTravel = (s.gcSpeedTravel || printer.speed_travel) * 60;
-  const speedFirst  = (s.gcSpeedFirst  || printer.speed_first)  * 60;
-  const retLen   = s.gcRetract   ?? printer.retract_len;
-  const retSpeed = printer.retract_speed * 60;
-
-  // Offset stamp to bed centre
-  const offX = (printer.bed_x - s.physW) / 2;
-  const offY = (printer.bed_y - s.physH) / 2;
-
-  const baseZ  = 0;
-  const midZ   = s.includeBase ? s.baseThick : 0;
-  const topZ   = midZ + s.designLayers * layerH;
-  const totalLayers = Math.round(topZ / layerH);
-  const baseLayers  = Math.round(midZ / layerH);
-
-  let E = 0; // cumulative extrusion
-  let curX = 0, curY = 0, curZ = -1;
-  let isRetracted = false;
-  const lines = [];
-
-  const emit = l => lines.push(l);
-
-  const mmpm = v => v.toFixed(0);
-  const mm   = v => v.toFixed(4);
-  const emm  = v => v.toFixed(5);
-
-  // Extrusion amount for a move of given length
-  const extrudeAmt = (len) => (len * layerH * extW) / filArea;
-
-  function moveTo(x, y, speed, comment='') {
-    const dx=x-curX, dy=y-curY;
-    const d=Math.sqrt(dx*dx+dy*dy);
-    if (d<0.01) return;
-    curX=x; curY=y;
-    emit(`G1 X${mm(x+offX)} Y${mm(y+offY)} F${mmpm(speed)}${comment?' ;'+comment:''}`);
-  }
-
-  function travelTo(x, y) {
-    if (!isRetracted && retLen>0) {
-      E -= retLen;
-      emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; retract`);
-      isRetracted = true;
-    }
-    moveTo(x, y, speedTravel, 'travel');
-  }
-
-  function lineTo(x, y, speed, layer) {
-    if (isRetracted && retLen>0) {
-      E += retLen;
-      emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; unretract`);
-      isRetracted = false;
-    }
-    const dx=x-curX, dy=y-curY;
-    const d=Math.sqrt(dx*dx+dy*dy);
-    if (d<0.15) return; // skip micro-segments < 0.15mm
-    E += extrudeAmt(d);
-    const sp = layer===1 ? speedFirst : speed;
-    emit(`G1 X${mm(x+offX)} Y${mm(y+offY)} E${emm(E)} F${mmpm(sp)}`);
-    curX=x; curY=y;
-  }
-
-  function setLayer(z) {
-    if (Math.abs(z-curZ)<0.001) return;
-    curZ=z;
-    emit(`G1 Z${mm(z)} F3000 ; layer z=${mm(z)}`);
-  }
-
-  // Coalesce ring — remove points closer than minD to previous
-  function coalesceRing(ring, minD) {
-    if (ring.length < 3) return ring;
-    const out = [ring[0]];
-    for (let i = 1; i < ring.length; i++) {
-      const prev = out[out.length-1];
-      const dx = ring[i].x - prev.x, dy = ring[i].y - prev.y;
-      if (Math.sqrt(dx*dx+dy*dy) >= minD) out.push(ring[i]);
-    }
-    return out.length >= 3 ? out : ring;
-  }
-
-  // Minimum G-code segment length (mm) — below this points are merged
-  const MIN_SEG = 0.25;
-
-  // Print a closed polygon ring on current Z
-  function printRing(ring, layer) {
-    ring = coalesceRing(ring, MIN_SEG);
-    const start = ring[0];
-    travelTo(start.x, start.y);
-    setLayer(curZ); // already set before call
-    for (let i=1; i<ring.length; i++) lineTo(ring[i].x, ring[i].y, speedPrint, layer);
-    lineTo(start.x, start.y, speedPrint, layer); // close ring
-  }
-
-  // Rectilinear infill — true boustrophedon, no travel between adjacent lines
-  function printInfill(outerRings, layer, angle=0) {
-    const density = (typeof window._infillDensity === 'number' ? window._infillDensity : 1.0);
-    if (density <= 0) return;
-    const pitch = extW * 1.05 / Math.max(density, 0.05);
-
-    // Bounding box
-    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-    for (const r of outerRings)
-      for (const p of r){
-        if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x;
-        if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y;
-      }
-
-    // Build all scanlines first
-    const scanlines = [];
-    for (let y=minY+pitch/2; y<maxY; y+=pitch) {
-      const xs=[];
-      for (const ring of outerRings) {
-        const n=ring.length;
-        for (let i=0;i<n;i++){
-          const a=ring[i],b=ring[(i+1)%n];
-          if ((a.y<=y&&b.y>y)||(b.y<=y&&a.y>y)){
-            const t=(y-a.y)/(b.y-a.y);
-            xs.push(a.x+t*(b.x-a.x));
-          }
-        }
-      }
-      xs.sort((a,b)=>a-b);
-      if (xs.length >= 2) scanlines.push({y, xs});
-    }
-
-    const sp = layer===1 ? speedFirst : speedPrint;
-    let dir = 1;
-    let prevEndX = null, prevEndY = null;
-
-    for (const {y, xs} of scanlines) {
-      // Segments for this scanline
-      const segs = [];
-      for (let i=0;i+1<xs.length;i+=2) segs.push([xs[i], xs[i+1]]);
-      if (!segs.length) continue;
-
-      if (dir < 0) segs.reverse();
-
-      for (let si=0; si<segs.length; si++) {
-        let x0 = dir>0 ? segs[si][0] : segs[si][1];
-        let x1 = dir>0 ? segs[si][1] : segs[si][0];
-
-        // Can we connect from previous endpoint without travel?
-        const dx = x0-curX, dy = y-curY;
-        const distFromCur = Math.sqrt(dx*dx+dy*dy);
-
-        if (prevEndX !== null && distFromCur < pitch * 2.5) {
-          // Close enough — no retract, just move and continue extruding
-          // Brief unretracted travel along Y to next line
-          if (isRetracted && retLen>0) {
-            E += retLen;
-            emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; unretract`);
-            isRetracted = false;
-          }
-          // Move to line start (short unretracted move)
-          const distMove = Math.sqrt((x0-curX)**2+(y-curY)**2);
-          if (distMove > 0.01) {
-            E += extrudeAmt(distMove) * 0.3; // slight under-extrude on connector
-            emit(`G1 X${mm(x0+offX)} Y${mm(y+offY)} E${emm(E)} F${mmpm(sp)}`);
-            curX=x0; curY=y;
-          }
-        } else {
-          travelTo(x0, y);
-        }
-        lineTo(x1, y, sp, layer);
-        prevEndX = x1; prevEndY = y;
-      }
-      dir = -dir;
-    }
-  }
-
-  // ── Build G-code ─────────────────────────────────────
-
-  // Apply start G-code (substitute placeholders)
-  const startGcode = (printer.start_gcode||'')
-    .replace(/\{nozzle_temp\}/g, s.gcTempNozzle || printer.temp_nozzle)
-    .replace(/\{bed_temp\}/g,    s.gcTempBed    || printer.temp_bed)
-    .replace(/\{z_max\}/g,       mm(topZ + 20))
-    .replace(/\[nozzle_diameter\]/g, mm(s.nozzle || printer.nozzle || 0.4))
-    .replace(/\{nozzle\}/g,          mm(s.nozzle || printer.nozzle || 0.4))
-    .replace(/\[printer_model\]/g,   printer.id || 'generic')
-    .replace(/\[filament_type\]/g,   'PLA')
-    .replace(/\[bed_temperature\]/g, s.gcTempBed    || printer.temp_bed)
-    .replace(/\[nozzle_temperature\]/g, s.gcTempNozzle || printer.temp_nozzle);
-  emit('; StampForge — generated G-code');
-  emit(`; Project: ${getProjectSlug()}`);
-  emit(`; Printer: ${printer.name}`);
-  emit(`; Nozzle: ${(s.nozzle || 0.4).toFixed(2)}mm  Filament: ${printer.filament}mm`);
-  emit(`; Stamp: ${s.physW}x${s.physH}mm, ${totalLayers} layers, layer_h=${layerH}`);
-  emit('; ───────────────────────────────────');
-  emit(startGcode);
-  emit('M82 ; absolute extrusion');
-  emit('G92 E0');
-  emit('');
-
-  for (let layer=1; layer<=totalLayers; layer++) {
-    const z = layer * layerH;
-    const isBase = layer <= baseLayers;
-    const isDesign = !isBase;
-
-    emit(`; ── Layer ${layer}/${totalLayers} z=${mm(z)} ${isBase?'[base]':'[design]'}`);
-
-    // Fan control
-    if (layer === printer.fan_layer)
-      emit(`M106 S${printer.fan_speed} ; fan on`);
-
-    setLayer(z);
-
-    if (isBase && s.includeBase) {
-      // Base plate: solid infill only (rectangle)
-      emit('; base infill');
-      const baseRect = [
-        {x:0,y:0},{x:s.physW,y:0},
-        {x:s.physW,y:s.physH},{x:0,y:s.physH}
-      ];
-      // Perimeter
-      printRing(baseRect, layer);
-      // Infill
-      printInfill([baseRect], layer, layer%2===0?0:90);
-    }
-
-    if (isDesign) {
-      const numPerim = s.numPerimeters || 2;
-      emit('; perimeters');
-      for (const ring of outers) {
-        for (let pi=0; pi<numPerim; pi++) {
-          const pRing = pi===0 ? ring : offsetRingBy(ring, pi*extW);
-          if (pRing.length >= 3) printRing(pRing, layer);
-        }
-      }
-      for (const ring of holes) {
-        if (ring.length >= 3) printRing(ring, layer);
-      }
-      emit('; infill');
-      const innerRings = outers.map(r => numPerim>1 ? offsetRingBy(r,(numPerim-1)*extW) : r);
-      printInfill([...innerRings, ...holes], layer, layer%2===0?0:90);
-    }
-
-    emit('');
-  }
-
-  // End G-code
-  const endGcode = (printer.end_gcode||'')
-    .replace(/\{z_max\}/g, mm(topZ + 20));
-  emit(endGcode);
-
-  return lines.join('\n');
-}
-
-
-function onPrinterChange() {
-  const p = getPrinterProfile(document.getElementById('printerSelect').value);
-  document.getElementById('gcTempNozzle').value = p.temp_nozzle;
-  document.getElementById('gcTempBed').value    = p.temp_bed;
-  document.getElementById('gcSpeedPrint').value  = p.speed_print;
-  document.getElementById('gcSpeedTravel').value = p.speed_travel;
-  document.getElementById('gcSpeedFirst').value  = p.speed_first;
-  document.getElementById('gcRetract').value     = p.retract_len;
-  document.getElementById('gcFilDia').value      = p.filament;
-  // Also sync nozzle size to print settings panel
-  document.getElementById('nozzleD').value       = p.nozzle;
-}
-
-async function exportGcode() {
-  const s = getPrinterProfile ? getSettings() : getSettings();
-  const printerId = document.getElementById('printerSelect').value;
-  const printer = getPrinterProfile(printerId);
-  // Override filament diameter from UI
-  printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
-
-  const btn = document.getElementById('gcodeBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ SLICING...';
-
-  setTimeout(async () => {
-    try {
-      const gcode = await generateGcode(s, printer);
-      if (!gcode) {
-        showToast('⚠ No geometry — draw something first');
-      } else {
-        const blob = new Blob([gcode], {type:'text/plain'});
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        a.download = `${getProjectSlug()}_${s.physW}x${s.physH}mm.gcode`;
-        a.click();
-        URL.revokeObjectURL(url);
-        const lineCount = gcode.split('\n').length;
-        showToast(`✓ G-code — ${lineCount} lines — ${printer.name}`);
-      }
-    } catch(err) {
-      showToast('ERROR: ' + err.message);
-      console.error(err);
-    }
-    btn.disabled = false;
-    btn.textContent = 'GCODE';
-  }, 50);
-}
-
-
-// ══════════════════════════════════════════════════════
-//  USB SERIAL PRINT ENGINE  (Web Serial API — Chrome/Edge)
-// ══════════════════════════════════════════════════════
-let _port      = null;
-let _writer    = null;
-let _reader    = null;
-let _gcodeLines = [];
-let _printing  = false;
-let _cancelled = false;
-let _lineIdx   = 0;
-let _printStart = 0;
-
-function openPrintModal() {
-  // Clear log each time modal opens
-  document.getElementById('printLog').innerHTML = '';
-  document.getElementById('printProgressBar').style.width = '0%';
-  document.getElementById('pLine').textContent  = '0';
-  document.getElementById('pTotal').textContent = '0';
-  document.getElementById('pEta').textContent   = '—';
-  document.getElementById('printModal').classList.add('open');
-  if (!('serial' in navigator)) {
-    pLog('⚠ Web Serial API not available.', 'err');
-    pLog('Open this file via http://localhost (not file://) and use Chrome or Edge.', 'inf');
-    return;
-  }
-  if (_port) {
-    pLog('Port already open. Ready to print.', 'ok');
-    pStat('connected');
-  } else {
-    pLog('Click CONNECT USB to select the printer port.', 'inf');
-    pLog('Make sure no other app (Repetier, PrusaSlicer, Pronterface) has the port open.', 'inf');
-  }
-}
-
-async function closePrintModal() {
-  document.getElementById('printModal').classList.remove('open');
-  // If not printing, close port so it's free for other apps
-  if (!_printing && _port) {
-    try {
-      if (_reader) { await _reader.cancel(); _reader = null; }
-      await _port.close();
-      _port = null;
-      document.getElementById('printConnectBtn').textContent = '🔌 CONNECT USB';
-      document.getElementById('printConnectBtn').disabled = false;
-      document.getElementById('printStartBtn').disabled = true;
-      pStat('disconnected');
-    } catch(e) { /* ignore */ }
-  }
-}
-
-function pLog(msg, cls='') {
-  const log = document.getElementById('printLog');
-  const d = document.createElement('div');
-  if (cls) d.className = cls;
-  d.textContent = msg;
-  log.appendChild(d);
-  log.scrollTop = log.scrollHeight;
-}
-
-function pStat(txt) { document.getElementById('pStat').textContent = txt; }
-function pPort(txt) { document.getElementById('pPort').textContent = txt; }
-
-function pProgress(cur, total) {
-  document.getElementById('pLine').textContent  = cur;
-  document.getElementById('pTotal').textContent = total;
-  const pct = total > 0 ? (cur / total * 100).toFixed(1) : 0;
-  document.getElementById('printProgressBar').style.width = pct + '%';
-  if (_printStart && cur > 0) {
-    const elapsed = (Date.now() - _printStart) / 1000;
-    const rate    = cur / elapsed;
-    const rem     = Math.round((total - cur) / rate);
-    const mm = v => String(Math.floor(v)).padStart(2,'0');
-    document.getElementById('pEta').textContent =
-      rem > 0 ? `${mm(rem/60)}:${mm(rem%60)}` : '—';
-  }
-}
-
-async function usbConnect() {
-  if (!('serial' in navigator)) {
-    pLog('⚠ Web Serial not available — use Chrome or Edge via localhost.', 'err');
-    return;
-  }
-  // Close existing port if any
-  if (_port) {
-    try {
-      if (_reader) { await _reader.cancel(); _reader = null; }
-      await _port.close();
-    } catch(e) {}
-    _port = null;
-  }
-  const btn = document.getElementById('printConnectBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ CONNECTING…';
-  try {
-    _port = await navigator.serial.requestPort();
-    pLog('Port selected. Opening at 115200 baud…', 'inf');
-    await _port.open({ baudRate: 115200, dataBits: 8, stopBits: 1, parity: 'none' });
-    pLog('✓ Port open — waiting for printer greeting…', 'ok');
-    pStat('connected');
-    // Try to get port info for display
-    try {
-      const info = _port.getInfo();
-      pPort(`VID:${info.usbVendorId?.toString(16).padStart(4,'0')} PID:${info.usbProductId?.toString(16).padStart(4,'0')}`);
-    } catch(e) { pPort('USB Serial'); }
-    btn.textContent = '✓ CONNECTED';
-    document.getElementById('printStartBtn').disabled = false;
-    _readLoop();
-    // Send M115 to get firmware info
-    await new Promise(r => setTimeout(r, 1500)); // let printer boot
-    await _sendLine('M115');
-  } catch(e) {
-    _port = null;
-    btn.disabled = false;
-    btn.textContent = '🔌 CONNECT USB';
-    if (e.name === 'NotFoundError') {
-      pLog('No port selected.', 'inf');
-    } else if (e.message && e.message.includes('open')) {
-      pLog('⚠ Could not open port — another app may have it open.', 'err');
-      pLog('Close Repetier-Host, PrusaSlicer, or Pronterface and try again.', 'inf');
-    } else {
-      pLog('Connect error: ' + e.message, 'err');
-    }
-  }
-}
-
-// Accumulate incoming serial data into lines
-let _rxBuf = '';
-let _okResolve = null;
-
-async function _readLoop() {
-  const dec = new TextDecoderStream();
-  _port.readable.pipeTo(dec.writable);
-  _reader = dec.readable.getReader();
-  try {
-    while (true) {
-      const { value, done } = await _reader.read();
-      if (done) break;
-      _rxBuf += value;
-      let nl;
-      while ((nl = _rxBuf.indexOf('\n')) !== -1) {
-        const line = _rxBuf.slice(0, nl).trim();
-        _rxBuf = _rxBuf.slice(nl + 1);
-        _onSerialLine(line);
-      }
-    }
-  } catch(e) {
-    if (_printing) pLog('Read error: ' + e.message, 'err');
-  }
-}
-
-function _onSerialLine(line) {
-  if (!line) return;
-  if (line.startsWith('ok'))     { pLog('← ' + line, 'ok');  if (_okResolve) { _okResolve(); _okResolve = null; } }
-  else if (line.startsWith('T')) { /* temperature, skip */ }
-  else if (line.startsWith('Error') || line.startsWith('!!')) { pLog('← ' + line, 'err'); }
-  else                            { pLog('← ' + line); }
-}
-
-function _waitForOk() {
-  return new Promise(res => { _okResolve = res; });
-}
-
-async function _sendLine(line) {
-  const enc = new TextEncoder();
-  const w   = _port.writable.getWriter();
-  await w.write(enc.encode(line + '\n'));
-  w.releaseLock();
-}
-
-async function usbStartPrint() {
-  if (!_port) { pLog('Not connected.', 'err'); return; }
-
-  // Generate G-code on the fly
-  const s = getSettings();
-  const printerId = document.getElementById('printerSelect').value;
-  const printer = getPrinterProfile(printerId);
-  printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
-
-  pLog('Generating G-code…', 'inf');
-  const gcode = await generateGcode(s, printer);
-  if (!gcode) { pLog('No geometry — draw something first.', 'err'); return; }
-
-  // Filter: skip blank lines and pure comments for transmission efficiency
-  _gcodeLines = gcode.split('\n')
-    .map(l => l.split(';')[0].trim())  // strip inline comments
-    .filter(l => l.length > 0);
-
-  _printing   = true;
-  _cancelled  = false;
-  _lineIdx    = 0;
-  _printStart = Date.now();
-
-  document.getElementById('printStartBtn').disabled  = true;
-  document.getElementById('printCancelBtn').style.display = 'flex';
-  document.getElementById('usbPrintBtn').disabled = true;
-  pStat('printing');
-  pLog(`Starting — ${_gcodeLines.length} lines`, 'inf');
-
-  try {
-    while (_lineIdx < _gcodeLines.length && !_cancelled) {
-      const line = _gcodeLines[_lineIdx];
-      await _sendLine(line);
-      pLog('→ ' + line);
-      pProgress(_lineIdx + 1, _gcodeLines.length);
-      await _waitForOk();
-      _lineIdx++;
-    }
-    if (_cancelled) {
-      pLog('Print cancelled by user.', 'err');
-      pStat('cancelled');
-      // Emergency stop
-      await _sendLine('M112');
-    } else {
-      pLog('✓ Print complete!', 'ok');
-      pStat('done');
-    }
-  } catch(e) {
-    pLog('Print error: ' + e.message, 'err');
-    pStat('error');
-  }
-
-  _printing = false;
-  document.getElementById('printCancelBtn').style.display = 'none';
-  document.getElementById('printStartBtn').disabled  = false;
-  document.getElementById('usbPrintBtn').disabled = false;
-}
-
-function usbCancel() {
-  if (_printing) {
-    _cancelled = true;
-    pLog('Cancelling after current line…', 'err');
-  }
-}
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// // ══════════════════════════════════════════════════════
+// //  PRINTER PROFILES + G-CODE ENGINE
+// // ══════════════════════════════════════════════════════
+// // ══════════════════════════════════════════════════════
+// //  PRINTER PROFILES
+// // ══════════════════════════════════════════════════════
+// const PRINTER_PROFILES = [
+//   {
+//     id:'prusa_mk3s', name:'Prusa i3 MK3S/MK3S+',
+//     bed_x:250,bed_y:210,firmware:'marlin',filament:1.75,
+//     temp_nozzle:215,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
+//     retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
+//     start_gcode:`M862.3 P "[printer_model]" ; printer model check
+// M862.1 P[nozzle_diameter] ; nozzle diameter check
+// M115 U3.13.3 ; tell printer latest fw version
+// G28 ; home all axes
+// G1 Z5 F3000 ; lift
+// M190 S{bed_temp} ; wait for bed
+// M109 S{nozzle_temp} ; wait for nozzle
+// M83 ; relative extrusion for intro line
+// G1 X0 Y-3 Z0.3 F3000 ; intro line start
+// G1 X60 E9 F1000 ; intro line
+// G1 X100 E3.5 F1000 ; intro line
+// G1 E-1 F2100 ; retract after intro
+// M82 ; back to absolute extrusion
+// G92 E0 ; reset extruder`,
+//     end_gcode:`G4 ; wait
+// M221 S100 ; reset flow
+// G1 E-2 F2100 ; retract to avoid ooze
+// M104 S0 ; nozzle off
+// M140 S0 ; bed off
+// G1 Z{z_max} F3000 ; raise nozzle
+// G28 X Y ; home X Y
+// M84 ; motors off`
+//   },
+//   {
+//     id:'prusa_mk4', name:'Prusa MK4',
+//     bed_x:250,bed_y:210,firmware:'marlin',filament:1.75,
+//     temp_nozzle:220,temp_bed:60,speed_print:50,speed_travel:200,speed_first:20,
+//     retract_len:0.6,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28 ; home
+// M190 S{bed_temp}
+// M109 S{nozzle_temp}
+// G1 Z5 F3000
+// G92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
+//   },
+//   {
+//     id:'ender3', name:'Creality Ender-3 / Ender-3 V2',
+//     bed_x:235,bed_y:235,firmware:'marlin',filament:1.75,
+//     temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
+//     retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28
+// M190 S{bed_temp}
+// M109 S{nozzle_temp}
+// G92 E0
+// G1 Z2 F3000
+// G1 X0.1 Y20 Z0.3 F5000
+// G1 X0.1 Y200 Z0.3 E15 F1500
+// G1 X0.4 Y200 Z0.3 F5000
+// G1 X0.4 Y20 Z0.3 E30 F1500
+// G92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'ender3_s1', name:'Creality Ender-3 S1 / S1 Pro',
+//     bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+//     temp_nozzle:210,temp_bed:60,speed_print:50,speed_travel:150,speed_first:25,
+//     retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'cr10', name:'Creality CR-10 / CR-10S',
+//     bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
+//     temp_nozzle:200,temp_bed:60,speed_print:50,speed_travel:150,speed_first:20,
+//     retract_len:5.0,retract_speed:45,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'cr10_v2', name:'Creality CR-10 V2/V3',
+//     bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
+//     temp_nozzle:205,temp_bed:60,speed_print:50,speed_travel:180,speed_first:20,
+//     retract_len:1.5,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'bambu_p1p', name:'Bambu Lab P1P / P1S',
+//     bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
+//     temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
+//     retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
+//     start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'bambu_x1', name:'Bambu Lab X1 / X1C',
+//     bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
+//     temp_nozzle:220,temp_bed:55,speed_print:150,speed_travel:500,speed_first:30,
+//     retract_len:0.5,retract_speed:50,fan_speed:255,fan_layer:1,
+//     start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'artillery_sw', name:'Artillery Sidewinder X1/X2',
+//     bed_x:300,bed_y:300,firmware:'marlin',filament:1.75,
+//     temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
+//     retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'artillery_genius', name:'Artillery Genius Pro',
+//     bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+//     temp_nozzle:200,temp_bed:60,speed_print:60,speed_travel:150,speed_first:25,
+//     retract_len:4.0,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'voron24', name:'Voron 2.4',
+//     bed_x:300,bed_y:300,firmware:'klipper',filament:1.75,
+//     temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
+//     retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
+//     start_gcode:`G28\nQGL\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
+//   },
+//   {
+//     id:'voron_trident', name:'Voron Trident',
+//     bed_x:250,bed_y:250,firmware:'klipper',filament:1.75,
+//     temp_nozzle:240,temp_bed:100,speed_print:100,speed_travel:350,speed_first:30,
+//     retract_len:0.5,retract_speed:40,fan_speed:255,fan_layer:1,
+//     start_gcode:`G28\nZ_TILT_ADJUST\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
+//   },
+//   {
+//     id:'anycubic_kobra', name:'Anycubic Kobra / Kobra 2',
+//     bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+//     temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
+//     retract_len:5.0,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'elegoo_neptune', name:'Elegoo Neptune 3 / 4',
+//     bed_x:220,bed_y:220,firmware:'marlin',filament:1.75,
+//     temp_nozzle:210,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
+//     retract_len:1.0,retract_speed:40,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'bambu_a1', name:'Bambu Lab A1 / A1 Mini',
+//     bed_x:256,bed_y:256,firmware:'bambu',filament:1.75,
+//     temp_nozzle:220,temp_bed:55,speed_print:100,speed_travel:300,speed_first:30,
+//     retract_len:0.8,retract_speed:40,fan_speed:255,fan_layer:1,
+//     start_gcode:`M190 S{bed_temp}\nM109 S{nozzle_temp}\nG28\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'prusa_mini', name:'Prusa MINI / MINI+',
+//     bed_x:180,bed_y:180,firmware:'marlin',filament:1.75,
+//     temp_nozzle:215,temp_bed:60,speed_print:45,speed_travel:150,speed_first:15,
+//     retract_len:3.2,retract_speed:35,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   },
+//   {
+//     id:'longer_lk4', name:'Longer LK4 Pro (Klipper)',
+//     bed_x:220,bed_y:220,firmware:'klipper',filament:1.75,
+//     temp_nozzle:205,temp_bed:55,speed_print:50,speed_travel:150,speed_first:20,
+//     retract_len:0.8,retract_speed:35,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X Y\nM84`
+//   },
+//   {
+//     id:'generic_reprap', name:'Generic RepRap / Custom',
+//     bed_x:200,bed_y:200,firmware:'reprap',filament:1.75,
+//     temp_nozzle:200,temp_bed:50,speed_print:40,speed_travel:120,speed_first:20,
+//     retract_len:2.0,retract_speed:30,fan_speed:255,fan_layer:2,
+//     start_gcode:`G28\nM190 S{bed_temp}\nM109 S{nozzle_temp}\nG92 E0`,
+//     end_gcode:`G1 E-2 F2100 ; retract\nM104 S0\nM140 S0\nG28 X\nM84`
+//   }
+// ];
+// 
+// function getPrinterProfile(id) {
+//   return PRINTER_PROFILES.find(p => p.id === id) || PRINTER_PROFILES[PRINTER_PROFILES.length-1];
+// }
+// 
+// // ══════════════════════════════════════════════════════
+// //  G-CODE ENGINE
+// // ══════════════════════════════════════════════════════
+// async function generateGcode(s, printer) {
+//   const contours = await buildContours(s);
+//   if (!contours.length) return null;
+// 
+//   // Classify outers/holes (same as buildSTL)
+//   const withArea = contours.map(c=>({c,a:signedArea(c),ab:Math.abs(signedArea(c))}));
+//   withArea.sort((x,y)=>y.ab-x.ab);
+//   const normalized=[];
+//   for (const item of withArea) {
+//     const ref=item.c[0]; let isHole=false;
+//     for (const prev of normalized)
+//       if (prev.isOuter && pointInPoly(ref.x,ref.y,prev.c)){isHole=true;break;}
+//     let poly=item.c;
+//     if (!isHole && item.a<0) poly=[...poly].reverse();
+//     if ( isHole && item.a>0) poly=[...poly].reverse();
+//     normalized.push({c:poly,isOuter:!isHole});
+//   }
+//   const outers = normalized.filter(x=>x.isOuter).map(x=>x.c);
+//   const holes  = normalized.filter(x=>!x.isOuter).map(x=>x.c);
+// 
+//   // Printer/slicer params
+//   const layerH   = s.layerH;
+//   const nozzle   = s.nozzle;
+//   const filDia   = printer.filament;
+//   const filArea  = Math.PI * (filDia/2) ** 2;
+//   const extW     = nozzle * 1.1;           // extrusion width = nozzle × 1.1
+//   const speedPrint  = (s.gcSpeedPrint  || printer.speed_print)  * 60; // mm/min
+//   const speedTravel = (s.gcSpeedTravel || printer.speed_travel) * 60;
+//   const speedFirst  = (s.gcSpeedFirst  || printer.speed_first)  * 60;
+//   const retLen   = s.gcRetract   ?? printer.retract_len;
+//   const retSpeed = printer.retract_speed * 60;
+// 
+//   // Offset stamp to bed centre
+//   const offX = (printer.bed_x - s.physW) / 2;
+//   const offY = (printer.bed_y - s.physH) / 2;
+// 
+//   const baseZ  = 0;
+//   const midZ   = s.includeBase ? s.baseThick : 0;
+//   const topZ   = midZ + s.designLayers * layerH;
+//   const totalLayers = Math.round(topZ / layerH);
+//   const baseLayers  = Math.round(midZ / layerH);
+// 
+//   let E = 0; // cumulative extrusion
+//   let curX = 0, curY = 0, curZ = -1;
+//   let isRetracted = false;
+//   const lines = [];
+// 
+//   const emit = l => lines.push(l);
+// 
+//   const mmpm = v => v.toFixed(0);
+//   const mm   = v => v.toFixed(4);
+//   const emm  = v => v.toFixed(5);
+// 
+//   // Extrusion amount for a move of given length
+//   const extrudeAmt = (len) => (len * layerH * extW) / filArea;
+// 
+//   function moveTo(x, y, speed, comment='') {
+//     const dx=x-curX, dy=y-curY;
+//     const d=Math.sqrt(dx*dx+dy*dy);
+//     if (d<0.01) return;
+//     curX=x; curY=y;
+//     emit(`G1 X${mm(x+offX)} Y${mm(y+offY)} F${mmpm(speed)}${comment?' ;'+comment:''}`);
+//   }
+// 
+//   function travelTo(x, y) {
+//     if (!isRetracted && retLen>0) {
+//       E -= retLen;
+//       emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; retract`);
+//       isRetracted = true;
+//     }
+//     moveTo(x, y, speedTravel, 'travel');
+//   }
+// 
+//   function lineTo(x, y, speed, layer) {
+//     if (isRetracted && retLen>0) {
+//       E += retLen;
+//       emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; unretract`);
+//       isRetracted = false;
+//     }
+//     const dx=x-curX, dy=y-curY;
+//     const d=Math.sqrt(dx*dx+dy*dy);
+//     if (d<0.15) return; // skip micro-segments < 0.15mm
+//     E += extrudeAmt(d);
+//     const sp = layer===1 ? speedFirst : speed;
+//     emit(`G1 X${mm(x+offX)} Y${mm(y+offY)} E${emm(E)} F${mmpm(sp)}`);
+//     curX=x; curY=y;
+//   }
+// 
+//   function setLayer(z) {
+//     if (Math.abs(z-curZ)<0.001) return;
+//     curZ=z;
+//     emit(`G1 Z${mm(z)} F3000 ; layer z=${mm(z)}`);
+//   }
+// 
+//   // Coalesce ring — remove points closer than minD to previous
+//   function coalesceRing(ring, minD) {
+//     if (ring.length < 3) return ring;
+//     const out = [ring[0]];
+//     for (let i = 1; i < ring.length; i++) {
+//       const prev = out[out.length-1];
+//       const dx = ring[i].x - prev.x, dy = ring[i].y - prev.y;
+//       if (Math.sqrt(dx*dx+dy*dy) >= minD) out.push(ring[i]);
+//     }
+//     return out.length >= 3 ? out : ring;
+//   }
+// 
+//   // Minimum G-code segment length (mm) — below this points are merged
+//   const MIN_SEG = 0.25;
+// 
+//   // Print a closed polygon ring on current Z
+//   function printRing(ring, layer) {
+//     ring = coalesceRing(ring, MIN_SEG);
+//     const start = ring[0];
+//     travelTo(start.x, start.y);
+//     setLayer(curZ); // already set before call
+//     for (let i=1; i<ring.length; i++) lineTo(ring[i].x, ring[i].y, speedPrint, layer);
+//     lineTo(start.x, start.y, speedPrint, layer); // close ring
+//   }
+// 
+//   // Rectilinear infill — true boustrophedon, no travel between adjacent lines
+//   function printInfill(outerRings, layer, angle=0) {
+//     const density = (typeof window._infillDensity === 'number' ? window._infillDensity : 1.0);
+//     if (density <= 0) return;
+//     const pitch = extW * 1.05 / Math.max(density, 0.05);
+// 
+//     // Bounding box
+//     let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+//     for (const r of outerRings)
+//       for (const p of r){
+//         if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x;
+//         if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y;
+//       }
+// 
+//     // Build all scanlines first
+//     const scanlines = [];
+//     for (let y=minY+pitch/2; y<maxY; y+=pitch) {
+//       const xs=[];
+//       for (const ring of outerRings) {
+//         const n=ring.length;
+//         for (let i=0;i<n;i++){
+//           const a=ring[i],b=ring[(i+1)%n];
+//           if ((a.y<=y&&b.y>y)||(b.y<=y&&a.y>y)){
+//             const t=(y-a.y)/(b.y-a.y);
+//             xs.push(a.x+t*(b.x-a.x));
+//           }
+//         }
+//       }
+//       xs.sort((a,b)=>a-b);
+//       if (xs.length >= 2) scanlines.push({y, xs});
+//     }
+// 
+//     const sp = layer===1 ? speedFirst : speedPrint;
+//     let dir = 1;
+//     let prevEndX = null, prevEndY = null;
+// 
+//     for (const {y, xs} of scanlines) {
+//       // Segments for this scanline
+//       const segs = [];
+//       for (let i=0;i+1<xs.length;i+=2) segs.push([xs[i], xs[i+1]]);
+//       if (!segs.length) continue;
+// 
+//       if (dir < 0) segs.reverse();
+// 
+//       for (let si=0; si<segs.length; si++) {
+//         let x0 = dir>0 ? segs[si][0] : segs[si][1];
+//         let x1 = dir>0 ? segs[si][1] : segs[si][0];
+// 
+//         // Can we connect from previous endpoint without travel?
+//         const dx = x0-curX, dy = y-curY;
+//         const distFromCur = Math.sqrt(dx*dx+dy*dy);
+// 
+//         if (prevEndX !== null && distFromCur < pitch * 2.5) {
+//           // Close enough — no retract, just move and continue extruding
+//           // Brief unretracted travel along Y to next line
+//           if (isRetracted && retLen>0) {
+//             E += retLen;
+//             emit(`G1 E${emm(E)} F${mmpm(retSpeed)} ; unretract`);
+//             isRetracted = false;
+//           }
+//           // Move to line start (short unretracted move)
+//           const distMove = Math.sqrt((x0-curX)**2+(y-curY)**2);
+//           if (distMove > 0.01) {
+//             E += extrudeAmt(distMove) * 0.3; // slight under-extrude on connector
+//             emit(`G1 X${mm(x0+offX)} Y${mm(y+offY)} E${emm(E)} F${mmpm(sp)}`);
+//             curX=x0; curY=y;
+//           }
+//         } else {
+//           travelTo(x0, y);
+//         }
+//         lineTo(x1, y, sp, layer);
+//         prevEndX = x1; prevEndY = y;
+//       }
+//       dir = -dir;
+//     }
+//   }
+// 
+//   // ── Build G-code ─────────────────────────────────────
+// 
+//   // Apply start G-code (substitute placeholders)
+//   const startGcode = (printer.start_gcode||'')
+//     .replace(/\{nozzle_temp\}/g, s.gcTempNozzle || printer.temp_nozzle)
+//     .replace(/\{bed_temp\}/g,    s.gcTempBed    || printer.temp_bed)
+//     .replace(/\{z_max\}/g,       mm(topZ + 20))
+//     .replace(/\[nozzle_diameter\]/g, mm(s.nozzle || printer.nozzle || 0.4))
+//     .replace(/\{nozzle\}/g,          mm(s.nozzle || printer.nozzle || 0.4))
+//     .replace(/\[printer_model\]/g,   printer.id || 'generic')
+//     .replace(/\[filament_type\]/g,   'PLA')
+//     .replace(/\[bed_temperature\]/g, s.gcTempBed    || printer.temp_bed)
+//     .replace(/\[nozzle_temperature\]/g, s.gcTempNozzle || printer.temp_nozzle);
+//   emit('; StampForge — generated G-code');
+//   emit(`; Project: ${getProjectSlug()}`);
+//   emit(`; Printer: ${printer.name}`);
+//   emit(`; Nozzle: ${(s.nozzle || 0.4).toFixed(2)}mm  Filament: ${printer.filament}mm`);
+//   emit(`; Stamp: ${s.physW}x${s.physH}mm, ${totalLayers} layers, layer_h=${layerH}`);
+//   emit('; ───────────────────────────────────');
+//   emit(startGcode);
+//   emit('M82 ; absolute extrusion');
+//   emit('G92 E0');
+//   emit('');
+// 
+//   for (let layer=1; layer<=totalLayers; layer++) {
+//     const z = layer * layerH;
+//     const isBase = layer <= baseLayers;
+//     const isDesign = !isBase;
+// 
+//     emit(`; ── Layer ${layer}/${totalLayers} z=${mm(z)} ${isBase?'[base]':'[design]'}`);
+// 
+//     // Fan control
+//     if (layer === printer.fan_layer)
+//       emit(`M106 S${printer.fan_speed} ; fan on`);
+// 
+//     setLayer(z);
+// 
+//     if (isBase && s.includeBase) {
+//       // Base plate: solid infill only (rectangle)
+//       emit('; base infill');
+//       const baseRect = [
+//         {x:0,y:0},{x:s.physW,y:0},
+//         {x:s.physW,y:s.physH},{x:0,y:s.physH}
+//       ];
+//       // Perimeter
+//       printRing(baseRect, layer);
+//       // Infill
+//       printInfill([baseRect], layer, layer%2===0?0:90);
+//     }
+// 
+//     if (isDesign) {
+//       const numPerim = s.numPerimeters || 2;
+//       emit('; perimeters');
+//       for (const ring of outers) {
+//         for (let pi=0; pi<numPerim; pi++) {
+//           const pRing = pi===0 ? ring : offsetRingBy(ring, pi*extW);
+//           if (pRing.length >= 3) printRing(pRing, layer);
+//         }
+//       }
+//       for (const ring of holes) {
+//         if (ring.length >= 3) printRing(ring, layer);
+//       }
+//       emit('; infill');
+//       const innerRings = outers.map(r => numPerim>1 ? offsetRingBy(r,(numPerim-1)*extW) : r);
+//       printInfill([...innerRings, ...holes], layer, layer%2===0?0:90);
+//     }
+// 
+//     emit('');
+//   }
+// 
+//   // End G-code
+//   const endGcode = (printer.end_gcode||'')
+//     .replace(/\{z_max\}/g, mm(topZ + 20));
+//   emit(endGcode);
+// 
+//   return lines.join('\n');
+// }
+// 
+// 
+// function onPrinterChange() {
+//   const p = getPrinterProfile(document.getElementById('printerSelect').value);
+//   document.getElementById('gcTempNozzle').value = p.temp_nozzle;
+//   document.getElementById('gcTempBed').value    = p.temp_bed;
+//   document.getElementById('gcSpeedPrint').value  = p.speed_print;
+//   document.getElementById('gcSpeedTravel').value = p.speed_travel;
+//   document.getElementById('gcSpeedFirst').value  = p.speed_first;
+//   document.getElementById('gcRetract').value     = p.retract_len;
+//   document.getElementById('gcFilDia').value      = p.filament;
+//   // Also sync nozzle size to print settings panel
+//   document.getElementById('nozzleD').value       = p.nozzle;
+// }
+// 
+// async function exportGcode() {
+//   const s = getPrinterProfile ? getSettings() : getSettings();
+//   const printerId = document.getElementById('printerSelect').value;
+//   const printer = getPrinterProfile(printerId);
+//   // Override filament diameter from UI
+//   printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+// 
+//   const btn = document.getElementById('gcodeBtn');
+//   btn.disabled = true;
+//   btn.textContent = '⏳ SLICING...';
+// 
+//   setTimeout(async () => {
+//     try {
+//       const gcode = await generateGcode(s, printer);
+//       if (!gcode) {
+//         showToast('⚠ No geometry — draw something first');
+//       } else {
+//         const blob = new Blob([gcode], {type:'text/plain'});
+//         const url  = URL.createObjectURL(blob);
+//         const a    = document.createElement('a');
+//         a.href     = url;
+//         a.download = `${getProjectSlug()}_${s.physW}x${s.physH}mm.gcode`;
+//         a.click();
+//         URL.revokeObjectURL(url);
+//         const lineCount = gcode.split('\n').length;
+//         showToast(`✓ G-code — ${lineCount} lines — ${printer.name}`);
+//       }
+//     } catch(err) {
+//       showToast('ERROR: ' + err.message);
+//       console.error(err);
+//     }
+//     btn.disabled = false;
+//     btn.textContent = 'GCODE';
+//   }, 50);
+// }
+
+
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// // ══════════════════════════════════════════════════════
+// //  USB SERIAL PRINT ENGINE  (Web Serial API — Chrome/Edge)
+// // ══════════════════════════════════════════════════════
+// let _port      = null;
+// let _writer    = null;
+// let _reader    = null;
+// let _gcodeLines = [];
+// let _printing  = false;
+// let _cancelled = false;
+// let _lineIdx   = 0;
+// let _printStart = 0;
+// 
+// function openPrintModal() {
+//   // Clear log each time modal opens
+//   document.getElementById('printLog').innerHTML = '';
+//   document.getElementById('printProgressBar').style.width = '0%';
+//   document.getElementById('pLine').textContent  = '0';
+//   document.getElementById('pTotal').textContent = '0';
+//   document.getElementById('pEta').textContent   = '—';
+//   document.getElementById('printModal').classList.add('open');
+//   if (!('serial' in navigator)) {
+//     pLog('⚠ Web Serial API not available.', 'err');
+//     pLog('Open this file via http://localhost (not file://) and use Chrome or Edge.', 'inf');
+//     return;
+//   }
+//   if (_port) {
+//     pLog('Port already open. Ready to print.', 'ok');
+//     pStat('connected');
+//   } else {
+//     pLog('Click CONNECT USB to select the printer port.', 'inf');
+//     pLog('Make sure no other app (Repetier, PrusaSlicer, Pronterface) has the port open.', 'inf');
+//   }
+// }
+// 
+// async function closePrintModal() {
+//   document.getElementById('printModal').classList.remove('open');
+//   // If not printing, close port so it's free for other apps
+//   if (!_printing && _port) {
+//     try {
+//       if (_reader) { await _reader.cancel(); _reader = null; }
+//       await _port.close();
+//       _port = null;
+//       document.getElementById('printConnectBtn').textContent = '🔌 CONNECT USB';
+//       document.getElementById('printConnectBtn').disabled = false;
+//       document.getElementById('printStartBtn').disabled = true;
+//       pStat('disconnected');
+//     } catch(e) { /* ignore */ }
+//   }
+// }
+// 
+// function pLog(msg, cls='') {
+//   const log = document.getElementById('printLog');
+//   const d = document.createElement('div');
+//   if (cls) d.className = cls;
+//   d.textContent = msg;
+//   log.appendChild(d);
+//   log.scrollTop = log.scrollHeight;
+// }
+// 
+// function pStat(txt) { document.getElementById('pStat').textContent = txt; }
+// function pPort(txt) { document.getElementById('pPort').textContent = txt; }
+// 
+// function pProgress(cur, total) {
+//   document.getElementById('pLine').textContent  = cur;
+//   document.getElementById('pTotal').textContent = total;
+//   const pct = total > 0 ? (cur / total * 100).toFixed(1) : 0;
+//   document.getElementById('printProgressBar').style.width = pct + '%';
+//   if (_printStart && cur > 0) {
+//     const elapsed = (Date.now() - _printStart) / 1000;
+//     const rate    = cur / elapsed;
+//     const rem     = Math.round((total - cur) / rate);
+//     const mm = v => String(Math.floor(v)).padStart(2,'0');
+//     document.getElementById('pEta').textContent =
+//       rem > 0 ? `${mm(rem/60)}:${mm(rem%60)}` : '—';
+//   }
+// }
+// 
+// async function usbConnect() {
+//   if (!('serial' in navigator)) {
+//     pLog('⚠ Web Serial not available — use Chrome or Edge via localhost.', 'err');
+//     return;
+//   }
+//   // Close existing port if any
+//   if (_port) {
+//     try {
+//       if (_reader) { await _reader.cancel(); _reader = null; }
+//       await _port.close();
+//     } catch(e) {}
+//     _port = null;
+//   }
+//   const btn = document.getElementById('printConnectBtn');
+//   btn.disabled = true;
+//   btn.textContent = '⏳ CONNECTING…';
+//   try {
+//     _port = await navigator.serial.requestPort();
+//     pLog('Port selected. Opening at 115200 baud…', 'inf');
+//     await _port.open({ baudRate: 115200, dataBits: 8, stopBits: 1, parity: 'none' });
+//     pLog('✓ Port open — waiting for printer greeting…', 'ok');
+//     pStat('connected');
+//     // Try to get port info for display
+//     try {
+//       const info = _port.getInfo();
+//       pPort(`VID:${info.usbVendorId?.toString(16).padStart(4,'0')} PID:${info.usbProductId?.toString(16).padStart(4,'0')}`);
+//     } catch(e) { pPort('USB Serial'); }
+//     btn.textContent = '✓ CONNECTED';
+//     document.getElementById('printStartBtn').disabled = false;
+//     _readLoop();
+//     // Send M115 to get firmware info
+//     await new Promise(r => setTimeout(r, 1500)); // let printer boot
+//     await _sendLine('M115');
+//   } catch(e) {
+//     _port = null;
+//     btn.disabled = false;
+//     btn.textContent = '🔌 CONNECT USB';
+//     if (e.name === 'NotFoundError') {
+//       pLog('No port selected.', 'inf');
+//     } else if (e.message && e.message.includes('open')) {
+//       pLog('⚠ Could not open port — another app may have it open.', 'err');
+//       pLog('Close Repetier-Host, PrusaSlicer, or Pronterface and try again.', 'inf');
+//     } else {
+//       pLog('Connect error: ' + e.message, 'err');
+//     }
+//   }
+// }
+// 
+// // Accumulate incoming serial data into lines
+// let _rxBuf = '';
+// let _okResolve = null;
+// 
+// async function _readLoop() {
+//   const dec = new TextDecoderStream();
+//   _port.readable.pipeTo(dec.writable);
+//   _reader = dec.readable.getReader();
+//   try {
+//     while (true) {
+//       const { value, done } = await _reader.read();
+//       if (done) break;
+//       _rxBuf += value;
+//       let nl;
+//       while ((nl = _rxBuf.indexOf('\n')) !== -1) {
+//         const line = _rxBuf.slice(0, nl).trim();
+//         _rxBuf = _rxBuf.slice(nl + 1);
+//         _onSerialLine(line);
+//       }
+//     }
+//   } catch(e) {
+//     if (_printing) pLog('Read error: ' + e.message, 'err');
+//   }
+// }
+// 
+// function _onSerialLine(line) {
+//   if (!line) return;
+//   if (line.startsWith('ok'))     { pLog('← ' + line, 'ok');  if (_okResolve) { _okResolve(); _okResolve = null; } }
+//   else if (line.startsWith('T')) { /* temperature, skip */ }
+//   else if (line.startsWith('Error') || line.startsWith('!!')) { pLog('← ' + line, 'err'); }
+//   else                            { pLog('← ' + line); }
+// }
+// 
+// function _waitForOk() {
+//   return new Promise(res => { _okResolve = res; });
+// }
+// 
+// async function _sendLine(line) {
+//   const enc = new TextEncoder();
+//   const w   = _port.writable.getWriter();
+//   await w.write(enc.encode(line + '\n'));
+//   w.releaseLock();
+// }
+// 
+// async function usbStartPrint() {
+//   if (!_port) { pLog('Not connected.', 'err'); return; }
+// 
+//   // Generate G-code on the fly
+//   const s = getSettings();
+//   const printerId = document.getElementById('printerSelect').value;
+//   const printer = getPrinterProfile(printerId);
+//   printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+// 
+//   pLog('Generating G-code…', 'inf');
+//   const gcode = await generateGcode(s, printer);
+//   if (!gcode) { pLog('No geometry — draw something first.', 'err'); return; }
+// 
+//   // Filter: skip blank lines and pure comments for transmission efficiency
+//   _gcodeLines = gcode.split('\n')
+//     .map(l => l.split(';')[0].trim())  // strip inline comments
+//     .filter(l => l.length > 0);
+// 
+//   _printing   = true;
+//   _cancelled  = false;
+//   _lineIdx    = 0;
+//   _printStart = Date.now();
+// 
+//   document.getElementById('printStartBtn').disabled  = true;
+//   document.getElementById('printCancelBtn').style.display = 'flex';
+//   document.getElementById('usbPrintBtn').disabled = true;
+//   pStat('printing');
+//   pLog(`Starting — ${_gcodeLines.length} lines`, 'inf');
+// 
+//   try {
+//     while (_lineIdx < _gcodeLines.length && !_cancelled) {
+//       const line = _gcodeLines[_lineIdx];
+//       await _sendLine(line);
+//       pLog('→ ' + line);
+//       pProgress(_lineIdx + 1, _gcodeLines.length);
+//       await _waitForOk();
+//       _lineIdx++;
+//     }
+//     if (_cancelled) {
+//       pLog('Print cancelled by user.', 'err');
+//       pStat('cancelled');
+//       // Emergency stop
+//       await _sendLine('M112');
+//     } else {
+//       pLog('✓ Print complete!', 'ok');
+//       pStat('done');
+//     }
+//   } catch(e) {
+//     pLog('Print error: ' + e.message, 'err');
+//     pStat('error');
+//   }
+// 
+//   _printing = false;
+//   document.getElementById('printCancelBtn').style.display = 'none';
+//   document.getElementById('printStartBtn').disabled  = false;
+//   document.getElementById('usbPrintBtn').disabled = false;
+// }
+// 
+// function usbCancel() {
+//   if (_printing) {
+//     _cancelled = true;
+//     pLog('Cancelling after current line…', 'err');
+//   }
+// }
 
 
 // ══════════════════════════════════════════════════════
@@ -3214,7 +3261,7 @@ function saveProject() {
     version: 2,
     name,
     settings: s,
-    printer: document.getElementById('printerSelect').value,
+    // printer: document.getElementById('printerSelect').value,  // future release
     canvas: canvas.toDataURL('image/png'),
     saved: new Date().toISOString()
   };
@@ -3242,20 +3289,20 @@ function loadProject() {
         // Restore title
         document.getElementById('projectTitle').textContent = p.name || 'untitled';
         // Restore printer
-        if (p.printer) {
-          document.getElementById('printerSelect').value = p.printer;
-          onPrinterChange();
-        }
+        // if (p.printer) {
+        // document.getElementById('printerSelect').value = p.printer;
+        // onPrinterChange();
+        // }
         // Restore settings overrides
         const s = p.settings || {};
         if (s.physW)         document.getElementById('physW').value         = s.physW;
         if (s.physH)         document.getElementById('physH').value         = s.physH;
         if (s.layerH)        document.getElementById('layerH').value        = s.layerH;
-        if (s.nozzle)        document.getElementById('nozzleD').value       = s.nozzle;
+        // if (s.nozzle)        document.getElementById('nozzleD').value       = s.nozzle;  // future release
         if (s.baseThick)     document.getElementById('baseThick').value     = s.baseThick;
         if (s.designLayers)  document.getElementById('designLayers').value  = s.designLayers;
         if (s.simplifyEps != null) document.getElementById('simplifyEps').value = s.simplifyEps;
-        if (s.numPerimeters) document.getElementById('numPerimeters').value = s.numPerimeters;
+        // if (s.numPerimeters) document.getElementById('numPerimeters').value = s.numPerimeters;
         if (s.chaikinPasses != null) {
           document.getElementById('chaikinPasses').value = s.chaikinPasses;
           document.getElementById('chaikinVal').textContent = s.chaikinPasses + ' passes';
@@ -3289,175 +3336,176 @@ function loadProject() {
 }
 
 
-// ══════════════════════════════════════════════════════
-//  LAYER PREVIEW
-// ══════════════════════════════════════════════════════
-let _layerData = null;
-
-async function openLayerPreview() {
-  const btn = document.getElementById('layerPreviewBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ SLICING...';
-  setTimeout(async () => {
-    try {
-      const s = getSettings();
-      const printer = getPrinterProfile(document.getElementById('printerSelect').value);
-      printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
-      _layerData = await buildLayerData(s, printer);
-      if (!_layerData || !_layerData.length) { showToast('⚠ No geometry — draw something first'); return; }
-      const total = _layerData.length;
-      const slider = document.getElementById('layerSlider');
-      slider.max = total; slider.value = total;
-      let totalE = 0;
-      _layerData.forEach(l => totalE += l.filament);
-      const estMin = Math.round(_layerData.reduce((a,l)=>a+l.time,0)/60);
-      document.getElementById('lsTotalLayers').textContent = total;
-      document.getElementById('lsFilament').textContent    = totalE.toFixed(1);
-      document.getElementById('lsTime').textContent        = estMin + ' min';
-      document.getElementById('layerModal').classList.add('open');
-      layerDraw(total);
-    } catch(e) { showToast('ERROR: '+e.message); console.error(e); }
-    finally { btn.disabled=false; btn.textContent='◈ PREVIEW'; }
-  }, 50);
-}
-
-function layerDraw(idx) {
-  if (!_layerData) return;
-  const ld = _layerData[idx-1]; if (!ld) return;
-  document.getElementById('layerNum').textContent = idx+' / '+_layerData.length;
-  const cv = document.getElementById('layerCanvas');
-  const lctx = cv.getContext('2d');
-  const W=cv.width, H=cv.height;
-  const s=ld.settings;
-  const margin=24, sc=Math.min((W-margin*2)/s.physW,(H-margin*2)/s.physH);
-  const ox=(W-s.physW*sc)/2, oy=(H-s.physH*sc)/2;
-  const tx=x=>ox+x*sc, ty=y=>H-oy-y*sc;
-  lctx.clearRect(0,0,W,H);
-  lctx.fillStyle='#0d0d10'; lctx.fillRect(0,0,W,H);
-  lctx.strokeStyle='rgba(255,255,255,.1)'; lctx.lineWidth=1;
-  lctx.strokeRect(tx(0),ty(s.physH),s.physW*sc,s.physH*sc);
-  for (let li=Math.max(0,idx-4);li<idx-1;li++) {
-    const a=0.06+0.03*(li-(idx-5));
-    drawLayerPaths(lctx,_layerData[li],tx,ty,a);
-  }
-  drawLayerPaths(lctx,ld,tx,ty,1);
-  lctx.fillStyle='rgba(100,200,100,.7)'; lctx.font='10px monospace';
-  lctx.fillText('Z = '+ld.z.toFixed(3)+' mm  |  '+(ld.isBase?'BASE':'DESIGN'), tx(0)+4, ty(s.physH)+14);
-}
-
-function drawLayerPaths(lctx,ld,tx,ty,alpha) {
-  if (alpha>=0.9) {
-    lctx.strokeStyle='rgba(255,60,60,'+(alpha*0.35)+')';
-    lctx.lineWidth=0.5; lctx.setLineDash([2,4]);
-    for (const seg of ld.travels) {
-      lctx.beginPath(); lctx.moveTo(tx(seg[0].x),ty(seg[0].y));
-      lctx.lineTo(tx(seg[1].x),ty(seg[1].y)); lctx.stroke();
-    }
-    lctx.setLineDash([]);
-  }
-  lctx.strokeStyle='rgba(80,255,180,'+(alpha*0.55)+')'; lctx.lineWidth=0.8;
-  for (const seg of ld.infill) {
-    lctx.beginPath(); lctx.moveTo(tx(seg[0].x),ty(seg[0].y));
-    lctx.lineTo(tx(seg[1].x),ty(seg[1].y)); lctx.stroke();
-  }
-  lctx.strokeStyle=ld.isBase?'rgba(120,120,120,'+(alpha*0.8)+')':'rgba(255,140,0,'+alpha+')';
-  lctx.lineWidth=alpha>=0.9?1.5:0.8;
-  for (const ring of ld.perimeters) {
-    lctx.beginPath(); lctx.moveTo(tx(ring[0].x),ty(ring[0].y));
-    for (let i=1;i<ring.length;i++) lctx.lineTo(tx(ring[i].x),ty(ring[i].y));
-    lctx.closePath(); lctx.stroke();
-  }
-}
-
-function offsetRingBy(ring, dist) {
-  const cx=ring.reduce((s,p)=>s+p.x,0)/ring.length;
-  const cy=ring.reduce((s,p)=>s+p.y,0)/ring.length;
-  return ring.map(p=>{const dx=p.x-cx,dy=p.y-cy,d=Math.sqrt(dx*dx+dy*dy)||1;return{x:p.x-(dx/d)*dist,y:p.y-(dy/d)*dist};});
-}
-
-function infillSegments(outerRings, pitch) {
-  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  for (const r of outerRings) for (const p of r){if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;}
-  const segs=[];
-  for (let y=minY+pitch/2;y<maxY;y+=pitch) {
-    const xs=[];
-    for (const ring of outerRings){const n=ring.length;for(let i=0;i<n;i++){const a=ring[i],b=ring[(i+1)%n];if((a.y<=y&&b.y>y)||(b.y<=y&&a.y>y)){const t=(y-a.y)/(b.y-a.y);xs.push(a.x+t*(b.x-a.x));}}}
-    xs.sort((a,b)=>a-b);
-    for(let i=0;i+1<xs.length;i+=2) segs.push([{x:xs[i],y},{x:xs[i+1],y}]);
-  }
-  return segs;
-}
-
-async function buildLayerData(s, printer) {
-  const contours = await buildContours(s);
-  if(!contours.length) return null;
-  const withArea=contours.map(c=>({c,a:signedArea(c),ab:Math.abs(signedArea(c))}));
-  withArea.sort((x,y)=>y.ab-x.ab);
-  const norm=[];
-  for(const item of withArea){
-    const ref=item.c[0];let isHole=false;
-    for(const prev of norm) if(prev.isOuter&&pointInPoly(ref.x,ref.y,prev.c)){isHole=true;break;}
-    let poly=item.c;
-    if(!isHole&&item.a<0)poly=[...poly].reverse();
-    if(isHole&&item.a>0)poly=[...poly].reverse();
-    norm.push({c:poly,isOuter:!isHole});
-  }
-  const outers=norm.filter(x=>x.isOuter).map(x=>x.c);
-  const holes =norm.filter(x=>!x.isOuter).map(x=>x.c);
-  const layerH=s.layerH, nozzle=s.nozzle, extW=nozzle*1.1;
-  const filArea=Math.PI*(printer.filament/2)**2;
-  const sp=s.gcSpeedPrint||printer.speed_print;
-  const spFirst=s.gcSpeedFirst||printer.speed_first;
-  const midZ=s.includeBase?s.baseThick:0;
-  const topZ=midZ+s.designLayers*layerH;
-  const totalLayers=Math.round(topZ/layerH);
-  const baseLayers=Math.round(midZ/layerH);
-  const numPerim=s.numPerimeters||2;
-  const _density = (typeof window._infillDensity === 'number' ? window._infillDensity : 1.0);
-  const pitch = _density <= 0 ? Infinity : extW * 1.05 / Math.max(_density, 0.05);
-  const extAmt=len=>(len*layerH*extW)/filArea;
-  const segLen=(a,b)=>Math.sqrt((b.x-a.x)**2+(b.y-a.y)**2);
-  const layers=[];
-  let cx=0,cy=0;
-  for(let layer=1;layer<=totalLayers;layer++){
-    const z=layer*layerH, isBase=layer<=baseLayers;
-    const perimeters=[],infill=[],travels=[];
-    let filament=0;
-    const addTravel=(x,y)=>{travels.push([{x:cx,y:cy},{x,y}]);cx=x;cy=y;};
-    const addLine=(x0,y0,x1,y1)=>{filament+=extAmt(segLen({x:x0,y:y0},{x:x1,y:y1}));cx=x1;cy=y1;};
-    if(isBase&&s.includeBase){
-      const br=[{x:0,y:0},{x:s.physW,y:0},{x:s.physW,y:s.physH},{x:0,y:s.physH}];
-      perimeters.push(br);
-      addTravel(br[0].x,br[0].y);
-      for(let i=1;i<=br.length;i++){const p=br[i%br.length];addLine(cx,cy,p.x,p.y);}
-      for(const seg of infillSegments([br],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);}
-    }
-    if(!isBase){
-      for(const ring of outers){
-        for(let pi=0;pi<numPerim;pi++){
-          const pRing=pi===0?ring:offsetRingBy(ring,pi*extW);
-          if(pRing.length<3)continue;
-          perimeters.push(pRing);
-          addTravel(pRing[0].x,pRing[0].y);
-          for(let i=1;i<=pRing.length;i++){const p=pRing[i%pRing.length];addLine(cx,cy,p.x,p.y);}
-        }
-      }
-      for(const ring of holes){
-        if(ring.length<3) continue;
-        perimeters.push(ring);
-        addTravel(ring[0].x,ring[0].y);
-        for(let i=1;i<=ring.length;i++){const p=ring[i%ring.length];addLine(cx,cy,p.x,p.y);}
-      }
-      const innerRings=outers.map(r=>numPerim>1?offsetRingBy(r,(numPerim-1)*extW):r);
-      if (_density > 0) { for(const seg of infillSegments([...innerRings,...holes],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
-    }
-    const timeS=filament/sp*60;
-    // allRings for preview even-odd fill: all original contours (outers + holes)
-    const allRingsForPreview = norm.map(x=>x.c);
-    layers.push({z,isBase,perimeters,infill,travels,filament,time:timeS,settings:s,allRings:allRingsForPreview});
-  }
-  return layers;
-}
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// // ══════════════════════════════════════════════════════
+// //  LAYER PREVIEW
+// // ══════════════════════════════════════════════════════
+// let _layerData = null;
+// 
+// async function openLayerPreview() {
+//   const btn = document.getElementById('layerPreviewBtn');
+//   btn.disabled = true;
+//   btn.textContent = '⏳ SLICING...';
+//   setTimeout(async () => {
+//     try {
+//       const s = getSettings();
+//       const printer = getPrinterProfile(document.getElementById('printerSelect').value);
+//       printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+//       _layerData = await buildLayerData(s, printer);
+//       if (!_layerData || !_layerData.length) { showToast('⚠ No geometry — draw something first'); return; }
+//       const total = _layerData.length;
+//       const slider = document.getElementById('layerSlider');
+//       slider.max = total; slider.value = total;
+//       let totalE = 0;
+//       _layerData.forEach(l => totalE += l.filament);
+//       const estMin = Math.round(_layerData.reduce((a,l)=>a+l.time,0)/60);
+//       document.getElementById('lsTotalLayers').textContent = total;
+//       document.getElementById('lsFilament').textContent    = totalE.toFixed(1);
+//       document.getElementById('lsTime').textContent        = estMin + ' min';
+//       document.getElementById('layerModal').classList.add('open');
+//       layerDraw(total);
+//     } catch(e) { showToast('ERROR: '+e.message); console.error(e); }
+//     finally { btn.disabled=false; btn.textContent='◈ PREVIEW'; }
+//   }, 50);
+// }
+// 
+// function layerDraw(idx) {
+//   if (!_layerData) return;
+//   const ld = _layerData[idx-1]; if (!ld) return;
+//   document.getElementById('layerNum').textContent = idx+' / '+_layerData.length;
+//   const cv = document.getElementById('layerCanvas');
+//   const lctx = cv.getContext('2d');
+//   const W=cv.width, H=cv.height;
+//   const s=ld.settings;
+//   const margin=24, sc=Math.min((W-margin*2)/s.physW,(H-margin*2)/s.physH);
+//   const ox=(W-s.physW*sc)/2, oy=(H-s.physH*sc)/2;
+//   const tx=x=>ox+x*sc, ty=y=>H-oy-y*sc;
+//   lctx.clearRect(0,0,W,H);
+//   lctx.fillStyle='#0d0d10'; lctx.fillRect(0,0,W,H);
+//   lctx.strokeStyle='rgba(255,255,255,.1)'; lctx.lineWidth=1;
+//   lctx.strokeRect(tx(0),ty(s.physH),s.physW*sc,s.physH*sc);
+//   for (let li=Math.max(0,idx-4);li<idx-1;li++) {
+//     const a=0.06+0.03*(li-(idx-5));
+//     drawLayerPaths(lctx,_layerData[li],tx,ty,a);
+//   }
+//   drawLayerPaths(lctx,ld,tx,ty,1);
+//   lctx.fillStyle='rgba(100,200,100,.7)'; lctx.font='10px monospace';
+//   lctx.fillText('Z = '+ld.z.toFixed(3)+' mm  |  '+(ld.isBase?'BASE':'DESIGN'), tx(0)+4, ty(s.physH)+14);
+// }
+// 
+// function drawLayerPaths(lctx,ld,tx,ty,alpha) {
+//   if (alpha>=0.9) {
+//     lctx.strokeStyle='rgba(255,60,60,'+(alpha*0.35)+')';
+//     lctx.lineWidth=0.5; lctx.setLineDash([2,4]);
+//     for (const seg of ld.travels) {
+//       lctx.beginPath(); lctx.moveTo(tx(seg[0].x),ty(seg[0].y));
+//       lctx.lineTo(tx(seg[1].x),ty(seg[1].y)); lctx.stroke();
+//     }
+//     lctx.setLineDash([]);
+//   }
+//   lctx.strokeStyle='rgba(80,255,180,'+(alpha*0.55)+')'; lctx.lineWidth=0.8;
+//   for (const seg of ld.infill) {
+//     lctx.beginPath(); lctx.moveTo(tx(seg[0].x),ty(seg[0].y));
+//     lctx.lineTo(tx(seg[1].x),ty(seg[1].y)); lctx.stroke();
+//   }
+//   lctx.strokeStyle=ld.isBase?'rgba(120,120,120,'+(alpha*0.8)+')':'rgba(255,140,0,'+alpha+')';
+//   lctx.lineWidth=alpha>=0.9?1.5:0.8;
+//   for (const ring of ld.perimeters) {
+//     lctx.beginPath(); lctx.moveTo(tx(ring[0].x),ty(ring[0].y));
+//     for (let i=1;i<ring.length;i++) lctx.lineTo(tx(ring[i].x),ty(ring[i].y));
+//     lctx.closePath(); lctx.stroke();
+//   }
+// }
+// 
+// function offsetRingBy(ring, dist) {
+//   const cx=ring.reduce((s,p)=>s+p.x,0)/ring.length;
+//   const cy=ring.reduce((s,p)=>s+p.y,0)/ring.length;
+//   return ring.map(p=>{const dx=p.x-cx,dy=p.y-cy,d=Math.sqrt(dx*dx+dy*dy)||1;return{x:p.x-(dx/d)*dist,y:p.y-(dy/d)*dist};});
+// }
+// 
+// function infillSegments(outerRings, pitch) {
+//   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+//   for (const r of outerRings) for (const p of r){if(p.x<minX)minX=p.x;if(p.x>maxX)maxX=p.x;if(p.y<minY)minY=p.y;if(p.y>maxY)maxY=p.y;}
+//   const segs=[];
+//   for (let y=minY+pitch/2;y<maxY;y+=pitch) {
+//     const xs=[];
+//     for (const ring of outerRings){const n=ring.length;for(let i=0;i<n;i++){const a=ring[i],b=ring[(i+1)%n];if((a.y<=y&&b.y>y)||(b.y<=y&&a.y>y)){const t=(y-a.y)/(b.y-a.y);xs.push(a.x+t*(b.x-a.x));}}}
+//     xs.sort((a,b)=>a-b);
+//     for(let i=0;i+1<xs.length;i+=2) segs.push([{x:xs[i],y},{x:xs[i+1],y}]);
+//   }
+//   return segs;
+// }
+// 
+// async function buildLayerData(s, printer) {
+//   const contours = await buildContours(s);
+//   if(!contours.length) return null;
+//   const withArea=contours.map(c=>({c,a:signedArea(c),ab:Math.abs(signedArea(c))}));
+//   withArea.sort((x,y)=>y.ab-x.ab);
+//   const norm=[];
+//   for(const item of withArea){
+//     const ref=item.c[0];let isHole=false;
+//     for(const prev of norm) if(prev.isOuter&&pointInPoly(ref.x,ref.y,prev.c)){isHole=true;break;}
+//     let poly=item.c;
+//     if(!isHole&&item.a<0)poly=[...poly].reverse();
+//     if(isHole&&item.a>0)poly=[...poly].reverse();
+//     norm.push({c:poly,isOuter:!isHole});
+//   }
+//   const outers=norm.filter(x=>x.isOuter).map(x=>x.c);
+//   const holes =norm.filter(x=>!x.isOuter).map(x=>x.c);
+//   const layerH=s.layerH, nozzle=s.nozzle, extW=nozzle*1.1;
+//   const filArea=Math.PI*(printer.filament/2)**2;
+//   const sp=s.gcSpeedPrint||printer.speed_print;
+//   const spFirst=s.gcSpeedFirst||printer.speed_first;
+//   const midZ=s.includeBase?s.baseThick:0;
+//   const topZ=midZ+s.designLayers*layerH;
+//   const totalLayers=Math.round(topZ/layerH);
+//   const baseLayers=Math.round(midZ/layerH);
+//   const numPerim=s.numPerimeters||2;
+//   const _density = (typeof window._infillDensity === 'number' ? window._infillDensity : 1.0);
+//   const pitch = _density <= 0 ? Infinity : extW * 1.05 / Math.max(_density, 0.05);
+//   const extAmt=len=>(len*layerH*extW)/filArea;
+//   const segLen=(a,b)=>Math.sqrt((b.x-a.x)**2+(b.y-a.y)**2);
+//   const layers=[];
+//   let cx=0,cy=0;
+//   for(let layer=1;layer<=totalLayers;layer++){
+//     const z=layer*layerH, isBase=layer<=baseLayers;
+//     const perimeters=[],infill=[],travels=[];
+//     let filament=0;
+//     const addTravel=(x,y)=>{travels.push([{x:cx,y:cy},{x,y}]);cx=x;cy=y;};
+//     const addLine=(x0,y0,x1,y1)=>{filament+=extAmt(segLen({x:x0,y:y0},{x:x1,y:y1}));cx=x1;cy=y1;};
+//     if(isBase&&s.includeBase){
+//       const br=[{x:0,y:0},{x:s.physW,y:0},{x:s.physW,y:s.physH},{x:0,y:s.physH}];
+//       perimeters.push(br);
+//       addTravel(br[0].x,br[0].y);
+//       for(let i=1;i<=br.length;i++){const p=br[i%br.length];addLine(cx,cy,p.x,p.y);}
+//       for(const seg of infillSegments([br],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);}
+//     }
+//     if(!isBase){
+//       for(const ring of outers){
+//         for(let pi=0;pi<numPerim;pi++){
+//           const pRing=pi===0?ring:offsetRingBy(ring,pi*extW);
+//           if(pRing.length<3)continue;
+//           perimeters.push(pRing);
+//           addTravel(pRing[0].x,pRing[0].y);
+//           for(let i=1;i<=pRing.length;i++){const p=pRing[i%pRing.length];addLine(cx,cy,p.x,p.y);}
+//         }
+//       }
+//       for(const ring of holes){
+//         if(ring.length<3) continue;
+//         perimeters.push(ring);
+//         addTravel(ring[0].x,ring[0].y);
+//         for(let i=1;i<=ring.length;i++){const p=ring[i%ring.length];addLine(cx,cy,p.x,p.y);}
+//       }
+//       const innerRings=outers.map(r=>numPerim>1?offsetRingBy(r,(numPerim-1)*extW):r);
+//       if (_density > 0) { for(const seg of infillSegments([...innerRings,...holes],pitch)){addTravel(seg[0].x,seg[0].y);infill.push(seg);addLine(seg[0].x,seg[0].y,seg[1].x,seg[1].y);} }
+//     }
+//     const timeS=filament/sp*60;
+//     // allRings for preview even-odd fill: all original contours (outers + holes)
+//     const allRingsForPreview = norm.map(x=>x.c);
+//     layers.push({z,isBase,perimeters,infill,travels,filament,time:timeS,settings:s,allRings:allRingsForPreview});
+//   }
+//   return layers;
+// }
 
 
 // ══════════════════════════════════════════════════════
@@ -3466,11 +3514,12 @@ async function buildLayerData(s, printer) {
 //  then tessellates at configurable resolution.
 // ══════════════════════════════════════════════════════
 
-function updateSmoothUI() {
-  const mode = document.getElementById('smoothMode').value;
-  document.getElementById('chaikinUI').style.display = mode==='chaikin' ? '' : 'none';
-  document.getElementById('bezierUI').style.display  = mode==='bezier'  ? '' : 'none';
-}
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// function updateSmoothUI() {
+//   const mode = document.getElementById('smoothMode').value;
+//   document.getElementById('chaikinUI').style.display = mode==='chaikin' ? '' : 'none';
+//   document.getElementById('bezierUI').style.display  = mode==='bezier'  ? '' : 'none';
+// }
 
 // Cubic bezier point at parameter t
 function bezierPoint(p0,p1,p2,p3,t) {
@@ -3591,93 +3640,94 @@ function bezierFitAndTessellate(pts, tol, tessN) {
 }
 
 
-// ══════════════════════════════════════════════════════
-//  OCTOPRINT INTEGRATION
-// ══════════════════════════════════════════════════════
-let _octoConnected = false;
-
-function openOctoModal() {
-  document.getElementById('octoModal').classList.add('open');
-}
-
-function octoLog(msg, cls='') {
-  const el = document.getElementById('octoStatus');
-  el.innerHTML = cls ? `<span class="${cls}">${msg}</span>` : msg;
-}
-
-async function octoTest() {
-  const host = document.getElementById('octoHost').value.trim().replace(/\/$/, '');
-  const key  = document.getElementById('octoKey').value.trim();
-  if (!host || !key) { octoLog('Host and API key are required.', 'err'); return; }
-
-  octoLog('Connecting…', 'inf');
-  document.getElementById('octoTestBtn').disabled = true;
-
-  try {
-    const r = await fetch(`${host}/api/version`, {
-      headers: { 'X-Api-Key': key, 'Content-Type': 'application/json' }
-    });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const data = await r.json();
-    _octoConnected = true;
-    octoLog(`<span class="ok">✓ Connected — OctoPrint ${data.server || ''}, API ${data.api || ''}</span>`);
-    document.getElementById('octoSendBtn').disabled = false;
-  } catch(e) {
-    _octoConnected = false;
-    octoLog(`<span class="err">✗ Failed: ${e.message}</span><br>Check host URL, API key, and that OctoPrint is running.`);
-    document.getElementById('octoSendBtn').disabled = true;
-  }
-  document.getElementById('octoTestBtn').disabled = false;
-}
-
-async function octoSend() {
-  const host = document.getElementById('octoHost').value.trim().replace(/\/$/, '');
-  const key  = document.getElementById('octoKey').value.trim();
-  const btn  = document.getElementById('octoSendBtn');
-
-  btn.disabled = true;
-  btn.textContent = '⧗';
-  octoLog('Generating G-code…', 'inf');
-
-  try {
-    const s = getSettings();
-    const printer = getPrinterProfile(document.getElementById('printerSelect').value);
-    printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
-    const gcode = await generateGcode(s, printer);
-    if (!gcode) { octoLog('No geometry — draw something first.', 'err'); return; }
-
-    const slug = getProjectSlug();
-    const filename = `${slug}_${s.physW}x${s.physH}mm.gcode`;
-
-    octoLog('Uploading to OctoPrint…', 'inf');
-
-    // Upload file
-    const formData = new FormData();
-    const blob = new Blob([gcode], { type: 'text/plain' });
-    formData.append('file', blob, filename);
-    formData.append('select', 'true');
-    formData.append('print', 'true');  // start print immediately
-
-    const r = await fetch(`${host}/api/files/local`, {
-      method: 'POST',
-      headers: { 'X-Api-Key': key },
-      body: formData
-    });
-
-    if (!r.ok) {
-      const err = await r.text();
-      throw new Error(`Upload failed: HTTP ${r.status} — ${err.slice(0,120)}`);
-    }
-
-    const data = await r.json();
-    octoLog(`<span class="ok">✓ Uploaded & printing: ${filename}<br>${Math.round(gcode.length/1024)}KB · ${gcode.split('\\n').length} lines</span>`);
-  } catch(e) {
-    octoLog(`<span class="err">✗ ${e.message}</span>`);
-  }
-
-  btn.disabled = false;
-  btn.textContent = '▶ SLICE & PRINT';
-}
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// // ══════════════════════════════════════════════════════
+// //  OCTOPRINT INTEGRATION
+// // ══════════════════════════════════════════════════════
+// let _octoConnected = false;
+// 
+// function openOctoModal() {
+//   document.getElementById('octoModal').classList.add('open');
+// }
+// 
+// function octoLog(msg, cls='') {
+//   const el = document.getElementById('octoStatus');
+//   el.innerHTML = cls ? `<span class="${cls}">${msg}</span>` : msg;
+// }
+// 
+// async function octoTest() {
+//   const host = document.getElementById('octoHost').value.trim().replace(/\/$/, '');
+//   const key  = document.getElementById('octoKey').value.trim();
+//   if (!host || !key) { octoLog('Host and API key are required.', 'err'); return; }
+// 
+//   octoLog('Connecting…', 'inf');
+//   document.getElementById('octoTestBtn').disabled = true;
+// 
+//   try {
+//     const r = await fetch(`${host}/api/version`, {
+//       headers: { 'X-Api-Key': key, 'Content-Type': 'application/json' }
+//     });
+//     if (!r.ok) throw new Error(`HTTP ${r.status}`);
+//     const data = await r.json();
+//     _octoConnected = true;
+//     octoLog(`<span class="ok">✓ Connected — OctoPrint ${data.server || ''}, API ${data.api || ''}</span>`);
+//     document.getElementById('octoSendBtn').disabled = false;
+//   } catch(e) {
+//     _octoConnected = false;
+//     octoLog(`<span class="err">✗ Failed: ${e.message}</span><br>Check host URL, API key, and that OctoPrint is running.`);
+//     document.getElementById('octoSendBtn').disabled = true;
+//   }
+//   document.getElementById('octoTestBtn').disabled = false;
+// }
+// 
+// async function octoSend() {
+//   const host = document.getElementById('octoHost').value.trim().replace(/\/$/, '');
+//   const key  = document.getElementById('octoKey').value.trim();
+//   const btn  = document.getElementById('octoSendBtn');
+// 
+//   btn.disabled = true;
+//   btn.textContent = '⧗';
+//   octoLog('Generating G-code…', 'inf');
+// 
+//   try {
+//     const s = getSettings();
+//     const printer = getPrinterProfile(document.getElementById('printerSelect').value);
+//     printer.filament = parseFloat(document.getElementById('gcFilDia').value) || 1.75;
+//     const gcode = await generateGcode(s, printer);
+//     if (!gcode) { octoLog('No geometry — draw something first.', 'err'); return; }
+// 
+//     const slug = getProjectSlug();
+//     const filename = `${slug}_${s.physW}x${s.physH}mm.gcode`;
+// 
+//     octoLog('Uploading to OctoPrint…', 'inf');
+// 
+//     // Upload file
+//     const formData = new FormData();
+//     const blob = new Blob([gcode], { type: 'text/plain' });
+//     formData.append('file', blob, filename);
+//     formData.append('select', 'true');
+//     formData.append('print', 'true');  // start print immediately
+// 
+//     const r = await fetch(`${host}/api/files/local`, {
+//       method: 'POST',
+//       headers: { 'X-Api-Key': key },
+//       body: formData
+//     });
+// 
+//     if (!r.ok) {
+//       const err = await r.text();
+//       throw new Error(`Upload failed: HTTP ${r.status} — ${err.slice(0,120)}`);
+//     }
+// 
+//     const data = await r.json();
+//     octoLog(`<span class="ok">✓ Uploaded & printing: ${filename}<br>${Math.round(gcode.length/1024)}KB · ${gcode.split('\\n').length} lines</span>`);
+//   } catch(e) {
+//     octoLog(`<span class="err">✗ ${e.message}</span>`);
+//   }
+// 
+//   btn.disabled = false;
+//   btn.textContent = '▶ SLICE & PRINT';
+// }
 
 
 // ── Brush size presets ────────────────────────────────
@@ -3694,121 +3744,123 @@ function setBrushPreset(size) {
 // Keep presets in sync when input changes manually
 const _origUpdateBrush = window.updateBrush;
 
-// ── USB port purge + reconnect ────────────────────────
-async function usbPurge() {
-  pLog('Purging port…', 'inf');
-  // Close any open port
-  if (_port) {
-    try {
-      if (_reader) {
-        try { await _reader.cancel(); } catch(e) {}
-        _reader = null;
-      }
-      try { await _port.close(); } catch(e) {}
-      _port = null;
-    } catch(e) {}
-  }
-  // Try to release any forgotten ports via getPorts()
-  if ('serial' in navigator) {
-    try {
-      const ports = await navigator.serial.getPorts();
-      for (const p of ports) {
-        try { await p.close(); } catch(e) {}
-      }
-      pLog('Ports released. Click CONNECT USB to try again.', 'ok');
-    } catch(e) {
-      pLog('Purge done. Click CONNECT USB to try again.', 'ok');
-    }
-  }
-  // Reset UI
-  const btn = document.getElementById('printConnectBtn');
-  btn.textContent = '🔌 CONNECT USB';
-  btn.disabled = false;
-  document.getElementById('printStartBtn').disabled = true;
-  pStat('disconnected');
-  pPort('—');
-}
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// // ── USB port purge + reconnect ────────────────────────
+// async function usbPurge() {
+//   pLog('Purging port…', 'inf');
+//   // Close any open port
+//   if (_port) {
+//     try {
+//       if (_reader) {
+//         try { await _reader.cancel(); } catch(e) {}
+//         _reader = null;
+//       }
+//       try { await _port.close(); } catch(e) {}
+//       _port = null;
+//     } catch(e) {}
+//   }
+//   // Try to release any forgotten ports via getPorts()
+//   if ('serial' in navigator) {
+//     try {
+//       const ports = await navigator.serial.getPorts();
+//       for (const p of ports) {
+//         try { await p.close(); } catch(e) {}
+//       }
+//       pLog('Ports released. Click CONNECT USB to try again.', 'ok');
+//     } catch(e) {
+//       pLog('Purge done. Click CONNECT USB to try again.', 'ok');
+//     }
+//   }
+//   // Reset UI
+//   const btn = document.getElementById('printConnectBtn');
+//   btn.textContent = '🔌 CONNECT USB';
+//   btn.disabled = false;
+//   document.getElementById('printStartBtn').disabled = true;
+//   pStat('disconnected');
+//   pPort('—');
+// }
 
 
-// ══════════════════════════════════════════════════════
-//  PRINT QUALITY PRESETS
-// ══════════════════════════════════════════════════════
-
-// infillDensity: 0 = perimeters only, 1 = full solid
-// Stored as s.infillDensity and used in generateGcode + buildLayerData
-let _printQuality = 'standard';
-
-const QUALITY_PRESETS = {
-  draft: {
-    simplifyEps:   3.0,   // aggressive simplification
-    smoothMode:    'chaikin',
-    chaikinPasses: 2,
-    bezierTess:    4,
-    numPerimeters: 1,     // single shell
-    infillDensity: 1.0,   // solid surface — required for ink transfer
-    gcSpeedPrint:  100,   // fast
-    gcSpeedTravel: 250,
-    gcSpeedFirst:  35,
-  },
-  standard: {
-    simplifyEps:   1.5,
-    smoothMode:    'bezier',
-    bezierTol:     1.5,
-    bezierTess:    8,
-    numPerimeters: 2,
-    infillDensity: 1.0,   // solid — stamps need full surface
-    gcSpeedPrint:  70,
-    gcSpeedTravel: 180,
-    gcSpeedFirst:  25,
-  },
-  fine: {
-    simplifyEps:   0.8,
-    smoothMode:    'bezier',
-    bezierTol:     1.0,
-    bezierTess:    16,
-    numPerimeters: 3,
-    infillDensity: 1.0,   // 100% solid
-    gcSpeedPrint:  40,
-    gcSpeedTravel: 120,
-    gcSpeedFirst:  15,
-  },
-};
-
-function setPrintQuality(q) {
-  _printQuality = q;
-  const p = QUALITY_PRESETS[q];
-  if (!p) return;
-
-  // Update quality button states
-  document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
-  const qBtn = document.getElementById('q-' + q);
-  if (qBtn) qBtn.classList.add('active');
-
-  // Apply settings to UI fields
-  document.getElementById('simplifyEps').value   = p.simplifyEps;
-  document.getElementById('smoothMode').value    = p.smoothMode;
-  updateSmoothUI();
-
-  if (p.smoothMode === 'chaikin')
-    document.getElementById('chaikinPasses').value = p.chaikinPasses;
-  if (p.smoothMode === 'bezier' && p.bezierTess)
-    document.getElementById('bezierTess').value = p.bezierTess;
-  if (p.bezierTol)
-    document.getElementById('bezierTol').value = p.bezierTol;
-
-  document.getElementById('numPerimeters').value   = p.numPerimeters;
-  document.getElementById('gcSpeedPrint').value    = p.gcSpeedPrint;
-  document.getElementById('gcSpeedTravel').value   = p.gcSpeedTravel;
-  document.getElementById('gcSpeedFirst').value    = p.gcSpeedFirst;
-
-  // Store infill density so gcode engine picks it up
-  window._infillDensity = p.infillDensity;
-
-  showToast('Quality: ' + q.toUpperCase() + ' — infill ' + Math.round(p.infillDensity*100) + '%');
-}
-
-// Init default
-window._infillDensity = QUALITY_PRESETS.standard.infillDensity;
+// [FUTURE RELEASE — 3D printing / G-code / printer comms disabled for STL-only release. See README roadmap.]
+// // ══════════════════════════════════════════════════════
+// //  PRINT QUALITY PRESETS
+// // ══════════════════════════════════════════════════════
+// 
+// // infillDensity: 0 = perimeters only, 1 = full solid
+// // Stored as s.infillDensity and used in generateGcode + buildLayerData
+// let _printQuality = 'standard';
+// 
+// const QUALITY_PRESETS = {
+//   draft: {
+//     simplifyEps:   3.0,   // aggressive simplification
+//     smoothMode:    'chaikin',
+//     chaikinPasses: 2,
+//     bezierTess:    4,
+//     numPerimeters: 1,     // single shell
+//     infillDensity: 1.0,   // solid surface — required for ink transfer
+//     gcSpeedPrint:  100,   // fast
+//     gcSpeedTravel: 250,
+//     gcSpeedFirst:  35,
+//   },
+//   standard: {
+//     simplifyEps:   1.5,
+//     smoothMode:    'bezier',
+//     bezierTol:     1.5,
+//     bezierTess:    8,
+//     numPerimeters: 2,
+//     infillDensity: 1.0,   // solid — stamps need full surface
+//     gcSpeedPrint:  70,
+//     gcSpeedTravel: 180,
+//     gcSpeedFirst:  25,
+//   },
+//   fine: {
+//     simplifyEps:   0.8,
+//     smoothMode:    'bezier',
+//     bezierTol:     1.0,
+//     bezierTess:    16,
+//     numPerimeters: 3,
+//     infillDensity: 1.0,   // 100% solid
+//     gcSpeedPrint:  40,
+//     gcSpeedTravel: 120,
+//     gcSpeedFirst:  15,
+//   },
+// };
+// 
+// function setPrintQuality(q) {
+//   _printQuality = q;
+//   const p = QUALITY_PRESETS[q];
+//   if (!p) return;
+// 
+//   // Update quality button states
+//   document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
+//   const qBtn = document.getElementById('q-' + q);
+//   if (qBtn) qBtn.classList.add('active');
+// 
+//   // Apply settings to UI fields
+//   document.getElementById('simplifyEps').value   = p.simplifyEps;
+//   document.getElementById('smoothMode').value    = p.smoothMode;
+//   updateSmoothUI();
+// 
+//   if (p.smoothMode === 'chaikin')
+//     document.getElementById('chaikinPasses').value = p.chaikinPasses;
+//   if (p.smoothMode === 'bezier' && p.bezierTess)
+//     document.getElementById('bezierTess').value = p.bezierTess;
+//   if (p.bezierTol)
+//     document.getElementById('bezierTol').value = p.bezierTol;
+// 
+//   document.getElementById('numPerimeters').value   = p.numPerimeters;
+//   document.getElementById('gcSpeedPrint').value    = p.gcSpeedPrint;
+//   document.getElementById('gcSpeedTravel').value   = p.gcSpeedTravel;
+//   document.getElementById('gcSpeedFirst').value    = p.gcSpeedFirst;
+// 
+//   // Store infill density so gcode engine picks it up
+//   window._infillDensity = p.infillDensity;
+// 
+//   showToast('Quality: ' + q.toUpperCase() + ' — infill ' + Math.round(p.infillDensity*100) + '%');
+// }
+// 
+// // Init default
+// window._infillDensity = QUALITY_PRESETS.standard.infillDensity;
 
 
 // Keyboard shortcuts
